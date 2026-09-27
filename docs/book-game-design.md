@@ -193,8 +193,12 @@ Twin Kings (hit both or one heals), Spore Choir (clogs a power), Tiny Tyrant (gu
 ## 12. The AI setup (free, no Claude usage)
 | Role | Main | Backup |
 |---|---|---|
-| Judge (smart) | **Groq**: GPT-OSS 120B or Llama 3.3 70B | Gemini Flash-Lite |
-| Storyteller (fast) | **Groq**: Llama 3.1 8B Instant (very high free limits) | Gemini Flash-Lite |
+| Judge (smart) | **Groq**: GPT-OSS 120B → Qwen 3.8 27B → GPT-OSS 20B | Gemini 3.5 Flash-Lite → Flash-Lite latest → Gemini 3.8 Flash |
+| Storyteller (fast) | **Groq**: GPT-OSS 20B → Qwen 3.8 27B | Gemini 3.5 Flash-Lite, then GPT-OSS 120B |
+
+*(Updated Sep 2026: Groq retired its Llama models, and old Gemini 2.x models are closed to new keys.)* Each Groq model has its
+own free per-minute budget (about 8,000 tokens/min, ~1,000 requests/day), and one judge call is ~1,500 tokens, so the chain
+spreads fast play across several models instead of stalling.
 
 - Your keys are pasted into Settings once and stored only in your browser.
 - Each turn = 1 Judge call + 1 Storyteller call. Messages are kept short so free daily limits cover long play sessions. Groq's big models give about 1,000 requests a day, capped by daily token limits.
@@ -227,7 +231,18 @@ Twin Kings (hit both or one heals), Spore Choir (clogs a power), Tiny Tyrant (gu
 3. **Trial run:** the first page of your first book is a tutorial. The narrator is generous and explains each verdict. After that, normal strictness.
 4. No extra content requests. Use the designs above.
 
-## 16. Playtesting help (built into the game)
+## 16. AI upgrades from real-AI playtesting (Sep 2026)
+Tested headlessly against the live Groq and Gemini APIs; fixes made from what actually went wrong:
+- **Fairer Judge.** It was calling creative ideas impossible ("blast them" with Super Strength, vines from library books). Now: generic attack words mean the power's natural attack; a power acting *through* a scene object stays natural; missing environment NEEDS never make something impossible (the engine already weakens it); ties go to the kinder verdict; it judges the core of an action and ignores impossible flourishes. Hard limits (solid fire, healing lightning, exploding bread, summoning dragons) still fail.
+- **No power unless you use it.** Jokes, juggling, climbing etc. no longer get a power attached (which used to make them fizzle).
+- **Asks instead of guessing.** Vague input ("do something clever") gets a question with two concrete ideas, and no turn is used.
+- **Hints that work.** Every impossible *and* fizzled stretch now says what would work right now.
+- **Memory.** The Judge sees your last 3 actions, so "again" works and near-copies score low on creativity.
+- **Better narration.** 1–2 punchy sentences, always whole sentences (no more cut-off text), grounded in the real outcome, never repeating the previous line.
+- **Bosses talk back.** Each boss turn adds a short in-character line reacting to what you did.
+- **The Host has taste.** The AI rates each act 1–5 ⭐ in the Host's voice, remembers your earlier acts, and hates reruns. The rating scales the Amusement gain.
+
+## 17. Playtesting help (built into the game)
 - ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.
 - An indicator showing which AI is currently narrating.
 - 🐞 **Report** button: copies your last few turns (what you typed, the verdict, what happened) so you can paste it to Claude with "this was wrong because…".

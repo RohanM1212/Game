@@ -12,7 +12,9 @@ so the AI can't be talked into "I win".
 - **Setup (once):** get free keys from [Groq](https://console.groq.com/keys) (main) and [Google AI Studio](https://aistudio.google.com/apikey) (backup).
   Open the game in Chrome, go to ⚙️ Settings, paste them, and press **Save & Test AI**.
   Keys stay in your browser only. They're never in backup codes or bug reports.
-- **Free-limit fallback:** if one model hits its free daily limit, the game automatically switches to the next one.
+- **Free-limit fallback:** if one model hits its free limit, the game automatically switches to the next one (Groq GPT-OSS / Qwen, then Gemini).
+- **AI that plays fair:** creative ideas are rewarded instead of punished, vague ones get a helpful question, bosses talk back, and the Unseen Host rates your acts ⭐1–5.
+- Already set up before Sep 2026? Nothing to do — the game switches to the new models by itself.
 - **Every power has a sheet:** natural uses, stretches (with minimum level), hard limits, environment needs, and a unique signature rule. See the Power Codex in-game.
 - 6 worlds, 16 objective types, 13 adaptive bosses, the Unseen Host, wheels, fusion, items, and 1–4 player hot-seat co-op/versus.
 - 🐞 in-game button copies a bug report (last turns + AI verdicts) to paste to Claude.

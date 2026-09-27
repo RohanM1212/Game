@@ -1343,6 +1343,7 @@ async function actInner(text) {
   if (!host) P.target = P.target || defaultTarget(P, C);
   const val = validateVerdict(pi, P, C);
   P.verdict = val.v;
+  remember(p, text, P.verdict);
   const dbg = { text, via: via ? via.p + '/' + via.m : 'keyword', judge: J, verdict: P.verdict, why: P.why || '' };
   (L.debug = L.debug || []).push(dbg); if (L.debug.length > 8) L.debug.shift();
   val.notes.forEach(n => log('note', n));
@@ -1356,7 +1357,7 @@ async function actInner(text) {
   }
   if (P.verdict === 'fizzle') {
     p.en = Math.max(0, p.en - 2);
-    log('bad', `🌀 That's a <b>stretch</b> that needs power level ${P.need} — it fizzles out. ${P.why ? '(' + esc(P.why) + ')' : ''} Upgrade your power in the shop to pull it off.`);
+    log('bad', `🌀 That's a <b>stretch</b> that needs power level ${P.need} — it fizzles out. ${P.why ? '(' + esc(P.why) + ')' : ''} Upgrade your power in the shop to pull it off.${P.hint ? ` 💡 <i>Works now: ${esc(P.hint)}</i>` : ''}`);
     return finishTurn(pi, P, host);
   }
   if (!host && C.boss) bossPreCheck(pi, P, C);
@@ -1410,11 +1411,12 @@ async function exploreAct(pi, text, P0) {
   if (!P.ap && (!P.world || P.world === 'none')) { log('note', '🤔 The narrator isn\'t sure what you want to do. Try moving, or something like “climb the tower to look around”, “freeze the river”, “ask the villagers about the goal”.'); return save(); }
   P.ap = P.ap || 'knowledge';
   const val = validateVerdict(pi, P, pseudo); P.verdict = val.v;
+  remember(p, text, P.verdict);
   (L.debug = L.debug || []).push({ text, via: AIC.last ? AIC.last.p + '/' + AIC.last.m : 'keyword', judge: J, verdict: P.verdict, why: P.why || '' }); if (L.debug.length > 8) L.debug.shift();
   val.notes.forEach(n => log('note', n));
   if (R.trial && P.verdict !== 'fizzle' && P.verdict !== 'impossible') log('note', `📘 <b>Tutorial:</b> that's <b>${{ natural: '✅ Natural', stretch: '🌀 a Stretch' }[P.verdict]}</b>${P.why ? ' — ' + esc(P.why.replace(/[.!]+$/, '')) : ''}.`);
   if (P.verdict === 'impossible') { log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'Your power can\'t do that.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
-  if (P.verdict === 'fizzle') { p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.`); return save(); }
+  if (P.verdict === 'fizzle') { p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.${P.hint ? ` 💡 <i>Works now: ${esc(P.hint)}</i>` : ''}`); return save(); }
   const ev = evaluate(pi, P, pseudo);
   p.en = Math.min(p.maxEn, p.en + Math.floor(ev.cost / 2)); // world actions cost half energy
   const mark = L.log.length;
@@ -1423,15 +1425,21 @@ async function exploreAct(pi, text, P0) {
   if (R.players.length > 1 && !L.ch) R.cur = nextHostPlayer();
   save();
 }
+function remember(p, text, v) { const L = R.level; (L.hist = L.hist || []).push({ who: p.name, text: String(text).slice(0, 80), v }); if (L.hist.length > 8) L.hist.shift(); }
 async function story(pi, P, text, outcome, J, idx) {
   if (!J || !aiReady()) return;
   const C = R.level.ch;
   try {
     const L = R.level, cell = L.kind === 'map' ? L.cells[L.y * L.w + L.x] : null;
     const clean = String(outcome).replace(/[+−-]?\d+%?/g, '').replace(/\(\s*\)/g, '').replace(/\s+/g, ' ');
-    const s = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined });
-    if (s && R.level.log[idx] && R.level.log[idx].c === 'nar') R.level.log[idx].h = esc(s);
-    else if (s) R.level.log.splice(idx, 0, { c: 'nar', h: esc(s) });
+    const enemies = C ? C.threats.filter(t => t.hp > 0).map(t => t.n) : [];
+    const { story: s, says } = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, enemies: enemies.length ? enemies : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined, previous: L.lastStory || undefined });
+    if (!s) return;
+    L.lastStory = s;
+    const lines = [{ c: 'nar', h: esc(s) }];
+    if (says && C && C.boss) lines.push({ c: 'note', h: `🗣️ <b>${esc(C.boss.n)}:</b> “${esc(says)}”` });
+    if (R.level.log[idx] && R.level.log[idx].c === 'nar') R.level.log.splice(idx, 1, ...lines);
+    else R.level.log.splice(idx, 0, ...lines);
   } catch (e) { AIC.lastErr = e.message; }
 }
 function doRest(pi, text, host) {
@@ -1967,15 +1975,21 @@ function hostResolve(pi, P, ev) {
   if (['entertain', 'trick', 'persuade'].includes(ap)) {
     let gain = ev.score * { entertain: 1, trick: .75, persuade: .6 }[ap];
     const cnt = L.nov[pi] && L.nov[pi][ev.sig] || 0;
-    if (cnt > 1) { gain *= .6; log('note', '🎩 "A RERUN? Boooring."'); }
+    const quip = t => { if (!P.hostLine) log('note', t); }; // the AI Host speaks for himself when he can
+    if (cnt > 1) { gain *= .6; quip('🎩 "A RERUN? Boooring."'); }
     const re = ev.traits.filter(t => (S.hostMem || []).includes(t));
-    if (re.length && ev.traits.length === re.length) { gain *= .6; log('note', `🎩 "Ah, ${re.join(' and ')} again. I've seen this act before..."`); }
+    if (re.length && ev.traits.length === re.length) { gain *= .6; quip(`🎩 "Ah, ${re.join(' and ')} again. I've seen this act before..."`); }
     if (L.variant === 'critic') {
       const liked = ev.traits.filter(t => L.likes.includes(t));
       if (liked.length) { gain *= 1.8; log('note', `🎩 "YES! ${liked.join(', ')}! Now THAT is art!"`); }
       else { gain *= .5; const h = L.likes.find(t => !L.hinted.includes(t)) || pick(L.likes); if (!L.hinted.includes(h)) L.hinted.push(h); log('note', `🎩 "Meh. Where is the... <b>${h}</b>? Give me ${h}!"`); }
     }
     if (L.variant === 'sleeper' && L.amuse < 30) { L.noise += 30; gain *= .3; log('note', '💤 The snoring stutters... Performing is LOUD.'); }
+    if (P.hostRating) { // the AI Host judged how entertaining the act really was
+      gain = gain * [.35, .7, 1, 1.35, 1.8][P.hostRating - 1] + Math.max(0, P.hostRating - 3) * 5;
+      if (P.hostLine && !(L.variant === 'sleeper' && L.amuse < 30)) log('note', `🎩 “${esc(P.hostLine)}” <span class="small">(${'⭐'.repeat(P.hostRating)})</span>`);
+    }
+    const last = (L.hist || []).slice(-1)[0]; if (last) { (L.acts = L.acts || []).push(last.text); if (L.acts.length > 8) L.acts.shift(); }
     gain = Math.round(gain);
     L.amuse = Math.min(100, L.amuse + gain); L.bored = 0; L.annoy = Math.max(0, L.annoy - Math.round(gain / 3));
     ev.traits.forEach(t => L.usedTr[t] = (L.usedTr[t] || 0) + 1);
@@ -2036,15 +2050,18 @@ const PROV = {
   groq: { n: 'Groq', base: 'https://api.groq.com/openai/v1' },
   gemini: { n: 'Gemini', base: 'https://generativelanguage.googleapis.com/v1beta/openai' },
 };
+// Model lineups (checked Sep 2026 — Groq retired its Llama models). Each Groq model has its OWN free
+// per-minute budget, so spreading turns across several models keeps the narrator from stalling.
+const CHAIN_V = 2;
 const PREF = {
-  judge: [['groq', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'qwen/qwen3-32b']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash']], ['groq', ['llama-3.1-8b-instant']]],
-  story: [['groq', ['openai/gpt-oss-20b', 'llama-3.3-70b-versatile']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite']], ['groq', ['openai/gpt-oss-120b', 'llama-3.1-8b-instant']]],
+  judge: [['groq', ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b']], ['gemini', ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.8-flash', 'gemini-flash-latest']]],
+  story: [['groq', ['openai/gpt-oss-20b', 'qwen/qwen3.8-27b']], ['gemini', ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest']], ['groq', ['openai/gpt-oss-120b']]],
 };
 const AIC = { cool: {}, dead: {}, badKey: {}, last: null, lastErr: '' };
 const aiReady = () => KEYS.on !== false && (KEYS.groq || KEYS.gemini);
 function chainFor(role) {
   const out = [];
-  const resolved = KEYS.chains && KEYS.chains[role];
+  const resolved = KEYS.chainsV === CHAIN_V && KEYS.chains && KEYS.chains[role];
   if (resolved && resolved.length) return resolved.filter(x => KEYS[x.p]);
   PREF[role].forEach(([p, ms]) => { if (KEYS[p]) ms.forEach(m => out.push({ p, m })); });
   return out;
@@ -2052,15 +2069,19 @@ function chainFor(role) {
 async function chat(p, m, messages, o = {}) {
   const body = { model: m, messages, temperature: o.temp ?? .4, max_tokens: o.max ?? 400 };
   if (o.json) body.response_format = { type: 'json_object' };
+  // keep "thinking" short so it doesn't eat the reply (and the free per-minute budget)
   if (p === 'groq' && m.startsWith('openai/gpt-oss')) body.reasoning_effort = 'low';
+  else if (p === 'groq' && m.startsWith('qwen/')) body.reasoning_effort = 'none';
+  else if (p === 'gemini') body.reasoning_effort = 'low'; // 'none' + JSON mode is rejected by some Gemini models
+  const send = () => fetch(PROV[p].base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEYS[p] }, body: JSON.stringify(body), signal: ctl.signal });
   const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), o.timeout || 25000);
   try {
-    let res = await fetch(PROV[p].base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEYS[p] }, body: JSON.stringify(body), signal: ctl.signal });
-    if (res.status === 400 && o.json) { delete body.response_format; delete body.reasoning_effort; res = await fetch(PROV[p].base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEYS[p] }, body: JSON.stringify(body), signal: ctl.signal }); }
+    let res = await send();
+    if (res.status === 400 && (body.response_format || body.reasoning_effort)) { delete body.response_format; delete body.reasoning_effort; res = await send(); }
     if (!res.ok) { const t = await res.text().catch(() => ''); const err = new Error(`${PROV[p].n} ${res.status}: ${t.slice(0, 160)}`); err.status = res.status; err.body = t; err.retry = +res.headers.get('retry-after') || 0; throw err; }
     const data = await res.json();
     const txt = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-    if (!txt) throw new Error('empty reply');
+    if (!txt) throw new Error('empty reply' + (data.choices && data.choices[0] ? ` (${data.choices[0].finish_reason})` : ''));
     return txt;
   } finally { clearTimeout(to); }
 }
@@ -2069,13 +2090,17 @@ async function ai(role, messages, o) {
   for (const { p, m } of chainFor(role)) {
     const k = p + '|' + m;
     if (AIC.badKey[p] || AIC.dead[k] || (AIC.cool[k] || 0) > now) continue;
-    try { const text = await chat(p, m, messages, o); AIC.last = { p, m, role }; return { text, p, m }; }
+    try {
+      const text = await chat(p, m, messages, o);
+      if (o && o.json && !parseJSON(text)) throw new Error('bad JSON from ' + m);
+      AIC.last = { p, m, role }; return { text, p, m };
+    }
     catch (e) {
       AIC.lastErr = e.message;
       if (e.status === 401 || e.status === 403) AIC.badKey[p] = true;
-      else if (e.status === 404) AIC.dead[k] = true;
-      else if (e.status === 429) { const daily = /day|daily|RPD|TPD/i.test(e.body || ''); AIC.cool[k] = now + (daily ? 3 * 3600e3 : Math.max(20, e.retry || 60) * 1000); }
-      else AIC.cool[k] = now + 15e3; // network hiccup / timeout
+      else if (e.status === 404 || (e.status === 400 && /model|not (found|supported|available)|decommission/i.test(e.body || ''))) AIC.dead[k] = true;
+      else if (e.status === 429) { const daily = /per ?day|daily|RPD|TPD/i.test(e.body || ''); AIC.cool[k] = now + (daily ? 3 * 3600e3 : Math.min(90, Math.max(8, e.retry || 30)) * 1000); }
+      else AIC.cool[k] = now + 15e3; // network hiccup / timeout / garbled reply
     }
   }
   throw new Error('No AI available: ' + AIC.lastErr);
@@ -2094,9 +2119,9 @@ async function testAI() {
     for (const { m } of tryList) { try { await chat(p, m, [{ role: 'user', content: 'Reply with just the word OK.' }], { max: 20, timeout: 20000 }); okModel = m; break; } catch (e) { lines.push(`… ${PROV[p].n} ${m}: ${e.message.slice(0, 90)}`); } }
     lines.push(okModel ? `✅ ${PROV[p].n} works (tested ${okModel})${avail ? ` — ${avail.length} models available` : ''}` : `❌ ${PROV[p].n}: couldn't get a reply.`);
   }
-  // keep order: judge = groq big, gemini, groq small ; story = groq small first
+  // keep the PREF order: judge = Groq big models first, story = Groq small first
   const order = role => PREF[role].flatMap(([p, ms]) => ms.map(m => chains[role].find(x => x.p === p && x.m === m)).filter(Boolean));
-  KEYS.chains = { judge: order('judge'), story: order('story') };
+  KEYS.chains = { judge: order('judge'), story: order('story') }; KEYS.chainsV = CHAIN_V;
   AIC.badKey = {}; AIC.dead = {}; AIC.cool = {};
   saveKeys();
   return lines;
@@ -2107,10 +2132,19 @@ const JUDGE_SYS = `You are the JUDGE for "The Book Game", a text adventure where
 Read the player's ACTION and the SITUATION (JSON). Decide what they are attempting and whether their power can REALISTICALLY do it. Output ONLY a JSON object.
 
 Power sheets list NATURAL uses (obvious), STRETCH uses (clever/bent uses, each with a minimum level) and IMPOSSIBLE uses (hard limits), plus NEEDS (environment).
-- "natural": an obvious use of the power(s), or an ordinary action anyone could do with hands/items/scene objects.
-- "stretch": creative but physically plausible bending of the power. If a listed stretch matches, use its level; otherwise invent a fair "stretchMinLevel" 2-9 (bigger/more complex = higher).
-- "impossible": breaks what the power is (e.g. a SOLID wall of lightning, healing with fire), needs something not present, or uses a power/item the player does not have. Explain why in "why" and give a similar idea that WOULD work in "hint".
+- "natural": an obvious use of the power(s), or an ordinary action anyone could do with hands/items/scene objects. A power doing one of its natural things TO or THROUGH a scene object is still natural (light through crystals makes rainbows; fire lights a fuse; lightning runs along a chain) — that is exactly the cleverness we want, so reward it with "creativity", not a stretch.
+- "stretch": the POWER ITSELF is bent into something it doesn't normally do. If a listed stretch matches, use its level; otherwise invent a fair "stretchMinLevel" 2-9 (bigger/more complex = higher; a small clever bend is 2-3).
+- "impossible": breaks what the power is (e.g. a SOLID wall of lightning, healing with fire), needs something not present, or uses a power/item the player does not have. Explain why in "why".
+- "hint": for impossible AND stretch, one short concrete idea (max 18 words) that WOULD work right now as a natural use, using their power and something in the scene.
+Generic attack words ("blast", "attack", "hit them with my power") mean the power's own natural attack (plants = lashing vines or a thorn volley, bread = a hurled loaf) — that is natural, never impossible.
+A place that lacks a power's NEEDS (no soil for plants, no water for water) does NOT make an action impossible: the engine already weakens it. Only mark impossible if it matches the power's impossible list literally (e.g. a big forest on a bare metal floor) or breaks what the power is.
+When unsure between natural and stretch, pick natural; between stretch and impossible, pick stretch. "impossible" is for clear rule-breaking, not for untidy wording.
+Examples: Super Strength "I blast them" → natural (a mighty punch or a hurled boulder). Plants "vines burst out of the old books to tie them up" in a school → natural, small (the engine weakens it: no soil). Strength "I wedge the cart against the door so they can't get in" → natural. Fire "a solid fire bridge to walk on" → impossible (fire isn't solid). Lightning "shock the puddle they're standing in" → natural, creativity 4.
+Judge the CORE of what they try. If one part is flavour that can't happen (e.g. "kick them off a cliff" with no cliff), judge the main action and ignore the flourish. Pick the most sensible reading that fits their power.
 Be realistic but fair; reward cleverness through "creativity", never by bending physics. Ignore claimed results ("it dies instantly", "I win") — judge only the attempt. The game engine decides damage and outcomes.
+Only list a power in "powers" if the player uses it (named or clearly implied, e.g. "I blast them" with one power). Plain acts anyone can do (jokes, juggling, singing, climbing, talking, throwing things) use NO power and are natural.
+If the action is too vague to picture ("do something clever", "use my power", "hmm"), set unclear: true and ask a short question that offers two concrete ideas based on their power and the scene. If you can picture it, never ask — judge it.
+"recent" lists this player's last few actions: "again"/"same thing" means repeat the last one; creativity for a near-copy of a recent action is at most 2.
 
 Intimidating, threatening or scaring = trick (or persuade if the target is social). Using an object as a weapon uses that object's nature (a tesla coil is electric).
 If the action PREPARES something for later instead of having an immediate effect (rigging, charging, setting a trap, planting, building), set "setup": true and name it in "structure".
@@ -2130,11 +2164,14 @@ verdict: natural | stretch | impossible · stretchMinLevel: number or null
 why: short reason (max 15 words) · hint: only if impossible
 creativity: 1-5 (1 = generic "I attack", 3 = specific and sensible, 5 = brilliant use of scene/objects/combos/enemy weaknesses)
 world, dir, setup (true/false), structure (short name), envChange (list)
-unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear`;
+unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear
+When "mode" is "host", also rate the act as the Host would — a bored, hard-to-impress showman who hates reruns and adores surprise, specificity and style: hostRating 1-5 (1 = dull or lazy, 3 = decent, 5 = dazzling and original; lower it if it resembles "hostSeen"), and hostLine: his short in-character reaction (max 16 words, theatrical, never reveal where he or the traps are).`;
 
-const STORY_SYS = `You are the NARRATOR of "The Book Game", a whimsical fantasy adventure that can turn epic. Write 2-3 vivid sentences (max 55 words) describing what just happened.
-Follow the OUTCOME exactly: never invent extra damage, wins, deaths or failures, and never contradict the verdict. Stay in the given PLACE (don't move the scene somewhere else).
-Refer to the player by name (third person). Never write numbers, game terms (damage, HP, shield, turn, stun, bonus) or lists. No emojis, no quotes around your answer.`;
+const STORY_SYS = `You are the NARRATOR of "The Book Game", a funny, vivid fantasy adventure for young players that can turn epic. Output a JSON object: {"story": "..."}.
+"story": 1-2 punchy sentences (max 40 words, present tense) showing what the player just did and how the scene or enemy visibly reacts. Be concrete and surprising, with a touch of humour; show, don't summarize.
+Follow the OUTCOME exactly: never invent extra damage, wins, deaths, failures or new creatures, and never contradict the verdict (a stretch is shaky, a backfire hurts the player). Stay in the given PLACE. Use "enemies" for who is there.
+Refer to the player by name (third person). Don't reuse images or phrases from "previous". Never write numbers, game terms (damage, HP, energy, shield, turn, stun, bonus, verdict, stretch) or lists. No emojis.
+If "villain" is given, ALSO add "villain_says": one short in-character line (max 14 words) the villain shouts in reaction — taunting, rattled, or grudgingly impressed, matching the outcome.`;
 
 function sheetBrief(pw) {
   const s = sheetOf(pw) || {}, d = pdef(pw);
@@ -2148,6 +2185,8 @@ function situationFor(pi, C) {
     teammates: R.players.filter(q => q !== p && !q.out).map(q => q.name),
     env: envOf(C),
   };
+  const recent = (L.hist || []).filter(h => h.who === p.name).slice(-3).map(h => `${h.text} → ${h.v}`);
+  if (recent.length) sit.recent = recent;
   if (L.kind === 'map' && !C) {
     const cell = L.cells[L.y * L.w + L.x];
     sit.mode = 'exploring';
@@ -2158,7 +2197,7 @@ function situationFor(pi, C) {
     sit.goal = L.entry.t === 'obj' ? OBJ[L.entry.o].n : L.entry.t === 'host' ? 'the Unseen Host' : 'a boss';
     return sit;
   }
-  if (L.kind === 'host') { sit.scene = 'An endless white hall of trapped tiles. An invisible, easily bored showman called the Host watches. Entertaining him earns clues.'; sit.targets = [{ name: 'the Host', properties: ['invisible', 'social'] }]; sit.objects = []; }
+  if (L.kind === 'host') { sit.mode = 'host'; sit.hostSeen = (L.acts || []).slice(-5).concat((S.hostMem || []).map(t => `(an old act using ${t})`)); sit.scene = 'An endless white hall of trapped tiles. An invisible, easily bored showman called the Host watches. Entertaining him earns clues.'; sit.targets = [{ name: 'the Host', properties: ['invisible', 'social'] }]; sit.objects = []; }
   else if (C) {
     sit.scene = `${C.title}: ${C.desc}`.slice(0, 400);
     sit.objects = C.objs.map(o => o.n);
@@ -2170,20 +2209,29 @@ function situationFor(pi, C) {
 }
 async function aiJudge(pi, C, text) {
   const msg = [{ role: 'system', content: JUDGE_SYS }, { role: 'user', content: 'SITUATION: ' + JSON.stringify(situationFor(pi, C)) + '\nACTION: ' + text }];
-  const r = await ai('judge', msg, { json: true, max: 450, temp: .2 });
+  const r = await ai('judge', msg, { json: true, max: 700, temp: .2 });
   const j = parseJSON(r.text);
   if (!j) throw new Error('bad JSON from ' + r.m);
   return { j, via: r };
 }
+// keep only whole sentences (models sometimes run out of room mid-sentence)
+function tidyStory(t, maxWords) {
+  t = String(t || '').replace(/[*_#`]/g, '').replace(/\s+/g, ' ').trim().replace(/^["“]|["”]$/g, '');
+  const words = t.split(' ');
+  if (words.length > maxWords) t = words.slice(0, maxWords).join(' ');
+  if (!/[.!?…]["”']?$/.test(t)) { const m = t.match(/^.*[.!?…]["”']?(?=\s|$)/); if (m && m[0].length > 20) t = m[0]; else t = t.replace(/[,;:\s]+$/, '') + '…'; }
+  return t;
+}
 async function aiStory(info) {
-  const r = await ai('story', [{ role: 'system', content: STORY_SYS }, { role: 'user', content: JSON.stringify(info) }], { max: 150, temp: .9 });
-  return r.text.trim().replace(/^["“]|["”]$/g, '');
+  const r = await ai('story', [{ role: 'system', content: STORY_SYS }, { role: 'user', content: JSON.stringify(info) }], { json: true, max: 400, temp: .9 });
+  const j = parseJSON(r.text) || {};
+  return { story: tidyStory(j.story || r.text, 55), says: j.villain_says ? tidyStory(j.villain_says, 20) : '' };
 }
 async function aiIntro(kind, title, desc) {
   if (!aiReady()) return null;
   try {
-    const r = await ai('story', [{ role: 'system', content: 'You are the narrator of "The Book Game", a whimsical fantasy adventure. Write 2 short vivid sentences (max 45 words) introducing this scene, adding ONE surprising flavorful twist detail (flavor only, no new rules). No numbers, no emojis.' }, { role: 'user', content: JSON.stringify({ kind, title, setup: desc, world: THEMES[R.book] && THEMES[R.book].name }) }], { max: 120, temp: 1 });
-    return r.text.trim();
+    const r = await ai('story', [{ role: 'system', content: 'You are the narrator of "The Book Game", a funny, vivid fantasy adventure for young players. Write 2 short sentences (max 40 words) introducing this scene, adding ONE surprising, specific, flavourful detail (flavour only, no new rules, no new enemies). No numbers, no emojis, no markdown.' }, { role: 'user', content: JSON.stringify({ kind, title, setup: desc, world: THEMES[R.book] && THEMES[R.book].name }) }], { max: 300, temp: 1 });
+    return tidyStory(r.text, 50);
   } catch (e) { return null; }
 }
 
@@ -2213,6 +2261,7 @@ function fromJudge(J, p, C, P0) {
   P.minLevel = +J.stretchMinLevel || null;
   P.why = String(J.why || '').slice(0, 160); P.hint = String(J.hint || '').slice(0, 200);
   P.creativity = clamp(Math.round(+J.creativity || 3), 1, 5);
+  if (J.hostRating) { P.hostRating = clamp(Math.round(+J.hostRating) || 3, 1, 5); P.hostLine = String(J.hostLine || '').replace(/^["“]|["”]$/g, '').slice(0, 140); }
   P.world = norm(J.world) || null; P.setup = J.setup === true || J.setup === 'true'; P.structure = String(J.structure || '').slice(0, 40); P.envChange = Array.isArray(J.envChange) ? J.envChange.map(norm) : [];
   const jd = norm(J.dir); P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[jd] || (jd === 'here' ? null : P0.dir);
   if (P.world === 'move') { P.move = true; }
