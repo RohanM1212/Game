@@ -132,7 +132,7 @@ const AP = {
 };
 const AP_WORDS = {
   force: 'attack hit punch kick smash crush blast burn shoot strike slam destroy fight throw hurl stab slash bash zap shock explode bomb break beat charge tackle launch pummel whack crash drown fling pelt bombard knock obliterat demolish squash stomp sting bite scorch melt pierce impale incinerat electrocut',
-  trick: 'trick distract fool lure lasso tie bind entangle bait fake decoy confuse mislead pretend prank disguise bluff blind misdirect scare spook frighten tease taunt dazzle trap swap switch steal pickpocket imitat mimic copy sabotag tangle trip',
+  trick: 'trick distract fool lure lasso tie bind entangle intimidat threaten menac bait fake decoy confuse mislead pretend prank disguise bluff blind misdirect scare spook frighten tease taunt dazzle trap swap switch steal pickpocket imitat mimic copy sabotag tangle trip',
   persuade: 'talk convince persuade negotiate befriend calm gift give offer bribe apolog reason ask beg plead compliment flatter charm promise share feed comfort reassure invite deal trade speech sooth pacif tame unite peace hug explain tell request inspire rally encourage vote campaign',
   sneak: 'sneak hide creep tiptoe quiet stealth invisib camouflag blend unseen crawl silent quietly lurk',
   protect: 'protect shield block defend barrier fortif dome armor shelter save catch hold brace bunker guard cushion secure',
@@ -587,6 +587,7 @@ const TRAIT_ENV = { water: ['water'], earth: ['ground', 'soil'], metal: ['metal'
 function envOf(C) {
   const e = new Set(THEME_ENV[R.book] || []);
   (C ? C.objs : []).forEach(o => o.traits.forEach(t => (TRAIT_ENV[t] || []).forEach(x => e.add(x))));
+  if (R.level && R.level.kind === 'map') { const c = R.level.cells[R.level.y * R.level.w + R.level.x]; (c && c.env || []).forEach(t => { e.add(t); if (t === 'frozen') e.add('ice'); if (t === 'burning') e.add('fire'); if (t === 'soil') e.add('soil'); if (t === 'bright') e.delete('dark'); }); }
   if (R.level && R.level.kind === 'host') { ['indoor', 'ground', 'bright'].forEach(x => e.add(x)); e.delete('dark'); e.delete('outdoor'); e.delete('birds'); e.delete('water'); e.delete('underwater'); }
   return [...e];
 }
@@ -655,32 +656,6 @@ const hpMul = () => (1 + .15 * (R.page - 1)) * (1 + .3 * (R.vol - 1)) * (.7 + .3
 const dmgMul = () => (1 + .1 * (R.page - 1)) * (1 + .2 * (R.vol - 1));
 
 /* ---------------- level generation ---------------- */
-function genLevel(entry, seed) {
-  srand(seed);
-  if (entry.t === 'host') return genHost(seed);
-  const th = THEMES[R.book], w = R.page <= 2 ? 5 : 6, h = w;
-  const cells = [];
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) cells.push({ t: 'empty', seen: false, vis: false, done: false, place: pick(th.places, srnd), objs: shuffle(th.objs, srnd).slice(0, 2).map(o => ({ n: o[0], i: o[1], traits: o[2].split(' ') })) });
-  const edge = [];
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (x === 0 || y === 0 || x === w - 1 || y === h - 1) edge.push([x, y]);
-  const [sx, sy] = pick(edge, srnd);
-  let far = [], fd = -1;
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const d = Math.abs(x - sx) + Math.abs(y - sy); if (d > fd) { fd = d; far = [[x, y]]; } else if (d === fd) far.push([x, y]); }
-  const [gx, gy] = pick(far, srnd);
-  const C = (x, y) => cells[y * w + x];
-  C(gx, gy).t = 'goal';
-  const free = shuffle(cells.map((c, i) => i).filter(i => i !== sy * w + sx && i !== gy * w + gx), srnd);
-  const put = (t, n) => { for (let k = 0; k < n && free.length; k++) cells[free.pop()].t = t; };
-  put('enc', 3 + Math.floor(R.page / 2)); put('obs', 2); put('treasure', 2); put('shrine', 1); put('npc', 1);
-  const L = { kind: 'map', seed, entry, w, h, cells, x: sx, y: sy, px: sx, py: sy, goal: [gx, gy], ch: null, log: [], nov: {}, acted: [], turns: 0 };
-  C(sx, sy).vis = true; C(sx, sy).done = true; revealAround(L, sx, sy, 1);
-  const goalName = entry.t === 'obj' ? `${OBJ[entry.o].i} ${OBJ[entry.o].n}` : entry.t === 'boss' ? '👹 the BOSS' : '🛡️ a Guardian';
-  logL(L, 'big', `📖 ${th.name} — Page ${R.page}`);
-  logL(L, 'nar', `You open your eyes in ${C(sx, sy).place}. Somewhere in this land waits ${goalName}. Explore to find it.`);
-  logL(L, 'sys', 'Move with the arrow buttons or type "go north". Type anything creative when you meet trouble.');
-  if (R.trial) logL(L, 'note', '📘 <b>Tutorial page.</b> The narrator will explain every verdict: ✅ <b>Natural</b> (an obvious use of your power — full strength), 🌀 <b>Stretch</b> (clever but bends your power — weaker, costs more, can backfire, needs a higher level), ❌ <b>Impossible</b> (your power just can\'t do that — fails). On this page nothing costs you a turn by accident.');
-  return L;
-}
 function revealAround(L, x, y, r) { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const nx = x + dx, ny = y + dy; if (nx >= 0 && ny >= 0 && nx < L.w && ny < L.h && Math.abs(dx) + Math.abs(dy) <= r) L.cells[ny * L.w + nx].seen = true; } }
 function logL(L, c, h) { L.log.push({ c, h }); if (L.log.length > 140) L.log.splice(0, L.log.length - 140); }
 const log = (c, h) => logL(R.level, c, h);
@@ -692,16 +667,29 @@ function mkThreatInst(t) {
 }
 function mkChallenge(kind, cell) {
   const L = R.level, th = THEMES[R.book];
-  const C = { kind, round: 1, threats: [], meter: null, boss: null, objs: cell ? cell.objs.slice() : [], shield: 0, shieldNext: 0, minions: [], spawnT: 0, title: '', icon: '', desc: '', clock: null, alarm: 0, noise: 0, hitsThisRound: [], evT: 4 };
+  const C = { kind, round: 1, threats: [], meter: null, boss: null, objs: cell ? cell.objs : [], shield: 0, shieldNext: 0, minions: [], spawnT: 0, title: '', icon: '', desc: '', clock: null, alarm: 0, noise: 0, hitsThisRound: [], evT: 4 };
   if (kind === 'enc') {
     const n = R.page >= 4 && Math.random() < .4 ? 2 : 1;
-    for (let i = 0; i < n; i++) C.threats.push(mkThreatInst(pick(th.threats)));
+    let pool = th.threats;
+    if (R.trial) { // tutorial: never hand out an enemy that hard-counters your power
+      const my = new Set(R.players.flatMap(p => p.powers.flatMap(pw => pdef(pw).traits)));
+      const ok = pool.filter(t => !(t[6] || '').split(' ').some(x => my.has(x)) && !((t[4] || '').includes('fireproof') && my.has('fire')) && !((t[4] || '').includes('mindless')));
+      if (ok.length) pool = ok;
+    }
+    for (let i = 0; i < n; i++) { const t = mkThreatInst(pick(pool)); if (R.trial) { t.hp = t.maxHp = Math.round(t.hp * .7); } C.threats.push(t); }
+    if (cell && cell.weak) { C.threats.forEach(t => t.hp = Math.max(1, t.hp - Math.round(cell.weak / n))); }
     C.title = C.threats.map(t => t.n).join(' & '); C.icon = C.threats[0].i; C.desc = `${C.threats.map(t => t.n).join(' and ')} block${n > 1 ? '' : 's'} your way! Defeat, calm or fool them — or slip past with Sneak or Speed.`;
   } else if (kind === 'obs') {
     const o = pick(OBSTACLES);
     C.obs = o; C.title = o.n; C.icon = o.i; C.desc = o.d + ' Any creative approach can get you past.';
     C.meter = { n: 'Progress', v: 0, goal: Math.round((32 + 5 * R.page) * (.6 + .4 * np())) };
     C.mult = o.mult; C.weak = shuffle(['fire', 'water', 'earth', 'air', 'plant', 'ice', 'gravity', 'elastic', 'size', 'space', 'metal', 'sticky']).slice(0, 3);
+    if (cell && cell.weak) C.meter.v = Math.min(C.meter.goal - 1, Math.round(cell.weak));
+  } else if (kind === 'quest') {
+    const q = cell.q;
+    C.q = q; C.title = q.n; C.icon = q.i; C.desc = q.d + ' Help out any way you can.';
+    C.meter = { n: 'Helped', v: 0, goal: Math.round((30 + 5 * R.page) * (.6 + .4 * np())) };
+    C.mult = q.mult; C.weak = q.weak;
   } else if (kind === 'obj') {
     const d = OBJ[L.entry.o];
     C.obj = L.entry.o; C.title = d.n; C.icon = d.i; C.desc = d.intro;
@@ -767,7 +755,7 @@ function parse(text, p, C) {
   if (!P.powers.length && toks.some(t => ['power', 'powers', 'ability', 'magic', 'abilities'].includes(t))) P.powers.push(0);
   
   // items
-  p.items.forEach((it, idx) => { if (it.uses > 0 && anyWm(toks, ITEMS[it.id].kw.split(' ').concat(nameWords(ITEMS[it.id].n)))) P.items.push(idx); });
+  p.items.forEach((it, idx) => { if (it.uses > 0 && anyWm(toks, itemDef(it).kw.split(' ').concat(nameWords(itemDef(it).n)))) P.items.push(idx); });
   // scene objects
   const objs = C ? C.objs : [];
   objs.forEach((o, idx) => { if (P.objs.length < 2 && anyWm(toks, nameWords(o.n))) P.objs.push(idx); });
@@ -796,7 +784,7 @@ function parse(text, p, C) {
   // infer approach if missing
   if (!P.ap) {
     if (P.form) P.ap = FORMS[P.form].ap;
-    else if (P.items.length && ITEMS[p.items[P.items[0]].id].id === 'potion') P.ap = 'heal';
+    else if (P.items.length && p.items[P.items[0]].id === 'potion') P.ap = 'heal';
     else if (P.items.some(i => p.items[i].id === 'potion')) P.ap = 'heal';
     else if (P.target && (P.target.type === 'threat' || P.target.type === 'boss') && (P.powers.length || P.items.length || P.objs.length)) P.ap = 'force';
     else if (P.powers.length && toks.length >= 3) { const d = pdef(p.powers[P.powers[0]]); P.ap = APS.slice().sort((a, b) => d.apt[b] - d.apt[a])[0]; P.guessed = true; }
@@ -808,7 +796,7 @@ function parse(text, p, C) {
 function traitsOf(p, P, C) {
   const tr = new Set();
   P.powers.forEach(i => pdef(p.powers[i]).traits.forEach(t => tr.add(t)));
-  P.items.forEach(i => ITEMS[p.items[i].id].traits.forEach(t => tr.add(t)));
+  P.items.forEach(i => itemDef(p.items[i]).traits.forEach(t => tr.add(t)));
   P.objs.forEach(i => C.objs[i].traits.forEach(t => tr.add(t)));
   if (!P.powers.length && !P.items.length) tr.add('physical');
   return [...tr];
@@ -817,7 +805,9 @@ function traitMul(traits, weak, resist, notes, name) {
   let m = 1;
   const w = traits.filter(t => weak.includes(t)), r = traits.filter(t => resist.includes(t));
   if (w.length) { m *= 1 + .3 * Math.min(2, w.length); notes.push(`🎯 ${name} is weak to ${w.join(' & ')}!`); }
-  if (r.length) { m *= .5; notes.push(`🧱 ${name} resists ${r.join(' & ')}.`); }
+  const other = traits.filter(t => !resist.includes(t) && t !== 'physical');
+  if (r.length && !other.length) { m *= .5; notes.push(`🧱 ${name} resists ${r.join(' & ')}.`); }
+  else if (r.length) notes.push(`🧱 ${name} resists ${r.join(' & ')} — but your ${other.slice(0, 2).join(' & ')} gets through!`);
   return m;
 }
 function formMul(form, vsSwarm, vsBig, notes) {
@@ -868,7 +858,7 @@ const TIER = [
 function tierLine(s) { let r = TIER[0][1]; for (const [m, l] of TIER) if (s >= m) r = l; return pick(r); }
 function pwPhrase(p, P, ev) {
   const pws = ev.pws.map(pdef);
-  const items = P.items.map(i => p.items[i] ? ITEMS[p.items[i].id].n : '').filter(Boolean);
+  const items = P.items.map(i => p.items[i] ? itemDef(p.items[i]).n : '').filter(Boolean);
   let s;
   if (!pws.length) s = items.length ? `a ${items.join(' and ')}` : 'sheer determination';
   else if (pws.length === 2) s = `${pws[0].adj} ${pws[1].noun.toLowerCase()} power`;
@@ -998,6 +988,8 @@ function worldPhase() {
   // minions
   C.minions.forEach(m => { const w = m.what || 'summons'; const t = C.threats.find(t => t.hp > 0); if (t) { t.hp -= m.dmg; lines.push(`${esc(m.owner)}'s ${w} hit ${t.n} −${m.dmg}`); if (t.hp <= 0) lines.push(`${t.n} falls!`); } else if (C.boss) { dmgBoss(C, m.dmg, 1); lines.push(`${esc(m.owner)}'s ${w} hit ${C.boss.n} −${m.dmg}`); } m.t--; if (m.grow) m.dmg = Math.round(m.dmg * m.grow); });
   C.minions = C.minions.filter(m => m.t > 0);
+  alliesAct(C);
+  applyTraps(C, C);
   if (lines.length) log('eff', lines.join(' · '));
   if (checkWin()) return;
   // threats attack
@@ -1047,7 +1039,7 @@ function checkWin() {
   let won = false;
   if (C.kind === 'enc' && C.escaped) { finishChallenge(true); return true; }
   if (C.kind === 'enc') won = C.threats.every(t => t.hp <= 0);
-  if (C.kind === 'obs' || C.kind === 'obj') won = C.meter.v >= C.meter.goal;
+  if (C.kind === 'obs' || C.kind === 'obj' || C.kind === 'quest') won = C.meter.v >= C.meter.goal;
   if (C.kind === 'boss') won = bossDefeated(C);
   if (won) { finishChallenge(false); return true; }
   if (alive().length === 0) { failLevel(); return true; }
@@ -1061,6 +1053,15 @@ function finishChallenge(escaped) {
     if (escaped) { log('big', '🏃 You got away!'); }
     else { const g = 8 + 2 * R.page; giveGold(g); log('big', `⚔️ Encounter cleared! +${g} gold`); }
   } else if (C.kind === 'obs') { log('big', `✅ You got past the ${C.title}!`); }
+  else if (C.kind === 'quest') {
+    const g = 12 + 4 * R.page; giveGold(g); cell.helped = true;
+    let extra = '';
+    const r = rnd();
+    if (r < .35) { const it = pick(Object.keys(ITEMS)); const who = pick(alive()); addItem(who, it); extra = ` They also give ${esc(who.name)} a ${ITEMS[it].i} ${ITEMS[it].n}.`; }
+    else if (r < .65 && L.intel < 3) { L.intel++; const [gx, gy] = L.goal; L.cells[gy * L.w + gx].seen = true; extra = ` They tell you a secret about your goal (intel ${L.intel}/3) — it's to the ${compass(L.x, L.y, gx, gy)}.`; }
+    else if ((L.allies || []).length < 2) { const a = Object.assign({}, pick(ALLIES)); L.allies.push(a); extra = ` ${a.i} ${a.n} is so grateful they join your party!`; }
+    log('big', `❗ You helped! +${g} gold.${extra}`);
+  }
   else { levelComplete(C); return; }
   save();
 }
@@ -1111,41 +1112,6 @@ function canRetry() { const fee = R.fail.fee; return R.mode === 'versus' ? R.pla
 function runOver() { R.screen = 'over'; save(); }
 
 /* ---------------- exploration ---------------- */
-function moveParty(d) {
-  const L = R.level;
-  if (L.kind === 'host') return hostMove(d);
-  if (L.ch) { log('note', 'You can\'t leave while something blocks you! (Sneak or Speed can help you slip past.)'); return save(); }
-  const dx = { e: 1, w: -1 }[d] || 0, dy = { s: 1, n: -1 }[d] || 0;
-  const nx = L.x + dx, ny = L.y + dy;
-  if (nx < 0 || ny < 0 || nx >= L.w || ny >= L.h) { log('note', 'The page ends there. You can\'t go that way.'); return save(); }
-  L.px = L.x; L.py = L.y; L.x = nx; L.y = ny;
-  const c = L.cells[ny * L.w + nx];
-  c.vis = true; c.seen = true; revealAround(L, nx, ny, 1);
-  const dn = { n: 'north', s: 'south', e: 'east', w: 'west' }[d];
-  if (c.done) { log('nar', `You head ${dn} back to ${c.place}.`); return save(); }
-  const objs = c.objs.map(o => `${o.i} ${o.n}`).join(' and ');
-  if (c.t === 'empty') { log('nar', `You head ${dn} and arrive at ${c.place}. You notice ${objs}.`); c.done = true; if (rnd() < .25) { const g = 3 + Math.floor(rnd() * 6); giveGold(g); log('eff', `🪙 You find ${g} gold on the ground.`); } }
-  else if (c.t === 'treasure') { const g = 15 + 5 * R.page; giveGold(g); c.done = true; let s = `💰 A hidden treasure in ${c.place}! +${g} gold`; if (rnd() < .5) { const it = pick(Object.keys(ITEMS)); const who = pick(alive()); addItem(who, it); s += ` and a ${ITEMS[it].i} ${ITEMS[it].n} for ${esc(who.name)}`; } log('big', s); }
-  else if (c.t === 'shrine') { R.players.forEach((q, i) => { healP(i, 40); q.en = q.maxEn; }); c.done = true; log('big', `⛲ A glowing shrine in ${c.place}. Everyone heals +40 HP and energy is restored.`); }
-  else if (c.t === 'npc') {
-    const [nm, ic] = pick(NPCS); c.done = true;
-    const [gx, gy] = L.goal; L.cells[gy * L.w + gx].seen = true;
-    const dir = compass(L.x, L.y, gx, gy);
-    let tip = '';
-    const e = L.entry;
-    if (e.t === 'obj') { const o = OBJ[e.o]; tip = ` "The ${o.n.toLowerCase()}? It goes best with ${Object.entries(o.mult).sort((a, b) => b[1] - a[1]).slice(0, 2).map(x => AP[x[0]].n.toLowerCase()).join(' or ')}... and they say ${o.weak.split(' ').slice(0, 2).join(' and ')} works wonders."`; }
-    else { const b = BOSSES[e.b]; tip = ` "Beware ${b.n}. ${b.intro}"`; }
-    log('nar', `${ic} In ${c.place} you meet ${nm}. "What you seek lies to the <b>${dir}</b>."${tip}`);
-  }
-  else if (c.t === 'enc') { L.ch = mkChallenge('enc', c); log('big', `${L.ch.icon} ${L.ch.title}!`); log('nar', `In ${c.place}, ${L.ch.desc}`); }
-  else if (c.t === 'obs') { L.ch = mkChallenge('obs', c); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); }
-  else if (c.t === 'goal') {
-    if (L.entry.t === 'obj') { L.ch = mkChallenge('obj', c); L.ch.objs = c.objs.slice(); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); introFor(L.ch); }
-    else { L.ch = mkChallenge('boss', c); log('big', `${L.ch.icon} ${L.ch.title.toUpperCase()}`); log('nar', L.ch.desc); if (L.ch.boss.memAp || L.ch.boss.memTr) log('bad', `😈 "I remember you. Last time you beat me with ${[L.ch.boss.memAp && AP[L.ch.boss.memAp].n.toLowerCase(), L.ch.boss.memTr].filter(Boolean).join(' and ')}. That won't work twice." (Those now do half damage.)`); bossAnnounce(L.ch); introFor(L.ch); }
-  }
-  R.cur = firstAlive();
-  save();
-}
 function compass(x, y, tx, ty) { const dx = tx - x, dy = ty - y; let s = ''; if (Math.abs(dy) > Math.abs(dx) / 2) s += dy < 0 ? 'north' : 'south'; if (Math.abs(dx) > Math.abs(dy) / 2) s += (s ? '-' : '') + (dx > 0 ? 'east' : 'west'); return s || 'here'; }
 function useMapScrap(p, P) {
   const L = R.level; L.cells.forEach(c => { if (rnd() < .75) c.seen = true; }); L.cells[L.goal[1] * L.w + L.goal[0]].seen = true;
@@ -1207,7 +1173,7 @@ function evaluate(pi, P, C) {
   if (pws.length === 2) { apt += 1; notes.push('⚡ Power combo! Two powers at once.'); }
   if (!pws.length) { apt = 1; lvl = 1; }
   let itemBonus = 0;
-  P.items.forEach(i => { itemBonus += ITEMS[p.items[i].id].apt[ap] || 0; });
+  P.items.forEach(i => { itemBonus += itemDef(p.items[i]).apt[ap] || 0; });
   apt += Math.min(2, itemBonus || (P.items.length ? 1 : 0));
   // size vs level & energy
   let scale = P.scale;
@@ -1228,11 +1194,14 @@ function evaluate(pi, P, C) {
   let score = 3 + apt * 4 * (1 + .35 * (lvl - 1));
   if (P.spored) score *= .5;
   const ptr = new Set(pws.flatMap(pw => pdef(pw).traits));
-  P.objs.forEach(i => {
-    const o = C.objs[i]; score += 3;
-    if (o.traits.some(t => ptr.has(t)) || (o.traits.includes('death') && ptr.has('summon'))) { score += 5; notes.push(`🌟 The ${o.n} supercharges your power!`); }
+  const usedObjs = P.objs.map(i => C.objs[i]).filter(Boolean);
+  usedObjs.forEach(o => {
+    score += 3;
+    if (o.prep) { score += o.prep * .8; notes.push(`✨ Your prepared ${o.n} pays off!`); }
+    else if (o.traits.some(t => ptr.has(t)) || (o.traits.includes('death') && ptr.has('summon'))) { score += 5; notes.push(`🌟 The ${o.n} supercharges your power!`); }
     else notes.push(`👍 Using the ${o.n}.`);
   });
+  P.usedObjs = usedObjs;
   score *= SCALES[scale].mul;
   // repetition (engine-tracked, can't be talked around)
   const L = R.level;
@@ -1260,7 +1229,11 @@ function evaluate(pi, P, C) {
   if (rnd() < (luck ? .2 : .08)) { score *= 1.5; crit = true; }
   P.items.forEach(i => { p.items[i].uses--; });
   p.items = p.items.filter(it => it.uses > 0);
-  return { score, notes, traits: traitsOf(p, P, C || { objs: [] }), scale, crit, pws, cost, sig, lvl };
+  const traitsNow = traitsOf(p, P, C || { objs: [] });
+  // scene objects get used up (unless sturdy, like your chair)
+  usedObjs.forEach(o => { if (!o.keep && C && C.objs) { const k = C.objs.indexOf(o); if (k >= 0) { C.objs.splice(k, 1); notes.push(`(The ${o.n} is used up.)`); } } });
+  P.objs = [];
+  return { score, notes, traits: traitsNow, scale, crit, pws, cost, sig, lvl };
 }
 
 /* ---------------- signature rules (what makes powers different) ---------------- */
@@ -1280,8 +1253,15 @@ function sigPre(pi, P, ev, C, tgt, notes) {
   if (hasSig(pws, 'earth') && ap === 'protect') m *= 1.3;
   if (hasSig(pws, 'gravity') && tp.includes('flying')) { m *= 1.4; notes.push('🌌 Gravity drags it out of the sky!'); }
   if (hasSig(pws, 'blackhole') && P.form && FORMS[P.form].kind === 'area') m *= 1.2;
-  if (tp.includes('fireproof') && ev.traits.includes('fire')) { m *= .2; notes.push('🔥 It\'s fireproof!'); }
-  if (tp.includes('armored') && ap === 'force' && !(P.form && FORMS[P.form].kind === 'focus') && !hasSig(pws, 'magnet')) { m *= .6; notes.push('🛡️ Armor soaks the blow (focused attacks work better).'); }
+  const dmgAp = ap === 'force' || ap === 'trick';
+  // the land you shaped matters
+  if (env.includes('water') && ev.traits.includes('electric') && dmgAp) { m *= 1.3; notes.push('🌊 The soaked ground conducts your lightning!'); }
+  if (env.includes('burning') && ev.traits.includes('fire')) { m *= 1.2; notes.push('🔥 The burning land feeds your fire.'); }
+  if (env.includes('frozen')) { if (ev.traits.includes('ice')) { m *= 1.2; notes.push('🧊 The frozen land strengthens your ice.'); } if (ev.traits.includes('fire')) m *= .85; }
+  if (env.includes('fog') && ['sneak', 'trick'].includes(ap)) { m *= 1.3; notes.push('🌫️ The fog hides your moves.'); }
+  const elem = ev.traits.filter(t => t !== 'physical');
+  if (dmgAp && tp.includes('fireproof') && ev.traits.includes('fire') && elem.every(t => t === 'fire' || t === 'light')) { m *= .2; notes.push('🔥 It\'s fireproof!'); }
+  if (dmgAp && tp.includes('armored') && ap === 'force' && !(P.form && FORMS[P.form].kind === 'focus') && !hasSig(pws, 'magnet')) { m *= .6; notes.push('🛡️ Armor soaks the blow (focused attacks work better).'); }
   return m;
 }
 function sigPost(pi, P, ev, C, tgt, eff, notes) {
@@ -1297,7 +1277,7 @@ function sigPost(pi, P, ev, C, tgt, eff, notes) {
   if (hasSig(pws, 'plants') && ['force', 'trick', 'protect'].includes(ap)) { C.minions.push({ owner: p.name, dmg: 2 + lvl, t: 4, grow: 1.4, what: 'growing vines' }); eff.push('🌱 a seed is planted'); }
   if (hasSig(pws, 'necro') && ['force', 'trick', 'protect'].includes(ap)) { const r = C.objs.findIndex(o => o.n === 'remains'); if (r >= 0) C.objs.splice(r, 1); C.minions.push({ owner: p.name, dmg: 3 + 2 * lvl, t: 99, what: 'undead minions' }); eff.push('💀 the dead rise to serve you'); }
   if ((hasSig(pws, 'bees') || hasSig(pws, 'duck') || hasSig(pws, 'duckarmy')) && ['force', 'trick'].includes(ap)) { const k = hasSig(pws, 'duckarmy') ? 2 : 1; C.minions.push({ owner: p.name, dmg: (2 + lvl) * k, t: 2, what: hasSig(pws, 'bees') ? 'bees' : 'ducks' }); eff.push(hasSig(pws, 'bees') ? '🐝 the bees keep stinging' : '🦆 the ducks keep attacking'); }
-  if (hasSig(pws, 'chair') && !C.objs.some(o => o.n === 'chair')) { C.objs.push({ n: 'chair', i: '🪑', traits: ['wood', 'physical'] }); eff.push('🪑 the chair is now part of the scene'); }
+  if (hasSig(pws, 'chair') && !C.objs.some(o => o.n === 'chair')) { C.objs.push({ n: 'chair', i: '🪑', traits: ['wood', 'physical'], keep: true }); eff.push('🪑 the chair is now part of the scene'); }
   if ((hasSig(pws, 'pigeons') || hasSig(pws, 'smell')) && ap === 'knowledge' && L.kind === 'map') { revealAround(L, L.x, L.y, 3); L.cells[L.goal[1] * L.w + L.goal[0]].seen = true; eff.push('🗺️ your scouts reveal the land and the goal'); }
   if (hasSig(pws, 'time') && ['protect', 'heal'].includes(ap) && (L.rewinds || 0) < 2 && L.lastDmg) { L.rewinds = (L.rewinds || 0) + 1; R.players.forEach((q, i) => { const h = healP(i, L.lastDmg[i] || 0); if (h) eff.push(`⏳ ${q.name} +${h} (rewound)`); }); }
   if ((hasSig(pws, 'bread') || hasSig(pws, 'grandma')) && ['heal', 'persuade'].includes(ap)) R.players.forEach((q, i) => { if (i !== pi) { const h = healP(i, 4 + 2 * lvl); if (h) eff.push(`🍞 ${q.name} eats (+${h})`); } });
@@ -1325,13 +1305,16 @@ async function actInner(text) {
   const P0 = parse(text, p, C);
   // quick local commands (no AI needed)
   if (P0.dir && (P0.move || (!P0.ap && P0.toks.length <= 3))) return host ? hostMove(P0.dir) : moveParty(P0.dir);
-  if (!host && !C) {
+  if (C && P0.dir && P0.move) { // trying to walk away mid-challenge
+    if (C.kind === 'quest') { log('nar', `You leave ${esc(C.title.toLowerCase())} for now.`); L.ch = null; return moveParty(P0.dir); }
     log('you', `${esc(p.name)}: “${esc(text)}”`);
-    if (P0.items.some(i => p.items[i].id === 'mapscrap')) { useMapScrap(p, P0); return save(); }
-    if (P0.ap === 'knowledge') { const pig = p.powers.some(pw => srcIds(pw).some(x => x === 'pigeons' || x === 'smell')); revealAround(L, L.x, L.y, pig ? 3 : 2); if (pig) L.cells[L.goal[1] * L.w + L.goal[0]].seen = true; log('nar', `${esc(p.name)} scouts the area${pig ? ' with a little help from their friends' : ''}. The land around you becomes clearer.`); return save(); }
-    if (P0.rest || P0.ap === 'heal') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
-    log('nar', pick(['Nothing here needs that right now. Keep exploring!', 'You practice a bit. The birds are impressed. Now — which way?', 'The narrator nods politely. Try moving: north, south, east, or west.']));
+    log('note', `🚧 ${esc(C.title)} is in your way. To get past, try something sneaky or fast (e.g. “I dash past them” or “I sneak around through the shadows”).`);
     return save();
+  }
+  if (!host && !C) {
+    if (P0.items.some(i => p.items[i].id === 'mapscrap')) { log('you', `${esc(p.name)}: “${esc(text)}”`); useMapScrap(p, P0); return save(); }
+    if (P0.rest && P0.toks.length <= 3) { log('you', `${esc(p.name)}: “${esc(text)}”`); R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
+    return exploreAct(pi, text, P0);
   }
   if (P0.rest && P0.toks.length <= 3) return doRest(pi, text, host);
   // ---- ask the Judge ----
@@ -1344,7 +1327,8 @@ async function actInner(text) {
   if (J) {
     if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(No turn used.)</span>`); return save(); }
     P = fromJudge(J, p, C, P0);
-    if (P.move && P.dir) return host ? hostMove(P.dir) : log('note', 'Something is blocking the way! Deal with it first (sneaking or speed can slip past).') || save();
+    if (P.move && P.dir && host) return hostMove(P.dir);
+    if (P.move && C) { P.move = false; if (C.kind === 'quest') { L.ch = null; return moveParty(P.dir || 'n'); } P.ap = 'speed'; log('note', '(The narrator reads that as trying to get past.)'); }
     if (P.rest) return doRest(pi, text, host);
   } else {
     fallbackVerdict(P, p);
@@ -1384,7 +1368,15 @@ async function actInner(text) {
     return finishTurn(pi, P, host);
   }
   const mark = L.log.length;
-  if (host) hostResolve(pi, P, ev); else resolve(pi, P, ev, C);
+  if (!host && P.setup) {
+    const nm = P.structure || 'a prepared trick';
+    const trap = /trap|snare|net|pit|mine|cage|fence/i.test(nm);
+    C.objs.push({ n: nm, i: trap ? '🪤' : '✨', traits: ev.traits.filter(t => t !== 'physical'), prep: Math.round(ev.score * 1.2), trap });
+    log('nar', `${esc(p.name)} prepares ${esc(nm)}.`);
+    log('eff', `🛠️ Prepared: <b>${esc(nm)}</b>. ${trap ? 'It will spring on the next enemy that acts.' : 'Mention it in a later action for a big bonus.'}`);
+    if (ev.notes.length) log('note', ev.notes.join(' '));
+  }
+  else if (host) hostResolve(pi, P, ev); else resolve(pi, P, ev, C);
   if (J) {
     const outcome = L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500);
     UI.thinking = true; render();
@@ -1395,11 +1387,49 @@ async function actInner(text) {
   if (host) return hostTick();
   if (!checkWin()) endTurn();
 }
+async function exploreAct(pi, text, P0) {
+  const L = R.level, p = R.players[pi], cell = L.cells[L.y * L.w + L.x];
+  const pseudo = { objs: cell.objs, threats: [], minions: [], title: cell.place, desc: '' };
+  let P = P0, J = null;
+  if (aiReady()) {
+    UI.thinking = true; render();
+    try { J = (await aiJudge(pi, null, text)).j; } catch (e) { AIC.lastErr = e.message; }
+    UI.thinking = false;
+  }
+  if (J) {
+    if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(Nothing happened yet.)</span>`); return save(); }
+    P = fromJudge(J, p, pseudo, P0);
+    if (P.move && P.dir) return moveParty(P.dir);
+  } else {
+    fallbackVerdict(P, p);
+    const W = { knowledge: ['village', 'landmark'].includes(cell.t) ? 'intel' : 'scout', persuade: 'recruit', force: P.dir ? 'clear' : 'none', protect: 'build', trick: P.form === 'trap' ? 'build' : 'none', speed: P.dir ? 'travel' : 'none' };
+    P.world = W[P.ap] || 'none'; P.structure = P.formWord || '';
+  }
+  log('you', `${esc(p.name)}: “${esc(text)}”`);
+  if (P.rest || P.world === 'rest') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
+  if (!P.ap && (!P.world || P.world === 'none')) { log('note', '🤔 The narrator isn\'t sure what you want to do. Try moving, or something like “climb the tower to look around”, “freeze the river”, “ask the villagers about the goal”.'); return save(); }
+  P.ap = P.ap || 'knowledge';
+  const val = validateVerdict(pi, P, pseudo); P.verdict = val.v;
+  (L.debug = L.debug || []).push({ text, via: AIC.last ? AIC.last.p + '/' + AIC.last.m : 'keyword', judge: J, verdict: P.verdict, why: P.why || '' }); if (L.debug.length > 8) L.debug.shift();
+  val.notes.forEach(n => log('note', n));
+  if (R.trial && P.verdict !== 'fizzle' && P.verdict !== 'impossible') log('note', `📘 <b>Tutorial:</b> that's <b>${{ natural: '✅ Natural', stretch: '🌀 a Stretch' }[P.verdict]}</b>${P.why ? ' — ' + esc(P.why.replace(/[.!]+$/, '')) : ''}.`);
+  if (P.verdict === 'impossible') { log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'Your power can\'t do that.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
+  if (P.verdict === 'fizzle') { p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.`); return save(); }
+  const ev = evaluate(pi, P, pseudo);
+  p.en = Math.min(p.maxEn, p.en + Math.floor(ev.cost / 2)); // world actions cost half energy
+  const mark = L.log.length;
+  worldAct(pi, P, ev, J);
+  if (J) { const outcome = L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500); UI.thinking = true; render(); await story(pi, P, text, outcome, J, mark); UI.thinking = false; }
+  if (R.players.length > 1 && !L.ch) R.cur = nextHostPlayer();
+  save();
+}
 async function story(pi, P, text, outcome, J, idx) {
   if (!J || !aiReady()) return;
   const C = R.level.ch;
   try {
-    const s = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome, scene: C ? C.title : 'The Unseen Host\'s white hall', villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined });
+    const L = R.level, cell = L.kind === 'map' ? L.cells[L.y * L.w + L.x] : null;
+    const clean = String(outcome).replace(/[+−-]?\d+%?/g, '').replace(/\(\s*\)/g, '').replace(/\s+/g, ' ');
+    const s = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined });
     if (s && R.level.log[idx] && R.level.log[idx].c === 'nar') R.level.log[idx].h = esc(s);
     else if (s) R.level.log.splice(idx, 0, { c: 'nar', h: esc(s) });
   } catch (e) { AIC.lastErr = e.message; }
@@ -1421,6 +1451,276 @@ function finishTurn(pi, P, host) {
 async function introFor(C) {
   const s = await aiIntro(C.kind, C.title, C.desc);
   if (s) { log('nar', `<i>${esc(s)}</i>`); save(); if (curView === 'level') render(); }
+}
+
+/* =====================================================================
+   THE LIVING WORLD — bigger maps, fewer fights, and actions that change
+   the level: scout, clear, build, lure, recruit, gather, travel, alter,
+   intel. Loud/destructive play raises ALERT (the goal gets harder).
+   ===================================================================== */
+const QUESTS = [
+  { n: 'A Lost Kid', i: '🧒', d: 'A crying kid has lost their way home.', mult: { persuade: 1.3, knowledge: 1.3, speed: 1.1, heal: 1.1, entertain: 1.2, force: .3 }, weak: ['light', 'sound', 'animal', 'food'] },
+  { n: 'A Stuck Cart', i: '🛒', d: 'A merchant\'s cart is stuck deep in the mud.', mult: { force: 1.3, knowledge: 1.1, protect: .8, speed: .9 }, weak: ['earth', 'gravity', 'physical', 'water', 'plant'] },
+  { n: 'A Sick Animal', i: '🦌', d: 'A wounded deer lies trembling by the path.', mult: { heal: 1.6, persuade: 1.2, knowledge: 1.1, force: .2 }, weak: ['life', 'holy', 'food', 'water'] },
+  { n: 'A Haunted Well', i: '🪣', d: 'Something is moaning at the bottom of the village well.', mult: { knowledge: 1.3, trick: 1.2, persuade: 1.1, force: .7 }, weak: ['light', 'holy', 'sound', 'dark'] },
+  { n: 'Feuding Neighbors', i: '🏚️', d: 'Two neighbors are screaming about a fence. Punches are close.', mult: { persuade: 1.4, entertain: 1.2, knowledge: 1.1, force: .3 }, weak: ['social', 'food', 'sound', 'mind'] },
+  { n: 'A Runaway Goat', i: '🐐', d: 'A farmer\'s prize goat has escaped and is eating everything.', mult: { speed: 1.4, trick: 1.3, persuade: 1.1, force: .6 }, weak: ['food', 'plant', 'sticky', 'animal'] },
+  { n: 'A Leaking Dam', i: '🌊', d: 'A little dam is cracking. The village below is in danger.', mult: { protect: 1.5, knowledge: 1.1, force: .6 }, weak: ['earth', 'ice', 'plant', 'wood', 'sticky'] },
+  { n: 'A Grumpy Inventor', i: '🧑‍🔬', d: 'An inventor\'s machine exploded. They need help fixing it.', mult: { knowledge: 1.4, heal: 1.1, protect: .9, force: .5 }, weak: ['electric', 'metal', 'mind', 'fire'] },
+];
+const ALLIES = [
+  { n: 'Local Archer', i: '🏹', kind: 'dmg', v: 5 }, { n: 'Village Healer', i: '🧑‍⚕️', kind: 'heal', v: 5 }, { n: 'Shield Bearer', i: '🛡️', kind: 'shield', v: 7 },
+  { n: 'Brave Kid with a Stick', i: '🧒', kind: 'dmg', v: 3 }, { n: 'Old Wizard', i: '🧙', kind: 'dmg', v: 6 }, { n: 'Friendly Dog', i: '🐕', kind: 'dmg', v: 4 },
+];
+const LANDMARKS = [['a crumbling watchtower', '🗼'], ['a tall hill', '⛰️'], ['a giant old tree', '🌳'], ['a lighthouse ruin', '🗼'], ['a stone statue you can climb', '🗿']];
+const VILLAGES = [['a small village', '🏘️'], ['a traveling camp', '⛺'], ['a quiet farmstead', '🏡'], ['a busy trading post', '🏪']];
+const ENV_ICONS = { burning: '🔥', frozen: '🧊', water: '🌊', fog: '🌫️', dark: '🌑', bright: '☀️', soil: '🌱' };
+
+const itemDef = it => it.custom || ITEMS[it.id];
+function addFound(p, name, icon, traits) {
+  p.items.push({ id: 'found_' + Math.random().toString(36).slice(2, 7), uses: 1, custom: { n: name, i: icon || '📦', traits: traits.slice(), kw: nameWords(name).join(' ') || name, apt: {}, d: 'Found in the world.', cost: 0, uses: 1 } });
+}
+const cellAt = (L, x, y) => (x >= 0 && y >= 0 && x < L.w && y < L.h) ? L.cells[y * L.w + x] : null;
+const DXY = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0] };
+
+function genLevel(entry, seed) {
+  srand(seed);
+  if (entry.t === 'host') return genHost(seed);
+  const th = THEMES[R.book], w = R.page <= 2 ? 7 : R.page <= 4 ? 8 : 9, h = w;
+  const cells = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) cells.push({ t: 'empty', seen: false, vis: false, done: false, place: pick(th.places, srnd), objs: shuffle(th.objs, srnd).slice(0, 2).map(o => ({ n: o[0], i: o[1], traits: o[2].split(' ') })), env: [], built: [] });
+  const edge = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (x === 0 || y === 0 || x === w - 1 || y === h - 1) edge.push([x, y]);
+  const [sx, sy] = pick(edge, srnd);
+  let far = [], fd = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const d = Math.abs(x - sx) + Math.abs(y - sy); if (d > fd) { fd = d; far = [[x, y]]; } else if (d === fd) far.push([x, y]); }
+  const [gx, gy] = pick(far, srnd);
+  cells[gy * w + gx].t = 'goal';
+  const free = shuffle(cells.map((c, i) => i).filter(i => i !== sy * w + sx && i !== gy * w + gx && Math.abs(i % w - sx) + Math.abs(Math.floor(i / w) - sy) > 1), srnd);
+  const N = w * w;
+  const put = (t, n, f) => { for (let k = 0; k < n && free.length; k++) { const c = cells[free.pop()]; c.t = t; if (f) f(c); } };
+  put('enc', Math.round(N * (R.trial ? .05 : .09)));
+  put('obs', Math.round(N * .06));
+  put('quest', 2 + (w >= 8 ? 1 : 0), c => { c.q = pick(QUESTS, srnd); });
+  put('village', 2, c => { const v = pick(VILLAGES, srnd); c.place = v[0]; c.vi = v[1]; });
+  put('landmark', 2, c => { const v = pick(LANDMARKS, srnd); c.place = v[0]; c.li = v[1]; });
+  put('merchant', 1, c => { c.stock = shuffle(Object.keys(ITEMS), srnd).slice(0, 3); });
+  put('treasure', 3); put('shrine', w >= 8 ? 2 : 1);
+  const L = { kind: 'map', seed, entry, w, h, cells, x: sx, y: sy, px: sx, py: sy, goal: [gx, gy], ch: null, log: [], nov: {}, acted: [], turns: 0, alert: 0, allies: [], intel: 0 };
+  cells[sy * w + sx].vis = true; cells[sy * w + sx].done = true; revealAround(L, sx, sy, 1);
+  const goalName = entry.t === 'obj' ? `${OBJ[entry.o].i} ${OBJ[entry.o].n}` : entry.t === 'boss' ? '👹 the BOSS' : '🛡️ a Guardian';
+  logL(L, 'big', `📖 ${th.name} — Page ${R.page}`);
+  logL(L, 'nar', `You open your eyes in ${cells[sy * w + sx].place}. Somewhere in this land waits ${goalName}.`);
+  logL(L, 'sys', 'Walk with the arrows (or "go north") — or just DO things: climb something to scout, freeze a river, set a trap and lure enemies into it, recruit locals, gather supplies, ask around about the goal. Loud destruction raises the 🚨 Alert.');
+  if (R.trial) logL(L, 'note', '📘 <b>Tutorial page.</b> The narrator will explain every verdict: ✅ <b>Natural</b> (an obvious use of your power — full strength), 🌀 <b>Stretch</b> (clever but bends your power — weaker, costs more, can backfire, needs a higher level), ❌ <b>Impossible</b> (your power just can\'t do that — fails). On this page nothing costs you a turn by accident.');
+  return L;
+}
+
+function moveParty(d) {
+  const L = R.level;
+  if (L.kind === 'host') return hostMove(d);
+  if (L.ch) { log('note', 'Something blocks the way! Deal with it first — or slip past with a sneaky or speedy move.'); return save(); }
+  const [dx, dy] = DXY[d] || [0, 0];
+  const nx = L.x + dx, ny = L.y + dy;
+  if (!cellAt(L, nx, ny)) { log('note', 'The page ends there. You can\'t go that way.'); return save(); }
+  L.px = L.x; L.py = L.y; L.x = nx; L.y = ny;
+  L.alert = Math.max(0, L.alert - 2);
+  R.players.forEach(q => { if (!q.ko) q.en = Math.min(q.maxEn, q.en + 2); });
+  enterCell({ n: 'north', s: 'south', e: 'east', w: 'west' }[d]);
+}
+function enterCell(how) {
+  const L = R.level, c = L.cells[L.y * L.w + L.x];
+  c.vis = true; c.seen = true; revealAround(L, L.x, L.y, 1);
+  const envTxt = c.env.length ? ` (${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(', ')})` : '';
+  if (c.done) { log('nar', `You head ${how} back to ${c.place}${envTxt}.`); return save(); }
+  const objs = c.objs.map(o => `${o.i} ${o.n}`).join(' and ');
+  if (c.t === 'empty') { log('nar', `You head ${how} and arrive at ${c.place}${envTxt}. You notice ${objs || 'nothing much'}.`); c.done = true; if (rnd() < .25) { const g = 3 + Math.floor(rnd() * 6); giveGold(g); log('eff', `🪙 You find ${g} gold on the ground.`); } }
+  else if (c.t === 'treasure') { const g = 15 + 5 * R.page; giveGold(g); c.done = true; let s = `💰 A hidden treasure in ${c.place}! +${g} gold`; if (rnd() < .5) { const it = pick(Object.keys(ITEMS)); const who = pick(alive()); addItem(who, it); s += ` and a ${ITEMS[it].i} ${ITEMS[it].n} for ${esc(who.name)}`; } log('big', s); }
+  else if (c.t === 'shrine') { R.players.forEach((q, i) => { healP(i, 40); q.en = q.maxEn; }); c.done = true; log('big', `⛲ A glowing shrine in ${c.place}. Everyone heals +40 HP and energy is restored.`); }
+  else if (c.t === 'landmark') { c.done = true; revealAround(L, L.x, L.y, 2); log('big', `${c.li} You reach ${c.place}. From here you can see much further.`); log('note', 'Tip: try climbing it or using your power up here to scout even further.'); }
+  else if (c.t === 'village') {
+    c.done = true;
+    if (c.hostile) { log('bad', `${c.vi} The people of ${c.place} slam their doors. They remember what you did.`); return save(); }
+    const [gx, gy] = L.goal; L.cells[gy * L.w + gx].seen = true;
+    log('big', `${c.vi} You arrive at ${c.place}.`);
+    log('nar', `The locals point <b>${compass(L.x, L.y, gx, gy)}</b> when you ask about what you seek. They seem friendly — you could <b>recruit</b> help here, or <b>ask around</b> for intel about the goal.`);
+  }
+  else if (c.t === 'merchant') { log('big', `🛒 A traveling merchant has set up shop in ${c.place}. (Buy with the buttons on the left.)`); }
+  else if (c.t === 'quest') { if (c.hostile) { c.done = true; log('bad', 'Nobody here wants your help anymore.'); return save(); } L.ch = mkChallenge('quest', c); log('big', `❗ ${c.q.i} ${c.q.n}`); log('nar', `${c.q.d} Helping out could earn a reward — or walk away (any direction) if you'd rather not.`); introFor(L.ch); }
+  else if (c.t === 'enc') { L.ch = mkChallenge('enc', c); log('big', `${L.ch.icon} ${L.ch.title}!`); log('nar', `In ${c.place}, ${L.ch.desc}`); applyTraps(L.ch, c); }
+  else if (c.t === 'obs') { L.ch = mkChallenge('obs', c); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); }
+  else if (c.t === 'goal') {
+    if (L.entry.t === 'obj') { L.ch = mkChallenge('obj', c); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); }
+    else { L.ch = mkChallenge('boss', c); log('big', `${L.ch.icon} ${L.ch.title.toUpperCase()}`); log('nar', L.ch.desc); if (L.ch.boss.memAp || L.ch.boss.memTr) log('bad', `😈 "I remember you. Last time you beat me with ${[L.ch.boss.memAp && AP[L.ch.boss.memAp].n.toLowerCase(), L.ch.boss.memTr].filter(Boolean).join(' and ')}. That won't work twice." (Those now do half damage.)`); }
+    applyPrep(L.ch); applyTraps(L.ch, c);
+    if (L.ch.boss) bossAnnounce(L.ch);
+    introFor(L.ch);
+  }
+  R.cur = firstAlive();
+  save();
+}
+/* intel and alert shape the goal fight */
+function applyPrep(C) {
+  const L = R.level;
+  if (L.intel > 0) {
+    if (C.meter) { const b = Math.round(C.meter.goal * .1 * L.intel); C.meter.v += b; log('eff', `📜 Your intel pays off: ${C.meter.n} starts at ${Math.round(C.meter.v / C.meter.goal * 100)}%.`); }
+    if (C.boss) { const b = Math.round(C.boss.maxHp * .06 * L.intel); C.boss.hp -= b; log('eff', `📜 Your intel reveals weak spots: ${C.boss.n} starts wounded (−${b}).`); }
+    C.threats.forEach(t => t.known = true);
+  }
+  if (L.alert >= 40) {
+    const extra = L.alert >= 80 ? 2 : 1;
+    for (let i = 0; i < extra; i++) spawnThreat(C);
+    if (C.boss) { C.boss.dmg = Math.round(C.boss.dmg * (1 + L.alert / 400)); }
+    log('bad', `🚨 Your noisy journey put them on guard! (Alert ${L.alert}%)`);
+  }
+}
+function applyTraps(C, cell) {
+  const traps = cell.objs.filter(o => o.trap && o.prep);
+  traps.forEach(o => {
+    const t = C.threats.find(t => t.hp > 0);
+    if (t) { t.hp -= o.prep; t.stun = 1; log('eff', `🪤 Your ${o.n} springs! ${t.n} −${o.prep} and loses a turn.`); }
+    else if (C.boss) { dmgBoss(C, o.prep, 1); log('eff', `🪤 Your ${o.n} springs on ${C.boss.n}! −${o.prep}`); }
+    cell.objs.splice(cell.objs.indexOf(o), 1);
+  });
+}
+
+/* ---------------- world actions (exploring, no challenge) ---------------- */
+function worldAct(pi, P, ev, J) {
+  const L = R.level, p = R.players[pi], cell = L.cells[L.y * L.w + L.x];
+  const dir = DXY[P.dir] ? P.dir : null;
+  const tgtCell = dir ? cellAt(L, L.x + DXY[dir][0], L.y + DXY[dir][1]) : cell;
+  const kind = P.world || 'none', sc = ev.score, loud = ev.traits.some(t => LOUD_TRAITS.includes(t)) || P.ap === 'force';
+  const out = [], notes = ev.notes;
+  const pws = ev.pws;
+  log('nar', `${esc(p.name)} gets to work.`); // replaced by the storyteller
+  if (!tgtCell && kind !== 'none') { out.push('The page ends that way.'); }
+  else if (kind === 'scout') {
+    let r = 2 + (P.verdict === 'natural' ? 1 : 0) + (cell.t === 'landmark' ? 2 : 0) + (pws.some(pw => srcIds(pw).some(x => ['pigeons', 'wind', 'dragon', 'gravity', 'smell', 'bees', 'portals'].includes(x))) ? 1 : 0);
+    revealAround(L, L.x, L.y, r);
+    const [gx, gy] = L.goal; const gc = L.cells[gy * L.w + gx];
+    out.push(`🔭 You can see ${r} areas in every direction.${gc.seen ? ` The goal lies <b>${compass(L.x, L.y, gx, gy)}</b>.` : ''}`);
+  }
+  else if (kind === 'clear') {
+    if (!tgtCell || tgtCell.done || !['enc', 'obs', 'quest', 'village', 'merchant'].includes(tgtCell.t)) out.push('There\'s nothing there that needs clearing.');
+    else if (['quest', 'village', 'merchant'].includes(tgtCell.t)) { tgtCell.hostile = true; if (tgtCell.t !== 'quest') tgtCell.done = true; L.alert += 25; out.push(`😱 You wreck part of ${tgtCell.place}! The locals are furious and won't help you now.`); }
+    else {
+      const need = tgtCell.t === 'enc' ? 40 * hpMul() : (32 + 5 * R.page) * (.6 + .4 * np());
+      tgtCell.weak = (tgtCell.weak || 0) + sc * 1.6;
+      tgtCell.seen = true;
+      if (tgtCell.weak >= need) { tgtCell.done = true; out.push(tgtCell.t === 'enc' ? '💥 You wipe out the danger over there before it reaches you!' : '💥 The obstacle over there is gone!'); if (tgtCell.t === 'enc') giveGold(4 + R.page); }
+      else out.push(`💥 You soften up what's over there (about ${Math.round(tgtCell.weak / need * 100)}% of the way).`);
+      if (loud) { L.alert += 12; out.push('🚨 That was LOUD.'); }
+    }
+  }
+  else if (kind === 'build') {
+    const nm = (P.structure || 'contraption').slice(0, 40);
+    const trapish = /trap|pit|snare|net|mine|spike|cage|fence/i.test(nm) || P.ap === 'trick';
+    if (tgtCell && tgtCell.t === 'obs' && !tgtCell.done && sc >= (32 + 5 * R.page) * .45) { tgtCell.done = true; out.push(`🏗️ Your ${esc(nm)} gets you past the obstacle ${dir ? 'to the ' + { n: 'north', s: 'south', e: 'east', w: 'west' }[dir] : ''}!`); }
+    else { (tgtCell || cell).objs.push({ n: nm, i: trapish ? '🪤' : '🏗️', traits: ev.traits.filter(t => t !== 'physical'), prep: Math.round(sc * 1.1), trap: trapish, keep: false }); (tgtCell || cell).built.push(nm); out.push(`🏗️ You build ${esc(nm)}${tgtCell && tgtCell !== cell ? ' next door' : ' here'}. ${trapish ? 'Any enemy fought there gets hit by it first.' : 'Use it in a later action for a big bonus.'}`); }
+  }
+  else if (kind === 'lure') {
+    const away = P.toks.includes('away');
+    if (!tgtCell || tgtCell.t !== 'enc' || tgtCell.done) out.push('There\'s nothing there to lure.');
+    else if (away) {
+      const empties = L.cells.filter(c => c.t === 'empty' && !c.vis && c !== cell);
+      tgtCell.t = 'empty'; tgtCell.done = false;
+      if (empties.length) pick(empties).t = 'enc';
+      out.push('🐾 You lure whatever was there far away. That path is clear now.');
+    } else {
+      tgtCell.t = 'empty'; tgtCell.done = true;
+      L.ch = mkChallenge('enc', cell);
+      if (tgtCell.weak) L.ch.threats.forEach(t => t.hp -= Math.round(tgtCell.weak / L.ch.threats.length));
+      out.push(`🐾 You lure them over — right onto your ground!`);
+      log('eff', out.join(' ')); notes.length && log('note', notes.join(' '));
+      log('big', `${L.ch.icon} ${L.ch.title}!`);
+      applyTraps(L.ch, cell);
+      return;
+    }
+  }
+  else if (kind === 'recruit') {
+    const locals = ['village', 'quest', 'merchant'].includes(cell.t) || cell.helped;
+    if (cell.hostile) out.push('Nobody here trusts you anymore.');
+    else if (!locals) out.push('There\'s nobody here to recruit. Try a village, or someone you helped.');
+    else if (L.allies.length >= 2) out.push('Your party is already full (2 allies max).');
+    else if (sc < 9) out.push('They listen politely... but nobody volunteers. Try being more convincing.');
+    else { const a = Object.assign({}, pick(ALLIES)); a.v = Math.round(a.v * (1 + .15 * (R.page - 1))); L.allies.push(a); out.push(`🤝 ${a.i} <b>${a.n}</b> joins your party! (${a.kind === 'dmg' ? 'attacks' : a.kind === 'heal' ? 'heals' : 'shields'} every round in fights)`); }
+  }
+  else if (kind === 'gather') {
+    const oi = P.objs.length ? P.objs[0] : 0, o = cell.objs[oi];
+    if (!o || o.keep) out.push('There\'s nothing here you can carry.');
+    else { cell.objs.splice(oi, 1); addFound(p, o.n, o.i, o.traits); out.push(`🎒 ${esc(p.name)} takes the ${o.n} along. (Usable once, anywhere.)`); }
+  }
+  else if (kind === 'travel') {
+    if (!dir) out.push('Which way? (north, south, east or west)');
+    else {
+      const steps = P.verdict === 'natural' ? 3 : 2;
+      let k = 0;
+      for (; k < steps; k++) { const c = cellAt(L, L.x + DXY[dir][0], L.y + DXY[dir][1]); if (!c) break; L.x += DXY[dir][0]; L.y += DXY[dir][1]; c.seen = true; revealAround(L, L.x, L.y, 1); }
+      out.push(`🚀 You cover ${k} areas in one go${k ? ', flying over whatever was in between' : ''}!`);
+      log('eff', out.join(' ')); notes.length && log('note', notes.join(' '));
+      if (k) enterCell({ n: 'north', s: 'south', e: 'east', w: 'west' }[dir]);
+      return;
+    }
+  }
+  else if (kind === 'alter') {
+    const tags = (P.envChange || []).filter(t => ENV_ICONS[t]);
+    if (!tags.length) out.push('The land shifts a little, but nothing really changes.');
+    else {
+      const center = tgtCell || cell, cx = L.cells.indexOf(center) % L.w, cy = Math.floor(L.cells.indexOf(center) / L.w);
+      const radius = sc >= 22 ? 1 : 0;
+      const hit = [];
+      for (let y = cy - radius; y <= cy + radius; y++) for (let x = cx - radius; x <= cx + radius; x++) { const c = cellAt(L, x, y); if (c) hit.push(c); }
+      hit.forEach(c => {
+        tags.forEach(t => { if (!c.env.includes(t)) c.env.push(t); });
+        if (tags.includes('frozen')) c.env = c.env.filter(e => e !== 'burning' && e !== 'water');
+        if (tags.includes('water')) c.env = c.env.filter(e => e !== 'burning');
+        if (c.t === 'obs' && !c.done && (tags.includes('frozen') || tags.includes('burning') || tags.includes('water'))) { c.weak = (c.weak || 0) + sc; if (c.weak > (32 + 5 * R.page) * .5) { c.done = true; out.push(`The ${c.place} obstacle is swept away!`); } }
+        if (c.t === 'enc' && !c.done && tags.includes('burning')) c.weak = (c.weak || 0) + sc * .6;
+        if (['village', 'quest', 'merchant'].includes(c.t) && tags.some(t => ['burning', 'water', 'frozen'].includes(t))) { c.hostile = true; out.push(`😱 You hit ${c.place}! The locals will not forgive this.`); }
+      });
+      if (tags.includes('burning') || tags.includes('water')) L.alert += 15;
+      if (tags.includes('fog') || tags.includes('dark')) L.alert = Math.max(0, L.alert - 15);
+      out.push(`${tags.map(t => ENV_ICONS[t]).join('')} The land around ${center === cell ? 'you' : 'there'} is now ${tags.join(' & ')}${radius ? ' (a wide area)' : ''}. This changes what works there — for you and your enemies.`);
+    }
+  }
+  else if (kind === 'intel') {
+    const who = ['village', 'quest', 'merchant', 'landmark'].includes(cell.t) || cell.helped || pws.some(pw => srcIds(pw).some(x => ['pigeons', 'mindread', 'smell', 'necro', 'time'].includes(x)));
+    if (!who) out.push('There\'s nobody here to ask — try a village, a lookout, or someone you helped (or a power that can find things out).');
+    else if (L.intel >= 3) out.push('You already know everything useful about the goal.');
+    else if (sc < 8) out.push('You learn a few rumors, but nothing solid.');
+    else {
+      L.intel++; const [gx, gy] = L.goal; L.cells[gy * L.w + gx].seen = true;
+      const e = L.entry;
+      let tip = e.t === 'obj' ? `Word is that ${OBJ[e.o].n} goes best with ${Object.entries(OBJ[e.o].mult).sort((a, b) => b[1] - a[1]).slice(0, 2).map(x => AP[x[0]].n.toLowerCase()).join(' and ')}, and ${OBJ[e.o].weak.split(' ').slice(0, 2).join(' or ')} helps.` : `They whisper about ${BOSSES[e.b].n}: ${BOSSES[e.b].intro}`;
+      out.push(`📜 Intel ${L.intel}/3 — the goal is to the <b>${compass(L.x, L.y, gx, gy)}</b>. ${tip} (You'll start the goal with a head start.)`);
+    }
+  }
+  else out.push(pick(['The world notices... a little.', 'It doesn\'t change much here — but it was fun.', 'Nothing here needs that right now.']));
+  if (L.alert > 100) L.alert = 100;
+  log('eff', out.join(' '));
+  if (notes.length) log('note', notes.join(' '));
+}
+
+/* ---------------- merchant ---------------- */
+function buyFromMerchant(id) {
+  const L = R.level, c = L.cells[L.y * L.w + L.x], p = R.players[R.cur], w = wallet(p), it = ITEMS[id];
+  if (!c || c.t !== 'merchant' || !c.stock.includes(id)) return;
+  const price = Math.round(it.cost * 1.2);
+  if (w.gold < price) { log('note', 'You can\'t afford that.'); return save(); }
+  w.gold -= price; addItem(p, id); c.stock = c.stock.filter(x => x !== id);
+  log('eff', `🛒 ${esc(p.name)} buys ${it.i} ${it.n} for ${price} gold.`); save();
+}
+
+/* ---------------- allies act in fights ---------------- */
+function alliesAct(C) {
+  const L = R.level; if (!L.allies || !L.allies.length) return;
+  const lines = [];
+  L.allies.forEach(a => {
+    if (a.kind === 'dmg') { const t = C.threats.find(t => t.hp > 0); if (t) { t.hp -= a.v; lines.push(`${a.i} ${a.n} hits ${t.n} −${a.v}`); } else if (C.boss) { dmgBoss(C, a.v, 1); lines.push(`${a.i} ${a.n} hits ${C.boss.n} −${a.v}`); } else if (C.meter) { C.meter.v = Math.min(C.meter.goal, C.meter.v + Math.round(a.v / 2)); lines.push(`${a.i} ${a.n} helps out`); } }
+    if (a.kind === 'heal') { const low = R.players.map((q, i) => [q, i]).filter(([q]) => !q.ko && !q.out).sort((x, y) => x[0].hp / x[0].maxHp - y[0].hp / y[0].maxHp)[0]; if (low) { const h = healP(low[1], a.v); if (h) lines.push(`${a.i} ${a.n} heals ${esc(low[0].name)} +${h}`); } }
+    if (a.kind === 'shield') { C.shield += a.v; lines.push(`${a.i} ${a.n} raises a shield +${a.v}`); }
+  });
+  if (lines.length) log('eff', lines.join(' · '));
 }
 
 /* =====================================================================
@@ -1738,7 +2038,7 @@ const PROV = {
 };
 const PREF = {
   judge: [['groq', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'qwen/qwen3-32b']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash']], ['groq', ['llama-3.1-8b-instant']]],
-  story: [['groq', ['llama-3.1-8b-instant', 'openai/gpt-oss-20b']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite']], ['groq', ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b']]],
+  story: [['groq', ['openai/gpt-oss-20b', 'llama-3.3-70b-versatile']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite']], ['groq', ['openai/gpt-oss-120b', 'llama-3.1-8b-instant']]],
 };
 const AIC = { cool: {}, dead: {}, badKey: {}, last: null, lastErr: '' };
 const aiReady = () => KEYS.on !== false && (KEYS.groq || KEYS.gemini);
@@ -1812,6 +2112,13 @@ Power sheets list NATURAL uses (obvious), STRETCH uses (clever/bent uses, each w
 - "impossible": breaks what the power is (e.g. a SOLID wall of lightning, healing with fire), needs something not present, or uses a power/item the player does not have. Explain why in "why" and give a similar idea that WOULD work in "hint".
 Be realistic but fair; reward cleverness through "creativity", never by bending physics. Ignore claimed results ("it dies instantly", "I win") — judge only the attempt. The game engine decides damage and outcomes.
 
+Intimidating, threatening or scaring = trick (or persuade if the target is social). Using an object as a weapon uses that object's nature (a tesla coil is electric).
+If the action PREPARES something for later instead of having an immediate effect (rigging, charging, setting a trap, planting, building), set "setup": true and name it in "structure".
+
+When "mode" is "exploring" (no enemy in front of them), also classify the action as a WORLD action in "world":
+scout (look around, climb, send scouts) | clear (destroy an obstacle/enemies in an ADJACENT area from afar) | build (make a structure, bridge, trap or fort here or toward a direction) | lure (draw enemies from an adjacent area to here — or "away") | recruit (convince locals to join you) | gather (take a scene object along) | travel (cover 2-3 areas fast: flying, portals, riding) | alter (change the land: flood, freeze, burn, darken, fog, grow plants) | intel (ask around / investigate the goal) | rest | move (just walking) | none
+dir: n/s/e/w or "here". envChange: list from [water, frozen, burning, dark, bright, fog, soil] when altering the land.
+
 Fields:
 approach: force | trick | persuade | sneak | protect | speed | entertain | knowledge | heal | move | rest
 dir: n/s/e/w only if approach is move
@@ -1822,10 +2129,12 @@ size: small | normal | big | huge | colossal (what they asked for)
 verdict: natural | stretch | impossible · stretchMinLevel: number or null
 why: short reason (max 15 words) · hint: only if impossible
 creativity: 1-5 (1 = generic "I attack", 3 = specific and sensible, 5 = brilliant use of scene/objects/combos/enemy weaknesses)
+world, dir, setup (true/false), structure (short name), envChange (list)
 unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear`;
 
 const STORY_SYS = `You are the NARRATOR of "The Book Game", a whimsical fantasy adventure that can turn epic. Write 2-3 vivid sentences (max 55 words) describing what just happened.
-Follow the OUTCOME exactly: never invent extra damage, wins, deaths or failures, and never contradict the verdict. Refer to the player by name (third person). No numbers, no lists, no emojis, no quotes around your answer.`;
+Follow the OUTCOME exactly: never invent extra damage, wins, deaths or failures, and never contradict the verdict. Stay in the given PLACE (don't move the scene somewhere else).
+Refer to the player by name (third person). Never write numbers, game terms (damage, HP, shield, turn, stun, bonus) or lists. No emojis, no quotes around your answer.`;
 
 function sheetBrief(pw) {
   const s = sheetOf(pw) || {}, d = pdef(pw);
@@ -1835,10 +2144,20 @@ function situationFor(pi, C) {
   const L = R.level, p = R.players[pi];
   const sit = {
     tutorial: !!R.trial,
-    player: { name: p.name, energy: p.en, powers: p.powers.map(sheetBrief), items: p.items.map(it => ({ id: it.id, name: ITEMS[it.id].n, note: ITEMS[it.id].d })) },
+    player: { name: p.name, energy: p.en, powers: p.powers.map(sheetBrief), items: p.items.map(it => ({ id: it.id, name: itemDef(it).n, note: itemDef(it).d })) },
     teammates: R.players.filter(q => q !== p && !q.out).map(q => q.name),
     env: envOf(C),
   };
+  if (L.kind === 'map' && !C) {
+    const cell = L.cells[L.y * L.w + L.x];
+    sit.mode = 'exploring';
+    sit.here = { place: cell.place, kind: cell.t, objects: cell.objs.map(o => o.n), env: cell.env, built: cell.built };
+    sit.neighbors = {};
+    Object.entries(DXY).forEach(([d, [dx, dy]]) => { const c = cellAt(L, L.x + dx, L.y + dy); if (!c) return; sit.neighbors[d] = c.seen ? { place: c.place, kind: c.done ? 'cleared' : c.t, env: c.env } : 'unexplored'; });
+    sit.allies = (L.allies || []).map(x => x.n); sit.alert = L.alert;
+    sit.goal = L.entry.t === 'obj' ? OBJ[L.entry.o].n : L.entry.t === 'host' ? 'the Unseen Host' : 'a boss';
+    return sit;
+  }
   if (L.kind === 'host') { sit.scene = 'An endless white hall of trapped tiles. An invisible, easily bored showman called the Host watches. Entertaining him earns clues.'; sit.targets = [{ name: 'the Host', properties: ['invisible', 'social'] }]; sit.objects = []; }
   else if (C) {
     sit.scene = `${C.title}: ${C.desc}`.slice(0, 400);
@@ -1877,7 +2196,7 @@ function fromJudge(J, p, C, P0) {
   if (ap === 'rest') { P.rest = true; return P; }
   P.ap = APS.includes(ap) ? ap : P0.ap;
   (J.powers || []).forEach(x => { const s = norm(x); const i = p.powers.findIndex(pw => pw.id === s || norm(pdef(pw).name) === s || srcIds(pw).includes(s) || norm(pdef(pw).name).includes(s)); if (i >= 0 && !P.powers.includes(i) && P.powers.length < 2) P.powers.push(i); });
-  (J.items || []).forEach(x => { const s = norm(x); const i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(ITEMS[it.id].n) === s || norm(ITEMS[it.id].n).includes(s))); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
+  (J.items || []).forEach(x => { const s = norm(x); const i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(itemDef(it).n) === s || norm(itemDef(it).n).includes(s))); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
   const objs = C ? C.objs : [];
   (J.objects || []).forEach(x => { const s = norm(x); const i = objs.findIndex(o => norm(o.n) === s || s.includes(norm(o.n)) || norm(o.n).includes(s)); if (i >= 0 && !P.objs.includes(i) && P.objs.length < 2) P.objs.push(i); });
   if (C && J.target) {
@@ -1894,6 +2213,10 @@ function fromJudge(J, p, C, P0) {
   P.minLevel = +J.stretchMinLevel || null;
   P.why = String(J.why || '').slice(0, 160); P.hint = String(J.hint || '').slice(0, 200);
   P.creativity = clamp(Math.round(+J.creativity || 3), 1, 5);
+  P.world = norm(J.world) || null; P.setup = J.setup === true || J.setup === 'true'; P.structure = String(J.structure || '').slice(0, 40); P.envChange = Array.isArray(J.envChange) ? J.envChange.map(norm) : [];
+  const jd = norm(J.dir); P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[jd] || (jd === 'here' ? null : P0.dir);
+  if (P.world === 'move') { P.move = true; }
+  if (P.world === 'rest') P.rest = true;
   if ((J.powers || []).length && !P.powers.length) { P.verdict = 'impossible'; P.why = P.why || 'You don\'t have that power.'; P.hint = P.hint || `Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')}.`; }
   return P;
 }
@@ -1931,7 +2254,8 @@ const A = {
   start: () => { document.querySelectorAll('.pname').forEach((el, i) => UI.names[i] = el.value.trim().slice(0, 14) || `Player ${i + 1}`); newRun(UI.names.slice(0, UI.setupN), UI.setupMode); render(); },
   book: v => { chooseBook(v); render(); },
   send: () => { const i = $('#cmd'); if (!i || BUSY) return; const t = i.value; if (!t.trim()) return; i.value = ''; act(t); },
-  mv: v => { moveParty(v); render(); },
+  mv: v => { if (BUSY) return; moveParty(v); render(); },
+  mbuy: v => { buyFromMerchant(v); render(); },
   chip: v => { const i = $('#cmd'); i.value = (i.value.trim() + ' ' + v).trim() + ' '; i.focus(); },
   idea: () => { const i = $('#cmd'); i.value = makeIdea(); i.focus(); },
   rest: () => { act('rest'); },
@@ -2009,7 +2333,9 @@ function setupView() {
 function helpView() {
   app.innerHTML = `<h2>How to Play</h2><div class="panel help" style="max-width:820px"><ul>
   <li><b>Pick a book.</b> Each book is a world with 6 pages (levels). You start with a random power.</li>
-  <li><b>Explore</b> the map (arrow buttons, arrow keys, or type "go north"). Find the page's goal: an objective, a Guardian, the Unseen Host, or the Boss.</li>
+  <li><b>Explore</b> the map (arrow buttons, arrow keys, or type "go north") — but you can also <b>change the world</b>: climb things to scout, freeze rivers, burn or flood areas, build traps and lure enemies into them, recruit locals as allies, gather objects to carry, gather intel about the goal. Loud destruction raises the <b>🚨 Alert</b> (the goal gets harder); stealth lowers it. Villages remember if you wreck them.</li>
+  <li><b>Scene objects get used up</b> when you use them. <b>Setup moves</b> (rigging, charging, building) do nothing right away but pay off big later.</li>
+  <li><b>Help people</b> (❗) for gold, items, intel or allies. Find the page's goal: an objective, a Guardian, the Unseen Host, or the Boss.</li>
   <li><b>The AI narrator</b> (free — set it up in ⚙️ Settings) reads anything you type and judges it against your power: ✅ <b>Natural</b> (full strength), 🌀 <b>Stretch</b> (weaker, riskier, needs a higher level), ❌ <b>Impossible</b> (fails and costs your turn — you get one free warning per run). Your first page ever is a tutorial.</li>
   <li><b>Every power has its own rules</b> — see the Power Codex: what it does naturally, its stretches, its limits, what it needs from the world, and a unique signature.</li>
   <li><b>Type what you do, in your own words.</b> Example: <i>"I build a big wall of fire between us and the monkeys"</i> or <i>"I use the vines and my plants to tie up the jaguar"</i>.</li>
@@ -2084,22 +2410,31 @@ function playerCard(q, i) {
     <div class="lbl"><span>❤️ HP</span><span>${Math.ceil(q.hp)}/${q.maxHp}</span></div>${bar(q.hp, q.maxHp, '#d9534f')}
     <div class="lbl"><span>⚡ Energy</span><span>${q.en}/${q.maxEn}</span></div>${bar(q.en, q.maxEn, '#e0c04a')}
     ${q.powers.map(pw => { const d = pdef(pw); return `<div class="pw"><span>${d.icon} ${d.name}</span><span class="tag">Lv ${pw.lvl}</span></div>`; }).join('')}
-    ${q.items.length ? `<div class="small" style="margin-top:4px">${q.items.map(it => `${ITEMS[it.id].i} ${ITEMS[it.id].n} ×${it.uses}`).join(' · ')}</div>` : ''}
+    ${q.items.length ? `<div class="small" style="margin-top:4px">${q.items.map(it => `${itemDef(it).i} ${itemDef(it).n} ×${it.uses}`).join(' · ')}</div>` : ''}
     ${[q.st.hidden && '🥷', q.st.dodge && '💨', q.st.insight && '🔍', q.st.trapShield && '🛡️', q.st.leap && '🦘'].filter(Boolean).join(' ')}
   </div>`;
 }
 function mapPanel(L) {
   const c = L.cells[L.y * L.w + L.x];
-  const ICON = { enc: '⚠️', obs: '🚧', treasure: '💰', shrine: '⛲', npc: '💬', goal: L.entry.t === 'obj' ? OBJ[L.entry.o].i : L.entry.t === 'boss' ? '👹' : '🛡️', empty: '' };
+  const cs = L.w >= 9 ? 32 : L.w >= 8 ? 35 : 38;
+  const ICON = { enc: '⚠️', obs: '🚧', treasure: '💰', shrine: '⛲', village: '🏘️', landmark: '🗼', merchant: '🛒', quest: '❗', goal: L.entry.t === 'obj' ? OBJ[L.entry.o].i : L.entry.t === 'boss' ? '👹' : '🛡️', empty: '' };
   let grid = '';
   for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) {
     const cl = L.cells[y * L.w + x], me = x === L.x && y === L.y;
-    grid += `<div class="cell ${cl.seen ? 'seen' : ''} ${cl.vis ? 'vis' : ''} ${me ? 'me' : ''}">${me ? '🧍' : cl.seen ? (cl.done && cl.t !== 'goal' ? '·' : ICON[cl.t] || '') : ''}</div>`;
+    let ic = me ? '🧍' : cl.seen ? (cl.done && !['goal', 'village', 'landmark', 'merchant', 'shrine'].includes(cl.t) ? (cl.built.length ? '🏗️' : '·') : (cl.t === 'village' ? (cl.vi || '🏘️') : cl.t === 'landmark' ? (cl.li || '🗼') : ICON[cl.t] || (cl.built.length ? '🏗️' : ''))) : '';
+    if (cl.hostile && cl.seen && !me) ic = '😠';
+    const envMark = cl.seen && cl.env.length ? `<span style="position:absolute;right:1px;bottom:0;font-size:10px">${cl.env.map(e => ENV_ICONS[e]).join('')}</span>` : '';
+    grid += `<div class="cell ${cl.seen ? 'seen' : ''} ${cl.vis ? 'vis' : ''} ${me ? 'me' : ''}" style="width:${cs}px;height:${cs}px;position:relative;font-size:${cs * .5}px">${ic}${envMark}</div>`;
   }
-  return `<h3>🗺️ Map</h3><div class="map" style="grid-template-columns:repeat(${L.w},40px)">${grid}</div>
+  const merch = c.t === 'merchant' && c.stock && c.stock.length ? `<div class="ent"><b>🛒 Merchant</b><br>${c.stock.map(id => `<button class="chip" data-a="mbuy" data-v="${id}">${ITEMS[id].i} ${ITEMS[id].n} — ${Math.round(ITEMS[id].cost * 1.2)}🪙</button>`).join(' ')}</div>` : '';
+  const allies = (L.allies || []).length ? `<div class="small">🤝 Allies: ${L.allies.map(a => `${a.i} ${a.n}`).join(', ')}</div>` : '';
+  return `<h3>🗺️ Map</h3><div class="map" style="grid-template-columns:repeat(${L.w},${cs}px)">${grid}</div>
   <div class="dirs"><span></span><button data-a="mv" data-v="n">⬆️</button><span></span><button data-a="mv" data-v="w">⬅️</button><span style="text-align:center;font-size:22px">🧍</span><button data-a="mv" data-v="e">➡️</button><span></span><button data-a="mv" data-v="s">⬇️</button><span></span></div>
-  <div class="desc">📍 ${cap(c.place)}. You see: ${c.objs.map(o => `${o.i} ${o.n}`).join(', ')}.</div>
-  <div class="small">⚠️ danger · 🚧 obstacle · 💰 treasure · ⛲ shrine · 💬 someone to talk to</div>`;
+  <div class="desc">📍 ${cap(c.place)}${c.env.length ? ` <span class="tag">${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(' ')}</span>` : ''}. You see: ${c.objs.map(o => `${o.i} ${o.n}`).join(', ') || 'nothing useful'}.</div>
+  ${merch}
+  <div class="lbl"><span>🚨 Alert</span><span>${L.alert}%</span></div>${bar(L.alert, 100, '#d9534f')}
+  <div class="small">📜 Intel ${L.intel || 0}/3 · ${allies || 'No allies yet'}</div>
+  <div class="small" style="margin-top:4px">⚠️ danger · 🚧 obstacle · ❗ someone needs help · 🏘️ village · 🗼 lookout · 🛒 merchant · 💰 treasure · ⛲ shrine · 🏗️ something you built</div>`;
 }
 function challengePanel(C) {
   let h = `<div class="art">${C.icon}</div><h3 style="text-align:center">${esc(C.title)}</h3><div class="desc">${C.desc}</div>`;
@@ -2148,7 +2483,7 @@ function chipsHtml(p, L, C) {
   const ch = (label, val) => `<button class="chip" data-a="chip" data-v="${esc(val)}">${label}</button>`;
   let h = '<div class="chips">';
   h += '<span class="chiplbl">Do</span>' + APS.map(a => ch(`${AP[a].i} ${AP[a].ex}`, AP[a].ex)).join('');
-  h += '<span class="chiplbl">With</span>' + p.powers.map(pw => { const d = pdef(pw); return ch(`${d.icon} ${d.name}`, d.kw[0]); }).join('') + p.items.map(it => ch(`${ITEMS[it.id].i} ${ITEMS[it.id].n}`, ITEMS[it.id].kw.split(' ')[0])).join('');
+  h += '<span class="chiplbl">With</span>' + p.powers.map(pw => { const d = pdef(pw); return ch(`${d.icon} ${d.name}`, d.kw[0]); }).join('') + p.items.map(it => ch(`${itemDef(it).i} ${itemDef(it).n}`, itemDef(it).kw.split(' ')[0])).join('');
   const objs = C ? C.objs : L.kind === 'map' ? L.cells[L.y * L.w + L.x].objs : [];
   if (objs.length) h += objs.map(o => ch(`${o.i} ${o.n}`, 'the ' + o.n)).join('');
   h += '<span class="chiplbl">Shape & size</span>' + ['wall', 'trap', 'beam', 'wave', 'army', 'bridge', 'show'].map(f => ch(f, f)).join('') + ['small', 'big', 'huge', 'colossal'].map(s => ch(s, s)).join('');
@@ -2157,12 +2492,13 @@ function chipsHtml(p, L, C) {
     if (C.kind === 'obj') tg.push(ch(`${C.icon} ${OBJ[C.obj].kw.split(' ')[0]}`, 'the ' + OBJ[C.obj].kw.split(' ')[0]));
     if (tg.length) h += '<span class="chiplbl">Target</span>' + tg.join('');
   }
+  if (L.kind === 'map' && !C) h += '<span class="chiplbl">Change the world</span>' + [['🔭 climb up and scout', 'I climb up high and look around'], ['📜 ask about the goal', 'I ask around about the goal'], ['🤝 recruit help', 'I try to recruit help from the locals'], ['🪤 set a trap here', 'I set a trap here'], ['🐾 lure enemies', 'I lure the enemies east into my trap'], ['🎒 gather', 'I gather the '], ['🌊 flood / 🧊 freeze / 🔥 burn', 'I use my power to change the land to the north']].map(([l, t]) => ch(l, t)).join('');
   h += '<span class="chiplbl"></span><button class="chip gold" data-a="idea">💡 Idea</button><button class="chip" data-a="rest">😴 Rest</button>';
   return h + '</div>';
 }
 function makeIdea() {
   const L = R.level, C = L.ch, p = R.players[R.cur];
-  if (L.kind === 'map' && !C) return pick(['go north', 'go east', 'go south', 'go west', 'scout the area']);
+  if (L.kind === 'map' && !C) { const pw = pdef(pick(p.powers)); return pick([`I use my ${pw.name.toLowerCase()} to scout the land around me`, `I ask around about where the goal is`, `I use my ${pw.name.toLowerCase()} to build a trap here`, `I use my ${pw.name.toLowerCase()} to change the land to the north`, 'I gather something useful from here', 'go ' + pick(['north', 'south', 'east', 'west'])]); }
   const pw = pick(p.powers), d = pdef(pw);
   const aps = APS.filter(a => d.apt[a] >= 2);
   let ap = pick(aps.length ? aps : APS);
