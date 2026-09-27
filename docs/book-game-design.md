@@ -242,7 +242,19 @@ Tested headlessly against the live Groq and Gemini APIs; fixes made from what ac
 - **Bosses talk back.** Each boss turn adds a short in-character line reacting to what you did.
 - **The Host has taste.** The AI rates each act 1–5 ⭐ in the Host's voice, remembers your earlier acts, and hates reruns. The rating scales the Amusement gain.
 
-## 17. Playtesting help (built into the game)
+## 17. Open-world pages (replaces the grid when the AI is on)
+The grid made every objective the same: walk to a square, fill a bar. Now, like a tabletop game master, the game drops you
+somewhere ("You wake up on cold linoleum…") and it's up to you.
+- **World bible (secret).** At the start of a page the AI writes: the start place, ~6 places you can see or hear of, 3 locals with wants, 2 roaming dangers, where the goal is, what's going on there, and 3 rumours. It's **stuff, never solutions**: no routes, keys or "the way out". Any plan that fits your powers and the world can work.
+- **Hidden goal.** The page's objective is secret until you uncover it (ask the right person, follow a rumour, reach the place). If you wander too long, rumours start reaching you, and after ~9 turns (6 in the tutorial) everyone's talking about it.
+- **Engine keeps the facts.** Places visited, what you've learned (📜), what you built, items picked up. They're sent back to the AI every turn, so the world stays consistent. You can't declare things into existence ("I find a helicopter" is ❌ Impossible).
+- **Real progress.** The Judge rates how much each action really moves you toward the goal (0–3); the engine turns that into 📖 Progress, scaled by your power, creativity and verdict, and less for repeating the same approach. Before the goal is known, progress caps at 35%.
+- **The world pushes back.** Loud or reckless moves raise 🚨 Alert and danger; fights (and obstacles) break out, and there's always trouble at 40% and 75%.
+- **Finale.** At 100% you reach the heart of the page: the boss, guardian or objective scene (the objective's meter is shorter since the journey did most of the work; what you learned counts as intel).
+- **No AI?** The page uses the classic grid map instead, so the game still works offline. The Unseen Host keeps its own trap hall.
+- Playtested with an AI player on the live APIs: a full page (find the goal, a fight, a locked gate, the heist finale) took ~27 turns.
+
+## 18. Playtesting help (built into the game)
 - ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.
 - An indicator showing which AI is currently narrating.
 - 🐞 **Report** button: copies your last few turns (what you typed, the verdict, what happened) so you can paste it to Claude with "this was wrong because…".
