@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rift Runners</title>
+<style>
+:root{--bg:#0b0d14;--panel:#161a26;--panel2:#1f2536;--line:#2c3450;--text:#e8ecf6;--dim:#8d97b3;--acc:#7c9cff;--gold:#ffd24a;--good:#5ee08a;--bad:#ff6070;--purple:#b48cff}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none}
+canvas{position:fixed;inset:0;display:block}
+#ui{position:fixed;inset:0;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+#ui.hidden{display:none}
+#ui.overlay{background:rgba(5,7,12,.72);justify-content:center}
+#ui.menu{background:transparent}
+h1{font-size:clamp(34px,6vw,64px);margin:18px 0 4px;letter-spacing:4px;background:linear-gradient(90deg,#7c9cff,#b48cff,#ff7ab8);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+h2{margin:6px 0 12px;font-size:26px;text-align:center}
+.sub{color:var(--dim);text-align:center;margin-bottom:18px}
+.col{display:flex;flex-direction:column;gap:10px;width:min(360px,100%)}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:min(1100px,100%)}
+button{font:inherit;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;position:relative;transition:transform .08s,border-color .08s}
+button:hover:not([disabled]),button:focus:not([disabled]){border-color:var(--acc);outline:none;transform:translateY(-2px);background:var(--panel2)}
+button[disabled]{opacity:.4;cursor:default}
+button.big{font-size:18px;padding:14px 18px}
+kbd{position:absolute;top:6px;right:8px;font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:0 5px;background:#0006}
+.card{width:210px;min-height:190px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 12px}
+.card .ci{font-size:40px;line-height:1.2}
+.card .ct{font-weight:700;font-size:17px}
+.card .cs{font-size:12px;color:var(--acc);text-transform:uppercase;letter-spacing:1px}
+.card .cd{font-size:14px;color:var(--dim)}
+.card.evo{border-color:#ffb84a;box-shadow:0 0 18px #ffb84a55}
+.card.evo .cs{color:#ffb84a}
+.card.new .cs{color:var(--good)}
+.card.relic .cs{color:var(--purple)}
+.price{color:var(--gold);font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:min(900px,100%)}
+.bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;width:min(1000px,100%);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:10px;font-size:15px}
+.bar .it{white-space:nowrap}
+.icons{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.ico{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 6px;font-size:14px;white-space:nowrap}
+.ico b{font-size:11px;color:var(--gold)}
+.map{position:relative;width:min(560px,100%);height:min(62vh,600px);margin:6px auto;flex-shrink:0}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.node{position:absolute;transform:translate(-50%,50%);width:48px;height:48px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;font-size:22px;text-align:center}
+.node:hover:not([disabled]),.node:focus:not([disabled]){transform:translate(-50%,50%) scale(1.15)}
+.node.reach{border-color:var(--acc);box-shadow:0 0 14px #7c9cff88;animation:pulse 1.2s infinite}
+.node.visited{border-color:var(--good);opacity:.85}
+.node.boss{width:64px;height:64px;font-size:30px;border-color:#ff6070}
+.node kbd{top:-10px;right:-8px;background:#000}
+@keyframes pulse{50%{box-shadow:0 0 22px #7c9cffcc}}
+.legend{font-size:13px;color:var(--dim);text-align:center;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;width:min(1000px,100%)}
+.mrow{display:flex;gap:10px;align-items:center}
+.mrow .mi{font-size:26px}
+.mrow .mt{flex:1}
+.mrow small{color:var(--dim)}
+.pips{letter-spacing:2px;color:var(--acc);font-size:12px}
+.locked{filter:grayscale(1)}
+.ach{padding:10px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--line)}
+.ach.done{border-color:var(--good)}
+textarea{width:100%;height:90px;background:#0a0c12;color:var(--text);border:1px solid var(--line);border-radius:8px;font-family:monospace;font-size:12px;padding:8px}
+#toasts{position:fixed;top:70px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;z-index:10}
+.toast{background:#1c2233ee;border:1px solid var(--acc);padding:8px 16px;border-radius:10px;font-weight:600;animation:tin .25s}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--dim)}
+p{line-height:1.5}
+.help{max-width:760px}
+.help li{margin:4px 0;line-height:1.45}
+.foot{margin-top:14px;color:var(--dim);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"></div>
+<div id="toasts"></div>
+<script>
+'use strict';
+/* =====================================================================
+   RIFT RUNNERS - an action roguelite with route-planning strategy.
+   Single-file, offline, progress saved in localStorage + export codes.
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const cv = $('#c'), cx = cv.getContext('2d'), ui = $('#ui');
+let VW = 0, VH = 0;
+function resize() { VW = cv.width = innerWidth; VH = cv.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+/* ---------- seeded RNG (so Daily Challenge is the same for everyone) ---------- */
+const RNG = { s: 1, next() { let t = (this.s = (this.s + 0x6D2B79F5) | 0); t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; } };
+const rnd = () => RNG.next();
+const ri = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+const pick = a => a[Math.floor(rnd() * a.length)];
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+function weighted(list) { let tot = 0; for (const o of list) tot += o.w; let r = rnd() * tot; for (const o of list) { r -= o.w; if (r <= 0) return o; } return list[list.length - 1]; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function hashStr(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h | 0; }
+const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+
+/* ================= DATA ================= */
+const WEAPONS = {
+  wand:      { name: 'Magic Bolt',      icon: '✨', desc: 'Fires bolts at the nearest enemy.',            evo: 'multi', evoName: 'Arcane Barrage' },
+  daggers:   { name: 'Throwing Knives', icon: '🔪', desc: 'Throws knives the way you are moving.',        evo: 'haste', evoName: 'Blade Storm' },
+  orbit:     { name: 'Orbit Blades',    icon: '🌙', desc: 'Blades circle around you.',                    evo: 'area',  evoName: 'Blade Halo' },
+  aura:      { name: 'Holy Aura',       icon: '☀️', desc: 'Burns every enemy close to you.',              evo: 'vital', evoName: 'Sanctuary' },
+  lightning: { name: 'Chain Lightning', icon: '⚡', desc: 'Zaps enemies and chains between them.',        evo: 'luck',  evoName: 'Thunder God' },
+  bomb:      { name: 'Bombs',           icon: '💣', desc: 'Lobs bombs that explode in an area.',          evo: 'might', evoName: 'Meteor Shower' },
+  boomerang: { name: 'Boomerang',       icon: '🪃', desc: 'Flies out and back, piercing everything.',     evo: 'swift', evoName: 'Cyclone' },
+  frost:     { name: 'Frost Nova',      icon: '❄️', desc: 'Blasts nearby enemies and slows them.',        evo: 'armor', evoName: 'Absolute Zero' },
+  fire:      { name: 'Fire Trail',      icon: '🔥', desc: 'Leaves burning ground where you walk.',        evo: 'crit',  evoName: 'Inferno' },
+};
+const PASSIVES = {
+  might:  { name: 'Might',     icon: '💪', desc: '+10% damage', max: 5 },
+  haste:  { name: 'Haste',     icon: '⏱️', desc: '-8% weapon cooldowns', max: 5 },
+  swift:  { name: 'Swiftness', icon: '👟', desc: '+8% move speed', max: 5 },
+  vital:  { name: 'Vitality',  icon: '❤️', desc: '+20 max HP, +0.3 HP/sec regen', max: 5 },
+  magnet: { name: 'Magnet',    icon: '🧲', desc: '+35% pickup range', max: 5 },
+  multi:  { name: 'Multishot', icon: '🎯', desc: '+1 projectile / blade / bomb', max: 3 },
+  area:   { name: 'Expanse',   icon: '🌀', desc: '+12% attack size', max: 5 },
+  luck:   { name: 'Luck',      icon: '🍀', desc: '+10% luck (crits, gold, extra choices)', max: 5 },
+  armor:  { name: 'Armor',     icon: '🛡️', desc: '-1 damage taken per hit', max: 5 },
+  crit:   { name: 'Precision', icon: '🗡️', desc: '+6% critical hit chance', max: 5 },
+  growth: { name: 'Growth',    icon: '📈', desc: '+12% XP gained', max: 5 },
+  greed:  { name: 'Greed',     icon: '💰', desc: '+15% gold gained', max: 5 },
+};
+const RELICS = {
+  fang:      { name: 'Vampire Fang',    icon: '🦷', desc: 'Kills have an 8% chance to heal 2 HP.' },
+  glass:     { name: 'Glass Cannon',    icon: '🧪', desc: '+40% damage, but -30% max HP.' },
+  boots:     { name: 'Winged Boots',    icon: '👢', desc: 'Dash recharges 40% faster.' },
+  thorns:    { name: 'Thorn Mail',      icon: '🌵', desc: 'Enemies that touch you take 30 damage.' },
+  coin:      { name: 'Lucky Coin',      icon: '🪙', desc: '+25% gold and +10% luck.' },
+  phoenix:   { name: 'Phoenix Feather', icon: '🪶', desc: 'Revive once at 50% HP.' },
+  hourglass: { name: 'Hourglass',       icon: '⏳', desc: 'Normal and elite fights are 20% shorter.' },
+  boom:      { name: 'Volatile Core',   icon: '💥', desc: 'Enemies have a 25% chance to explode when they die.' },
+  core:      { name: 'Magnet Core',     icon: '🧲', desc: 'Double pickup range.' },
+  crown:     { name: 'Heavy Crown',     icon: '👑', desc: '+40% XP, but enemies have +15% HP.' },
+  berserk:   { name: 'Berserker Band',  icon: '😡', desc: 'Up to +80% damage the lower your HP is.' },
+  clover:    { name: 'Four-Leaf Clover',icon: '☘️', desc: '+3 rerolls and +10% luck.' },
+  frostheart:{ name: 'Frost Heart',     icon: '🧊', desc: 'Dashing freezes nearby enemies.' },
+  idol:      { name: 'Golden Idol',     icon: '🗿', desc: '+30% shards when this run ends.' },
+  wind:      { name: 'Second Wind',     icon: '🌬️', desc: 'Heal 20% HP at the start of every fight.' },
+  overclock: { name: 'Overclock',       icon: '⚙️', desc: '-15% weapon cooldowns.' },
+  aegis:     { name: 'Aegis',           icon: '🔰', desc: 'Blocks one hit every 12 seconds.' },
+  chrono:    { name: 'Chrono Watch',    icon: '⌚', desc: 'Enemies move 12% slower.' },
+  heart:     { name: 'Giant Heart',     icon: '💗', desc: '+40 max HP.' },
+  twin:      { name: 'Twin Charm',      icon: '♊', desc: '+1 projectile / blade / bomb.' },
+  dice:      { name: 'Loaded Dice',     icon: '🎲', desc: '+15% critical hit chance.' },
+};
+const CHARS = {
+  knight:  { name: 'Knight',      icon: '🛡️', color: '#9fb4ff', weapon: 'orbit',     desc: 'Sturdy. +30 max HP, +1 armor.', mods: { maxHp: 30, armor: 1 }, unlock: null },
+  ranger:  { name: 'Ranger',      icon: '🏹', color: '#7ee08a', weapon: 'daggers',   desc: 'Quick. +12% speed, +10% crit.', mods: { speed: .12, crit: .10 }, unlock: { text: 'Reach Act 2', test: s => s.stats.bestAct >= 2 } },
+  mage:    { name: 'Mage',        icon: '🔮', color: '#c49cff', weapon: 'wand',      desc: '+1 projectile, +15% area, -15 max HP.', mods: { proj: 1, area: .15, maxHp: -15 }, unlock: { text: 'Kill 500 enemies (total)', test: s => s.stats.kills >= 500 } },
+  bomber:  { name: 'Bomber',      icon: '💣', color: '#ffae5c', weapon: 'bomb',      desc: '+25% area, +10% damage.', mods: { area: .25, might: .10 }, unlock: { text: 'Defeat a boss', test: s => s.stats.bosses >= 1 } },
+  pyro:    { name: 'Pyro',        icon: '🔥', color: '#ff7a5c', weapon: 'fire',      desc: '+10% speed, +1 HP/sec regen.', mods: { speed: .10, regen: 1 }, unlock: { text: 'Reach Act 3', test: s => s.stats.bestAct >= 3 } },
+  vampire: { name: 'Vampire',     icon: '🧛', color: '#ff5c8a', weapon: 'aura',      desc: 'Heals 0.5 HP per kill.', mods: { killHeal: .5 }, unlock: { text: 'Kill 3,000 enemies (total)', test: s => s.stats.kills >= 3000 } },
+  cryo:    { name: 'Cryomancer',  icon: '🧊', color: '#7fe3ff', weapon: 'frost',     desc: '+20% area, enemies 8% slower.', mods: { area: .2, chill: .08 }, unlock: { text: 'Defeat 10 elites (total)', test: s => s.stats.elites >= 10 } },
+  gambler: { name: 'Gambler',     icon: '🎲', color: '#ffd24a', weapon: null,        desc: 'Random weapon. +30% luck, +2 rerolls.', mods: { luck: .3, rerolls: 2 }, unlock: { text: 'Collect 2,000 gold (total)', test: s => s.stats.gold >= 2000 } },
+  storm:   { name: 'Stormcaller', icon: '⚡', color: '#fff27a', weapon: 'lightning', desc: '-10% cooldowns, +15% luck.', mods: { haste: .10, luck: .15 }, unlock: { text: 'Win a run (beat Act 3)', test: s => s.stats.wins >= 1 } },
+  ranger2: { name: 'Boomer',      icon: '🪃', color: '#c8a26b', weapon: 'boomerang', desc: '+15% damage, +10% speed.', mods: { might: .15, speed: .10 }, unlock: { text: 'Evolve a weapon', test: s => s.stats.evolutions >= 1 } },
+};
+const META = [
+  { id: 'hp',     name: 'Toughness',  icon: '❤️', desc: '+10 max HP',              max: 10, base: 12 },
+  { id: 'power',  name: 'Power',      icon: '💪', desc: '+5% damage',              max: 10, base: 15 },
+  { id: 'speed',  name: 'Agility',    icon: '👟', desc: '+4% move speed',          max: 5,  base: 15 },
+  { id: 'haste',  name: 'Focus',      icon: '⏱️', desc: '-3% cooldowns',           max: 5,  base: 20 },
+  { id: 'magnet', name: 'Attraction', icon: '🧲', desc: '+15% pickup range',       max: 5,  base: 10 },
+  { id: 'greed',  name: 'Fortune',    icon: '💰', desc: '+10% gold',               max: 5,  base: 12 },
+  { id: 'wisdom', name: 'Wisdom',     icon: '📈', desc: '+8% XP',                  max: 5,  base: 15 },
+  { id: 'luck',   name: 'Luck',       icon: '🍀', desc: '+5% luck',                max: 5,  base: 18 },
+  { id: 'armor',  name: 'Plating',    icon: '🛡️', desc: '+1 armor',                max: 3,  base: 40 },
+  { id: 'gold',   name: 'Head Start', icon: '🪙', desc: '+20 starting gold',       max: 5,  base: 10 },
+  { id: 'reroll', name: 'Reroll',     icon: '🎲', desc: '+1 reroll per run',       max: 5,  base: 30 },
+  { id: 'revive', name: 'Second Life',icon: '👼', desc: '+1 revive per run',       max: 2,  base: 150 },
+  { id: 'choice', name: 'Insight',    icon: '🔎', desc: '+1 extra level-up choice',max: 1,  base: 250 },
+];
+const metaCost = (m, lvl) => Math.round(m.base * Math.pow(lvl + 1, 1.6));
+const ENEMIES = {
+  grunt:    { hp: 14, spd: 72,  dmg: 7,  r: 12, xp: 1, color: '#e0564a' },
+  runner:   { hp: 9,  spd: 128, dmg: 5,  r: 9,  xp: 1, color: '#f0a030' },
+  brute:    { hp: 70, spd: 48,  dmg: 15, r: 20, xp: 4, color: '#9b59b6' },
+  shooter:  { hp: 20, spd: 60,  dmg: 8,  r: 12, xp: 2, color: '#3fb4e0' },
+  splitter: { hp: 34, spd: 64,  dmg: 8,  r: 15, xp: 2, color: '#5ecf6a' },
+  exploder: { hp: 16, spd: 100, dmg: 20, r: 11, xp: 2, color: '#ff4fa3' },
+  mini:     { hp: 9,  spd: 115, dmg: 4,  r: 8,  xp: 1, color: '#8fe89a' },
+};
+const BOSSES = {
+  colossus: { name: 'The Colossus',   color: '#b08a6a', r: 42 },
+  queen:    { name: 'The Hive Queen', color: '#7ad06a', r: 38 },
+  eye:      { name: 'The Void Eye',   color: '#9a6aff', r: 36 },
+};
+const BOSS_ORDER = ['colossus', 'queen', 'eye'];
+const ACTS = [
+  { name: 'Verdant Wilds', bg: '#0f1f16', grid: '#18301f' },
+  { name: 'Ember Depths',  bg: '#22120e', grid: '#361c16' },
+  { name: 'Frozen Rift',   bg: '#0d1826', grid: '#172840' },
+  { name: 'Shadow Realm',  bg: '#170e22', grid: '#261838' },
+  { name: 'Crystal Abyss', bg: '#0c2222', grid: '#163838' },
+  { name: 'Storm Spire',   bg: '#201e0e', grid: '#34301a' },
+];
+const actInfo = a => ACTS[(a - 1) % ACTS.length];
+const NODE = {
+  fight:    { icon: '⚔️', name: 'Fight' },
+  elite:    { icon: '💀', name: 'Elite (relic reward)' },
+  event:    { icon: '❓', name: 'Event' },
+  shop:     { icon: '🛒', name: 'Shop' },
+  rest:     { icon: '⛺', name: 'Rest' },
+  treasure: { icon: '💎', name: 'Treasure' },
+  boss:     { icon: '👹', name: 'Boss' },
+};
+const ACHIEVEMENTS = [
+  { id: 'k100',   name: 'First Blood',     desc: 'Kill 100 enemies (total)',      reward: 10,  test: s => s.stats.kills >= 100 },
+  { id: 'k5000',  name: 'Slayer',          desc: 'Kill 5,000 enemies (total)',    reward: 50,  test: s => s.stats.kills >= 5000 },
+  { id: 'k25000', name: 'Unstoppable',     desc: 'Kill 25,000 enemies (total)',   reward: 150, test: s => s.stats.kills >= 25000 },
+  { id: 'boss1',  name: 'Giant Slayer',    desc: 'Defeat a boss',                 reward: 20,  test: s => s.stats.bosses >= 1 },
+  { id: 'act3',   name: 'Deep Diver',      desc: 'Reach Act 3',                   reward: 30,  test: s => s.stats.bestAct >= 3 },
+  { id: 'win',    name: 'Rift Conqueror',  desc: 'Win a run (beat Act 3)',        reward: 75,  test: s => s.stats.wins >= 1 },
+  { id: 'act5',   name: 'Into the Endless',desc: 'Reach Act 5 in Endless',        reward: 100, test: s => s.stats.bestAct >= 5 },
+  { id: 'act10',  name: 'Beyond Reason',   desc: 'Reach Act 10 in Endless',       reward: 300, test: s => s.stats.bestAct >= 10 },
+  { id: 'evo',    name: 'Evolution',       desc: 'Evolve a weapon',               reward: 25,  test: s => s.stats.evolutions >= 1 },
+  { id: 'evo3',   name: 'Arsenal of Gods', desc: 'Have 3 evolved weapons in one run', reward: 100, test: (s, r) => r && r.weapons.filter(w => w.evo).length >= 3 },
+  { id: 'rich',   name: 'Hoarder',         desc: 'Hold 300 gold at once',         reward: 30,  test: (s, r) => r && r.gold >= 300 },
+  { id: 'relic8', name: 'Collector',       desc: 'Own 8 relics in one run',       reward: 60,  test: (s, r) => r && r.relics.length >= 8 },
+  { id: 'lv30',   name: 'Ascended',        desc: 'Reach level 30 in one run',     reward: 50,  test: (s, r) => r && r.level >= 30 },
+  { id: 'nohit',  name: 'Untouchable',     desc: 'Clear a fight without taking damage', reward: 20, test: s => s.stats.noHit >= 1 },
+  { id: 'heat3',  name: 'Feel the Heat',   desc: 'Win a run on Heat 3+',          reward: 100, test: s => s.maxHeat >= 4 },
+  { id: 'heat10', name: 'Inferno Master',  desc: 'Win a run on Heat 10',          reward: 500, test: s => s.stats.heat10 >= 1 },
+  { id: 'daily',  name: 'Daily Habit',     desc: 'Finish a Daily Challenge run',  reward: 15,  test: s => s.stats.dailies >= 1 },
+  { id: 'chars',  name: 'Full Roster',     desc: 'Unlock every character',        reward: 100, test: s => Object.keys(CHARS).every(k => s.chars[k]) },
+];
+
+/* ================= SAVE ================= */
+const SAVE_KEY = 'riftRunnersSave_v1';
+function defaultSave() {
+  return { v: 1, shards: 0, meta: {}, chars: { knight: true }, maxHeat: 0, heat: 0, ach: {}, daily: {}, run: null, lastChar: 'knight', seenHelp: false,
+    stats: { runs: 0, kills: 0, bosses: 0, wins: 0, bestAct: 1, elites: 0, gold: 0, playTime: 0, shardsEarned: 0, deaths: 0, evolutions: 0, noHit: 0, dailies: 0, heat10: 0, bestLevel: 0 } };
+}
+function merge(d, o) { for (const k in o) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k]) && d[k] && typeof d[k] === 'object') merge(d[k], o[k]); else d[k] = o[k]; } return d; }
+function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return merge(defaultSave(), JSON.parse(raw)); } catch (e) {} return defaultSave(); }
+let S = loadSave();
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+function exportCode() { return 'RIFT1:' + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function importCode(code) {
+  code = code.trim(); if (!code.startsWith('RIFT1:')) throw new Error('bad');
+  const obj = JSON.parse(decodeURIComponent(escape(atob(code.slice(6)))));
+  if (!obj || typeof obj !== 'object' || !obj.stats) throw new Error('bad');
+  S = merge(defaultSave(), obj); save();
+}
+
+/* ================= RUN STATE ================= */
+let run = null;   // current run (serializable)
+let ST = null;    // computed stats
+let G = null;     // fight state (transient)
+let P = null;     // player in fight
+let mode = 'menu';
+let paused = false;
+const has = id => run && run.relics.includes(id);
+
+function calcStats(r) {
+  const c = CHARS[r.char].mods, m = S.meta, p = r.passives, b = r.bonus;
+  const s = { maxHp: 100, speed: 190, might: 1, cdMul: 1, area: 1, proj: 0, magnet: 70, luck: 0, armor: 0, crit: .05, regen: 0, xpMul: 1, goldMul: 1, dashCd: 1.3, killHeal: 0, chill: 0 };
+  s.maxHp += (c.maxHp || 0) + 10 * (m.hp || 0) + 20 * (p.vital || 0) + (b.maxHp || 0);
+  s.armor += (c.armor || 0) + (m.armor || 0) + (p.armor || 0);
+  s.speed *= 1 + (c.speed || 0) + .04 * (m.speed || 0) + .08 * (p.swift || 0);
+  s.crit += (c.crit || 0) + .06 * (p.crit || 0) + (b.crit || 0);
+  s.proj += (c.proj || 0) + (p.multi || 0);
+  s.area += (c.area || 0) + .12 * (p.area || 0);
+  s.might += (c.might || 0) + .05 * (m.power || 0) + .10 * (p.might || 0) + (b.might || 0);
+  s.cdMul *= (1 - (c.haste || 0)) * (1 - .03 * (m.haste || 0)) * Math.pow(.92, p.haste || 0);
+  s.luck += (c.luck || 0) + .05 * (m.luck || 0) + .10 * (p.luck || 0);
+  s.killHeal += c.killHeal || 0;
+  s.regen += (c.regen || 0) + .3 * (p.vital || 0);
+  s.magnet *= 1 + .15 * (m.magnet || 0) + .35 * (p.magnet || 0);
+  s.xpMul *= 1 + .08 * (m.wisdom || 0) + .12 * (p.growth || 0);
+  s.goldMul *= 1 + .10 * (m.greed || 0) + .15 * (p.greed || 0) + (b.gold || 0);
+  s.chill += c.chill || 0;
+  const R = id => r.relics.includes(id);
+  if (R('glass')) { s.might += .4; s.maxHp *= .7; }
+  if (R('boots')) s.dashCd *= .6;
+  if (R('coin')) { s.goldMul += .25; s.luck += .1; }
+  if (R('core')) s.magnet *= 2;
+  if (R('crown')) s.xpMul *= 1.4;
+  if (R('clover')) s.luck += .1;
+  if (R('overclock')) s.cdMul *= .85;
+  if (R('chrono')) s.chill += .12;
+  if (R('heart')) s.maxHp += 40;
+  if (R('twin')) s.proj += 1;
+  if (R('dice')) s.crit += .15;
+  s.crit += s.luck * .3;
+  s.maxHp = Math.max(10, Math.round(s.maxHp));
+  s.cdMul = Math.max(.3, s.cdMul);
+  return s;
+}
+const xpNeed = l => Math.floor(5 + (l - 1) * 6 + Math.pow(l - 1, 1.6));
+function getHp() { return mode === 'fight' ? P.hp : run.hp; }
+function setHp(v) { v = clamp(v, 0, calcStats(run).maxHp); if (mode === 'fight') P.hp = v; else run.hp = v; }
+function healPct(p) { setHp(getHp() + calcStats(run).maxHp * p); }
+
+function addRelic(id) {
+  if (run.relics.includes(id)) return;
+  const before = calcStats(run).maxHp;
+  run.relics.push(id);
+  if (id === 'phoenix') run.revives++;
+  if (id === 'clover') run.rerolls += 3;
+  const after = calcStats(run).maxHp;
+  if (after > before) setHp(getHp() + after - before); else setHp(Math.min(getHp(), after));
+  if (mode === 'fight') ST = calcStats(run);
+}
+function randomRelics(n) { return shuffle(Object.keys(RELICS).filter(k => !run.relics.includes(k))).slice(0, n); }
+
+function newRun(charId, heat, daily) {
+  const seed = daily ? hashStr('rift-daily-' + todayStr()) : (Date.now() ^ Math.floor(Math.random() * 1e9)) | 0;
+  RNG.s = seed;
+  const c = CHARS[charId];
+  run = { char: charId, heat, daily: daily ? todayStr() : null, act: 1, map: null, pos: { r: -1, i: -1 }, path: [], target: null,
+    level: 1, xp: 0, gold: 20 + 20 * (S.meta.gold || 0), weapons: [{ id: c.weapon || pick(Object.keys(WEAPONS)), lvl: 1, evo: false }],
+    passives: {}, relics: [], bonus: {}, rerolls: (S.meta.reroll || 0) + (c.mods.rerolls || 0), revives: S.meta.revive || 0,
+    kills: 0, elites: 0, bosses: 0, floors: 0, curse: 0, endless: false, won: false, seed: 0, hp: 0 };
+  run.map = genMap(1);
+  if (daily) addRelic(pick(Object.keys(RELICS)));
+  run.hp = calcStats(run).maxHp;
+  S.lastChar = charId; S.heat = heat; S.stats.runs++;
+  saveRun(); showMap();
+}
+function saveRun() {
+  if (!run) return;
+  run.seed = RNG.s;
+  const copy = JSON.parse(JSON.stringify(run, (k, v) => (k === 't' || k === 'ang' || k === 'blades' || k === 'lx' || k === 'ly') ? undefined : v));
+  S.run = copy; save();
+}
+function resumeRun() { run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1; showMap(); }
+
+/* ================= MAP ================= */
+function genMap(act) {
+  const rows = [], R = 7;
+  for (let r = 0; r < R; r++) {
+    const n = r === 0 ? ri(2, 3) : ri(2, 4), row = [];
+    for (let i = 0; i < n; i++) {
+      let t;
+      if (r === 0) t = 'fight';
+      else if (r === R - 1) t = 'rest';
+      else t = weighted([{ t: 'fight', w: 44 }, { t: 'elite', w: r >= 2 ? 16 : 0 }, { t: 'event', w: 22 }, { t: 'shop', w: r >= 2 ? 10 : 0 }, { t: 'rest', w: r >= 3 ? 6 : 0 }, { t: 'treasure', w: 5 }]).t;
+      row.push({ t, x: (i + 1) / (n + 1) + (rnd() - .5) * .06, next: [] });
+    }
+    rows.push(row);
+  }
+  // guarantee variety
+  const mid = rows.slice(2, R - 1).flat();
+  if (!mid.some(n => n.t === 'shop')) pick(mid.filter(n => n.t === 'fight') .length ? mid.filter(n => n.t === 'fight') : mid).t = 'shop';
+  if (!mid.some(n => n.t === 'elite')) { const f = mid.filter(n => n.t === 'fight'); if (f.length) pick(f).t = 'elite'; }
+  rows.push([{ t: 'boss', x: .5, next: [] }]);
+  for (let r = 0; r < rows.length - 1; r++) {
+    const a = rows[r], b = rows[r + 1];
+    a.forEach((node, i) => {
+      const pos = a.length === 1 ? .5 : i / (a.length - 1);
+      const j = Math.round(pos * (b.length - 1));
+      node.next.push(j);
+      if (rnd() < .55) { const j2 = j + (rnd() < .5 ? -1 : 1); if (j2 >= 0 && j2 < b.length && !node.next.includes(j2)) node.next.push(j2); }
+    });
+    b.forEach((node, j) => {
+      if (!a.some(n => n.next.includes(j))) { let best = 0, bd = 9; a.forEach((n, i) => { const d = Math.abs(n.x - node.x); if (d < bd) { bd = d; best = i; } }); a[best].next.push(j); }
+    });
+  }
+  return rows;
+}
+function reachable() {
+  const rows = run.map;
+  if (run.pos.r < 0) return rows[0].map((_, i) => [0, i]);
+  if (run.pos.r >= rows.length - 1) return [];
+  return rows[run.pos.r][run.pos.i].next.map(j => [run.pos.r + 1, j]);
+}
+
+/* ================= UI HELPERS ================= */
+let inputLock = 0, keyHook = null;
+function screen(html, actions = [], cls = 'menu', hook = null) {
+  ui.className = cls; ui.innerHTML = html; keyHook = hook; ui.scrollTop = 0;
+  ui.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (performance.now() < inputLock) return; const f = actions[+b.dataset.a]; if (f) f(); });
+  const first = ui.querySelector('button.opt:not([disabled])') || ui.querySelector('button:not([disabled])');
+  if (first) first.focus({ preventScroll: true });
+}
+function hideUI() { ui.className = 'hidden'; ui.innerHTML = ''; keyHook = null; }
+function toast(msg, color) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; if (color) t.style.borderColor = color;
+  $('#toasts').appendChild(t); setTimeout(() => t.remove(), 2600);
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function statusBar() {
+  const st = calcStats(run), c = CHARS[run.char];
+  const w = run.weapons.map(w => `<span class="ico" title="${esc(w.evo ? WEAPONS[w.id].evoName : WEAPONS[w.id].name)}">${WEAPONS[w.id].icon}<b>${w.evo ? '★' : w.lvl}</b></span>`).join('');
+  const p = Object.entries(run.passives).map(([k, l]) => `<span class="ico" title="${esc(PASSIVES[k].name)}">${PASSIVES[k].icon}<b>${l}</b></span>`).join('');
+  const r = run.relics.map(k => `<span class="ico" title="${esc(RELICS[k].name + ': ' + RELICS[k].desc)}">${RELICS[k].icon}</span>`).join('');
+  return `<div class="bar">
+    <span class="it">${c.icon} <b>${c.name}</b></span>
+    <span class="it">❤️ ${Math.ceil(run.hp)}/${st.maxHp}</span>
+    <span class="it">🪙 ${run.gold}</span>
+    <span class="it">⭐ Lv ${run.level}</span>
+    <span class="it">🎲 ${run.rerolls}</span>
+    ${run.revives ? `<span class="it">👼 ${run.revives}</span>` : ''}
+    <span class="it">🌍 Act ${run.act}: ${actInfo(run.act).name}</span>
+    ${run.heat ? `<span class="it">🌡️ Heat ${run.heat}</span>` : ''}
+    ${run.daily ? `<span class="it">📅 Daily</span>` : ''}
+  </div>
+  <div class="bar"><div class="icons">${w}${p || ''}</div>${r ? `<div class="icons">${r}</div>` : ''}</div>`;
+}
+
+/* ================= SCREENS ================= */
+function showTitle() {
+  mode = 'menu'; run = null;
+  checkUnlocks();
+  const hasRun = !!S.run;
+  const d = S.daily[todayStr()];
+  screen(`
+    <h1>RIFT RUNNERS</h1>
+    <div class="sub">Fight. Choose your path. Grow stronger. Every run is different.</div>
+    <div class="col">
+      ${hasRun ? `<button class="opt big" data-a="0" data-n="1">▶ Continue Run <span class="tag">Act ${S.run.act} · ${CHARS[S.run.char].name}</span><kbd>1</kbd></button>` : ''}
+      <button class="opt big" data-a="1" data-n="${hasRun ? 2 : 1}">⚔️ New Run<kbd>${hasRun ? 2 : 1}</kbd></button>
+      <button class="opt big" data-a="2" data-n="${hasRun ? 3 : 2}">📅 Daily Challenge ${d ? `<span class="tag">best: ${d} floors</span>` : ''}<kbd>${hasRun ? 3 : 2}</kbd></button>
+      <button class="opt big" data-a="3" data-n="${hasRun ? 4 : 3}">💠 Upgrades <span class="tag">${S.shards} shards</span><kbd>${hasRun ? 4 : 3}</kbd></button>
+      <button class="opt big" data-a="4" data-n="${hasRun ? 5 : 4}">🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span><kbd>${hasRun ? 5 : 4}</kbd></button>
+      <button class="opt big" data-a="5" data-n="${hasRun ? 6 : 5}">📊 Stats &amp; Save Backup<kbd>${hasRun ? 6 : 5}</kbd></button>
+      <button class="opt big" data-a="6" data-n="${hasRun ? 7 : 6}">❓ How to Play<kbd>${hasRun ? 7 : 6}</kbd></button>
+    </div>
+    <div class="foot">Progress saves automatically in this browser. Use "Stats &amp; Save Backup" to copy a backup code.</div>`,
+    [resumeRun, () => hasRun ? confirmAbandon(() => showCharSelect(false)) : showCharSelect(false),
+     () => hasRun ? confirmAbandon(() => showCharSelect(true)) : showCharSelect(true), showUpgrades, showAchievements, showStats, showHelp]);
+  if (!S.seenHelp) { S.seenHelp = true; save(); showHelp(); }
+}
+function confirmAbandon(then) {
+  screen(`<h2>Abandon your current run?</h2><div class="sub">Starting a new run ends the saved one (you still get its shards).</div>
+    <div class="col"><button class="opt" data-a="0" data-n="1">Yes, end it<kbd>1</kbd></button><button class="opt" data-a="1" data-n="2">No, go back<kbd>2</kbd></button></div>`,
+    [() => { run = JSON.parse(JSON.stringify(S.run)); endRun('abandon', then); }, showTitle]);
+}
+function showHelp() {
+  screen(`<h2>How to Play</h2><div class="panel help">
+  <ul>
+    <li><b>Move:</b> WASD or Arrow keys. <b>Dash:</b> Space (you can't be hurt while dashing). <b>Pause:</b> Esc or P.</li>
+    <li><b>Your weapons fire on their own.</b> Focus on dodging and collecting the XP gems 💎 enemies drop.</li>
+    <li><b>Level up</b> to choose new weapons, upgrades and passives (press 1/2/3, or R to reroll).</li>
+    <li><b>Evolve:</b> get a weapon to level 5 AND own its matching passive → an EVOLVE card appears!
+      <br><small>${Object.values(WEAPONS).map(w => `${w.icon}+${PASSIVES[w.evo].icon}`).join(' &nbsp; ')}</small></li>
+    <li><b>Strategy map:</b> between fights, pick your route. ⚔️ fight · 💀 elite (hard, gives a relic) · 🛒 shop · ❓ event · ⛺ rest · 💎 treasure · 👹 boss.</li>
+    <li>Your HP carries between fights, so plan when to rest or shop.</li>
+    <li>Beat 3 acts to win. Then unlock <b>Heat</b> (harder, more shards) or keep going in <b>Endless</b>.</li>
+    <li><b>Shards</b> 💠 are earned every run, win or lose. Spend them on permanent upgrades. New characters unlock as you play.</li>
+    <li>Menus: number keys, arrow keys + Enter, or click with the trackpad.</li>
+  </ul></div>
+  <div class="col" style="margin-top:12px"><button class="opt" data-a="0" data-n="1">Got it!<kbd>1</kbd></button></div>`, [showTitle]);
+}
+let csHeat = null;
+function showCharSelect(daily) {
+  checkUnlocks();
+  if (csHeat === null) csHeat = Math.min(S.heat || 0, S.maxHeat);
+  const ids = Object.keys(CHARS);
+  let n = 0;
+  const cards = ids.map((id, i) => {
+    const c = CHARS[id], un = !!S.chars[id];
+    const w = c.weapon ? WEAPONS[c.weapon] : { icon: '🎲', name: 'Random' };
+    return `<button class="card opt ${un ? '' : 'locked'}" data-a="${i}" ${un ? `data-n="${++n <= 9 ? n : ''}"` : 'disabled'}>
+      <div class="ci">${un ? c.icon : '🔒'}</div><div class="ct">${c.name}</div>
+      <div class="cs">${w.icon} ${w.name}</div><div class="cd">${un ? c.desc : 'Unlock: ' + c.unlock.text}</div>${un && n <= 9 ? `<kbd>${n}</kbd>` : ''}</button>`;
+  }).join('');
+  const heatRow = S.maxHeat > 0 && !daily ? `<div class="bar"><button data-a="${ids.length}">◀ Q</button><span class="it">🌡️ Heat <b>${csHeat}</b> / ${S.maxHeat} &nbsp;<small style="color:var(--dim)">(+15% enemy HP &amp; +25% shards per level)</small></span><button data-a="${ids.length + 1}">E ▶</button></div>` : '';
+  const acts = ids.map(id => () => newRun(id, daily ? 0 : csHeat, daily));
+  acts.push(() => { csHeat = Math.max(0, csHeat - 1); showCharSelect(daily); });
+  acts.push(() => { csHeat = Math.min(S.maxHeat, csHeat + 1); showCharSelect(daily); });
+  acts.push(showTitle);
+  screen(`<h2>${daily ? '📅 Daily Challenge — ' + todayStr() : 'Choose your Runner'}</h2>
+    <div class="sub">${daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.' : 'Each character starts with a different weapon.'}</div>
+    ${heatRow}<div class="row">${cards}</div>
+    <div class="col" style="margin-top:14px"><button data-a="${ids.length + 2}">← Back (Esc)</button></div>`, acts, 'menu', k => {
+    if (k === 'escape') { showTitle(); return true; }
+    if (!daily && S.maxHeat > 0 && k === 'q') { acts[ids.length](); return true; }
+    if (!daily && S.maxHeat > 0 && k === 'e') { acts[ids.length + 1](); return true; }
+  });
+}
+function showUpgrades() {
+  const rows = META.map((m, i) => {
+    const l = S.meta[m.id] || 0, maxed = l >= m.max, cost = metaCost(m, l);
+    return `<button class="opt mrow" data-a="${i}" ${maxed || S.shards < cost ? 'disabled' : ''}>
+      <span class="mi">${m.icon}</span><span class="mt"><b>${m.name}</b> <small>${m.desc}</small><br><span class="pips">${'■'.repeat(l)}${'□'.repeat(m.max - l)}</span></span>
+      <span class="price">${maxed ? 'MAX' : cost + ' 💠'}</span></button>`;
+  }).join('');
+  screen(`<h2>💠 Permanent Upgrades</h2><div class="sub">You have <b style="color:#7fe3ff">${S.shards}</b> shards. Earn more by playing: every floor, kill, elite and boss counts.</div>
+    <div class="grid">${rows}</div><div class="col" style="margin-top:14px"><button data-a="${META.length}">← Back (Esc)</button></div>`,
+    [...META.map(m => () => { const l = S.meta[m.id] || 0, c = metaCost(m, l); if (l < m.max && S.shards >= c) { S.shards -= c; S.meta[m.id] = l + 1; save(); toast(`${m.icon} ${m.name} upgraded!`); } showUpgrades(); }), showTitle],
+    'menu', k => { if (k === 'escape') { showTitle(); return true; } });
+}
+function showAchievements() {
+  const list = ACHIEVEMENTS.map(a => `<div class="ach ${S.ach[a.id] ? 'done' : ''}">${S.ach[a.id] ? '✅' : '⬜'} <b>${a.name}</b> <span class="tag">+${a.reward} 💠</span><br><small style="color:var(--dim)">${a.desc}</small></div>`).join('');
+  const chars = Object.entries(CHARS).map(([k, c]) => `<div class="ach ${S.chars[k] ? 'done' : ''}">${S.chars[k] ? c.icon : '🔒'} <b>${c.name}</b><br><small style="color:var(--dim)">${c.unlock ? c.unlock.text : 'Starter'}</small></div>`).join('');
+  screen(`<h2>🏆 Achievements</h2><div class="grid">${list}</div><h2 style="margin-top:18px">Characters</h2><div class="grid">${chars}</div>
+    <div class="col" style="margin-top:14px"><button class="opt" data-a="0">← Back (Esc)</button></div>`, [showTitle], 'menu', k => { if (k === 'escape') { showTitle(); return true; } });
+}
+function showStats(msg) {
+  const s = S.stats, h = Math.floor(s.playTime / 3600), m = Math.floor(s.playTime / 60) % 60;
+  screen(`<h2>📊 Stats</h2><div class="panel"><div class="grid" style="width:100%">
+    <div>Runs: <b>${s.runs}</b></div><div>Wins: <b>${s.wins}</b></div><div>Deepest act: <b>${s.bestAct}</b></div>
+    <div>Enemies killed: <b>${s.kills.toLocaleString()}</b></div><div>Bosses: <b>${s.bosses}</b></div><div>Elites: <b>${s.elites}</b></div>
+    <div>Gold collected: <b>${s.gold.toLocaleString()}</b></div><div>Evolutions: <b>${s.evolutions}</b></div><div>Highest level: <b>${s.bestLevel}</b></div>
+    <div>Shards earned: <b>${s.shardsEarned}</b></div><div>Max Heat unlocked: <b>${S.maxHeat}</b></div><div>Play time: <b>${h}h ${m}m</b></div>
+  </div></div>
+  <h2 style="margin-top:16px">💾 Save Backup</h2>
+  <div class="panel"><p style="margin-top:0">School Chromebooks sometimes wipe browser data. <b>Copy this code</b> and email it to yourself or paste it in a Google Doc. Paste it back here to restore everything, or to move your save to a new version of the game.</p>
+    <textarea id="code" readonly></textarea>
+    <div class="row" style="justify-content:flex-start;margin:8px 0"><button data-a="0">📋 Copy code</button></div>
+    <p><b>Restore from a code:</b></p><textarea id="imp" placeholder="Paste a RIFT1:... code here"></textarea>
+    <div class="row" style="justify-content:flex-start;margin-top:8px"><button data-a="1">📥 Load this code</button><button data-a="2" style="margin-left:auto;border-color:#5a2a33">🗑️ Reset all progress</button></div>
+    ${msg ? `<p style="color:var(--gold)">${msg}</p>` : ''}
+  </div>
+  <div class="col" style="margin-top:14px"><button class="opt" data-a="3">← Back (Esc)</button></div>`,
+  [() => { const t = $('#code'); t.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(t.value).then(() => toast('Copied!'), () => {}); else if (ok) toast('Copied!'); },
+   () => { try { importCode($('#imp').value); showStats('✅ Save loaded!'); } catch (e) { showStats('❌ That code did not work. Make sure you copied all of it.'); } },
+   () => { if (confirm('Really erase ALL progress? This cannot be undone (unless you have a backup code).')) { S = defaultSave(); S.seenHelp = true; save(); showStats('Progress reset.'); } },
+   showTitle], 'menu', k => { if (k === 'escape') { showTitle(); return true; } });
+  $('#code').value = exportCode();
+}
+
+function showMap(msg) {
+  mode = 'menu'; hideUI();
+  const rows = run.map, reach = reachable();
+  const visited = new Set(run.path.map(p => p[0] + ',' + p[1]));
+  const reachSorted = reach.slice().sort((a, b) => rows[a[0]][a[1]].x - rows[b[0]][b[1]].x);
+  const Y = r => 4 + r / (rows.length - 1) * 88;
+  let lines = '';
+  rows.forEach((row, r) => row.forEach((n, i) => n.next.forEach(j => {
+    const m = rows[r + 1][j]; const on = visited.has(r + ',' + i) && (visited.has((r + 1) + ',' + j) || (run.pos.r === r && run.pos.i === i));
+    lines += `<line x1="${n.x * 100}" y1="${100 - Y(r)}" x2="${m.x * 100}" y2="${100 - Y(r + 1)}" stroke="${on ? '#7c9cff' : '#39425e'}" stroke-width="${on ? 3 : 2}" vector-effect="non-scaling-stroke" stroke-dasharray="${on ? '' : '4 4'}"/>`;
+  })));
+  const actions = [];
+  let nodes = '';
+  rows.forEach((row, r) => row.forEach((n, i) => {
+    const ri2 = reachSorted.findIndex(p => p[0] === r && p[1] === i);
+    const isR = ri2 >= 0, vis = visited.has(r + ',' + i);
+    let attr = 'disabled';
+    if (isR) { actions.push(() => enterNode(r, i)); attr = `data-a="${actions.length - 1}" data-n="${ri2 + 1}"`; }
+    nodes += `<button class="node ${n.t === 'boss' ? 'boss' : ''} ${isR ? 'reach opt' : ''} ${vis ? 'visited' : ''}" style="left:${n.x * 100}%;bottom:${Y(r)}%" ${attr} title="${NODE[n.t].name}">${NODE[n.t].icon}${isR ? `<kbd>${ri2 + 1}</kbd>` : ''}</button>`;
+  }));
+  actions.push(() => { saveRun(); showTitle(); });
+  screen(`${statusBar()}
+    ${msg ? `<div class="sub" style="margin:4px 0;color:var(--gold)">${msg}</div>` : ''}
+    <div class="map"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${nodes}</div>
+    <div class="legend">Pick your next stop: <b>number keys</b>, arrows + Enter, or click. ⚔️ Fight · 💀 Elite · 🛒 Shop · ❓ Event · ⛺ Rest · 💎 Treasure · 👹 Boss</div>
+    <div class="col" style="margin-top:8px;width:220px"><button data-a="${actions.length - 1}">💾 Save &amp; Quit (Esc)</button></div>`,
+    actions, 'menu', k => { if (k === 'escape') { saveRun(); showTitle(); return true; } });
+  checkAch();
+}
+function enterNode(r, i) {
+  run.target = { r, i };
+  const t = run.map[r][i].t;
+  if (t === 'fight' || t === 'elite' || t === 'boss') startFight(t);
+  else if (t === 'shop') showShop();
+  else if (t === 'event') showEvent();
+  else if (t === 'rest') showRest();
+  else if (t === 'treasure') showTreasure();
+}
+function completeNode(msg) {
+  run.pos = { r: run.target.r, i: run.target.i };
+  run.path.push([run.target.r, run.target.i]);
+  run.target = null; run.floors++;
+  saveRun(); showMap(msg);
+}
+
+/* ----- relic choice ----- */
+function relicChoice(title, done, n = 3) {
+  const opts = randomRelics(n);
+  if (!opts.length) { run.gold += 50; done(); return; }
+  const acts = opts.map(id => () => { addRelic(id); toast(`${RELICS[id].icon} ${RELICS[id].name}`, '#b48cff'); done(); });
+  acts.push(done);
+  screen(`<h2>${title}</h2><div class="sub">Relics are permanent bonuses for this run.</div>
+    <div class="row">${opts.map((id, i) => `<button class="card opt relic" data-a="${i}" data-n="${i + 1}"><div class="ci">${RELICS[id].icon}</div><div class="ct">${RELICS[id].name}</div><div class="cs">Relic</div><div class="cd">${RELICS[id].desc}</div><kbd>${i + 1}</kbd></button>`).join('')}</div>
+    <div class="col" style="margin-top:14px"><button data-a="${opts.length}">Skip</button></div>`, acts, 'menu');
+  inputLock = performance.now() + 350;
+}
+
+/* ----- shop ----- */
+function showShop() {
+  const scale = 1 + .3 * (run.act - 1);
+  const items = [];
+  const ownW = run.weapons.filter(w => w.lvl < 5).map(w => ({ k: 'wup', id: w.id }));
+  const newW = run.weapons.length < 5 ? Object.keys(WEAPONS).filter(id => !run.weapons.some(w => w.id === id)).map(id => ({ k: 'wnew', id })) : [];
+  const pas = Object.keys(PASSIVES).filter(id => (run.passives[id] || 0) < PASSIVES[id].max && (run.passives[id] || Object.keys(run.passives).length < 5)).map(id => ({ k: run.passives[id] ? 'pup' : 'pnew', id }));
+  shuffle(ownW); shuffle(newW); shuffle(pas);
+  if (ownW[0]) items.push({ ...ownW[0], price: Math.round(35 * scale) });
+  if (newW[0]) items.push({ ...newW[0], price: Math.round(45 * scale) });
+  pas.slice(0, 2).forEach(p => items.push({ ...p, price: Math.round(30 * scale) }));
+  const rel = randomRelics(1)[0]; if (rel) items.push({ k: 'relic', id: rel, price: Math.round(90 * scale) });
+  items.push({ k: 'heal', price: Math.round(20 * scale) });
+  run.shop = items;
+  renderShop();
+}
+function renderShop() {
+  const items = run.shop, st = calcStats(run);
+  const acts = [];
+  const html = items.map((it, i) => {
+    const d = choiceDesc(it);
+    acts.push(() => {
+      if (it.sold || run.gold < it.price) return;
+      run.gold -= it.price; it.sold = true;
+      if (it.k === 'relic') { addRelic(it.id); toast(`${RELICS[it.id].icon} ${RELICS[it.id].name}`, '#b48cff'); }
+      else if (it.k === 'heal') healPct(.4);
+      else applyChoice(it);
+      renderShop();
+    });
+    return `<button class="card opt ${d.cls}" data-a="${i}" data-n="${i + 1}" ${it.sold || run.gold < it.price ? 'disabled' : ''}>
+      <div class="ci">${d.icon}</div><div class="ct">${d.title}</div><div class="cs">${it.sold ? 'SOLD' : d.sub}</div><div class="cd">${d.desc}</div>
+      <div class="price">${it.sold ? '—' : it.price + ' 🪙'}</div><kbd>${i + 1}</kbd></button>`;
+  }).join('');
+  acts.push(() => { if (run.rerolls > 0) { run.rerolls--; showShop(); } });
+  acts.push(() => completeNode());
+  screen(`<h2>🛒 Shop</h2><div class="sub">🪙 ${run.gold} gold · ❤️ ${Math.ceil(run.hp)}/${st.maxHp}</div>
+    <div class="row">${html}</div>
+    <div class="row" style="margin-top:14px"><button data-a="${items.length}" ${run.rerolls > 0 ? '' : 'disabled'}>🎲 Reroll shop (R) · ${run.rerolls} left</button><button data-a="${items.length + 1}">Leave shop (L) →</button></div>`,
+    acts, 'menu', k => { if (k === 'r') { acts[items.length](); return true; } if (k === 'l' || k === 'escape') { acts[items.length + 1](); return true; } });
+}
+
+/* ----- rest ----- */
+function showRest() {
+  const st = calcStats(run);
+  screen(`<h2>⛺ Campfire</h2><div class="sub">❤️ ${Math.ceil(run.hp)}/${st.maxHp}. Take a breather.</div>
+    <div class="row">
+      <button class="card opt" data-a="0" data-n="1"><div class="ci">❤️</div><div class="ct">Rest</div><div class="cs">Heal</div><div class="cd">Heal 40% of your max HP.</div><kbd>1</kbd></button>
+      <button class="card opt" data-a="1" data-n="2"><div class="ci">⭐</div><div class="ct">Train</div><div class="cs">Level up</div><div class="cd">Gain a free level-up choice.</div><kbd>2</kbd></button>
+      <button class="card opt" data-a="2" data-n="3"><div class="ci">🔨</div><div class="ct">Forage</div><div class="cs">Gold</div><div class="cd">Heal 15% and find ${15 + 10 * run.act} gold.</div><kbd>3</kbd></button>
+    </div>`,
+    [() => { healPct(.4); completeNode('You feel rested.'); },
+     () => { queueLevelUps(1, () => completeNode()); },
+     () => { healPct(.15); run.gold += 15 + 10 * run.act; completeNode(); }]);
+  inputLock = performance.now() + 300;
+}
+function showTreasure() {
+  const g = Math.round((25 + 15 * run.act + ri(0, 20)) * calcStats(run).goldMul);
+  run.gold += g; S.stats.gold += g;
+  relicChoice(`💎 Treasure! +${g} gold`, () => completeNode());
+}
+
+/* ----- events ----- */
+const EVENTS = [
+  { title: '🩸 Shrine of Blood', text: 'An altar hums with power. It wants something from you.',
+    opts: [{ label: 'Offer 25% of your max HP for a relic', cond: () => run.hp > calcStats(run).maxHp * .3, go: () => { run.hp -= calcStats(run).maxHp * .25; const r = randomRelics(1)[0]; if (r) addRelic(r); return r ? `You gain ${RELICS[r].icon} ${RELICS[r].name}!` : 'Nothing happens...'; } },
+           { label: 'Walk away', go: () => 'You leave the shrine alone.' }] },
+  { title: '🎰 The Gambler', text: 'A grinning figure shuffles cards. "Double or nothing?"',
+    opts: [{ label: 'Bet 30 gold (50%: win 80)', cond: () => run.gold >= 30, go: () => { run.gold -= 30; if (rnd() < .5 + calcStats(run).luck * .2) { run.gold += 80; return 'You win 80 gold! 🎉'; } return 'You lose. The gambler cackles.'; } },
+           { label: 'Bet everything (40%: triple it)', cond: () => run.gold >= 10, go: () => { const g = run.gold; run.gold = 0; if (rnd() < .4 + calcStats(run).luck * .15) { run.gold = g * 3; return `JACKPOT! You now have ${g * 3} gold!`; } return 'Ouch. All gone.'; } },
+           { label: 'No thanks', go: () => 'Probably wise.' }] },
+  { title: '💧 Healing Spring', text: 'Crystal-clear water glows softly.',
+    opts: [{ label: 'Drink deeply (heal 50%)', go: () => { healPct(.5); return 'You feel refreshed.'; } },
+           { label: 'Bathe (+15 max HP for this run)', go: () => { run.bonus.maxHp = (run.bonus.maxHp || 0) + 15; run.hp += 15; return 'You feel tougher. +15 max HP.'; } }] },
+  { title: '🥋 Wandering Master', text: '"For a small fee, I can teach you something."',
+    opts: [{ label: 'Pay 40 gold for 2 level-ups', cond: () => run.gold >= 40, go: () => { run.gold -= 40; return { text: 'Training complete!', levels: 2 }; } },
+           { label: 'Spar for free (lose 15 HP, gain 1 level-up)', cond: () => run.hp > 20, go: () => { run.hp -= 15; return { text: 'Bruised but wiser.', levels: 1 }; } },
+           { label: 'Leave', go: () => 'The master bows.' }] },
+  { title: '📦 Cursed Chest', text: 'Dark smoke leaks from a golden chest.',
+    opts: [{ label: 'Open it (relic, but enemies get +15% HP this run)', go: () => { run.curse++; const r = randomRelics(1)[0]; if (r) addRelic(r); return r ? `You gain ${RELICS[r].icon} ${RELICS[r].name}. You feel watched...` : 'Empty! But the curse remains.'; } },
+           { label: 'Leave it', go: () => 'Some things are best left closed.' }] },
+  { title: '📚 Ancient Library', text: 'Dusty tomes line the walls.',
+    opts: [{ label: 'Study (1 level-up)', go: () => ({ text: 'Knowledge is power.', levels: 1 }) },
+           { label: 'Sell old books (+45 gold)', go: () => { run.gold += 45; return '+45 gold.'; } }] },
+  { title: '🧙 Mysterious Stranger', text: '"Give me one of your relics... I will give you two."',
+    opts: [{ label: 'Trade a random relic for 2 random relics', cond: () => run.relics.length >= 1, go: () => { const lose = pick(run.relics); run.relics = run.relics.filter(x => x !== lose); const got = randomRelics(2).filter(x => x !== lose); got.forEach(addRelic); run.hp = Math.min(run.hp, calcStats(run).maxHp); return `Lost ${RELICS[lose].icon}. Gained ${got.map(x => RELICS[x].icon + ' ' + RELICS[x].name).join(' and ')}.`; } },
+           { label: 'Decline', go: () => 'The stranger vanishes.' }] },
+  { title: '🌀 Rift Anomaly', text: 'A crackling tear in reality. You could step through...',
+    opts: [{ label: 'Step in (60%: +15% damage this run, 40%: lose 25 HP)', go: () => { if (rnd() < .6 + calcStats(run).luck * .1) { run.bonus.might = (run.bonus.might || 0) + .15; return 'Power surges through you! +15% damage.'; } run.hp = Math.max(1, run.hp - 25); return 'The rift spits you out. -25 HP.'; } },
+           { label: 'Stay away', go: () => 'Smart.' }] },
+  { title: '🗡️ Bandit Ambush', text: 'Bandits block the road! "Pay up or fight!"',
+    opts: [{ label: 'Fight them (elite fight, relic reward)', go: () => ({ fight: 'elite' }) },
+           { label: 'Pay 25 gold', cond: () => run.gold >= 25, go: () => { run.gold -= 25; return 'They let you pass.'; } }] },
+  { title: '🗿 Golden Statue', text: 'A statue of a smiling merchant. Coins glitter at its feet.',
+    opts: [{ label: 'Pray (+15% gold gain this run)', go: () => { run.bonus.gold = (run.bonus.gold || 0) + .15; return 'You feel lucky with money.'; } },
+           { label: 'Grab the coins (+60 gold, lose 10 HP)', go: () => { run.gold += 60; run.hp = Math.max(1, run.hp - 10); return 'A tiny curse zaps you. Worth it.'; } }] },
+  { title: '🎯 Training Grounds', text: 'Old target dummies stand in rows.',
+    opts: [{ label: 'Practice aim (+6% crit this run)', go: () => { run.bonus.crit = (run.bonus.crit || 0) + .06; return 'Your aim improves.'; } },
+           { label: 'Practice dodging (heal 25%)', go: () => { healPct(.25); return 'You feel nimble.'; } }] },
+  { title: '🧪 Strange Potion', text: 'A bubbling flask sits on a rock. It smells... interesting.',
+    opts: [{ label: 'Drink it (random effect)', go: () => { const r = rnd(); if (r < .3) { healPct(1); return 'Fully healed!'; } if (r < .55) { run.bonus.maxHp = (run.bonus.maxHp || 0) + 25; run.hp += 25; return '+25 max HP!'; } if (r < .8) return { text: 'You feel smarter!', levels: 1 }; run.hp = Math.max(1, run.hp - 20); return 'Blegh. -20 HP.'; } },
+           { label: 'Sell it (+30 gold)', go: () => { run.gold += 30; return '+30 gold.'; } }] },
+];
+function showEvent() {
+  const ev = pick(EVENTS);
+  const opts = ev.opts.filter(o => !o.cond || o.cond());
+  screen(`<h2>${ev.title}</h2><div class="panel" style="max-width:600px;text-align:center"><p>${ev.text}</p></div>
+    <div class="col" style="margin-top:14px;width:min(520px,100%)">${opts.map((o, i) => `<button class="opt" data-a="${i}" data-n="${i + 1}">${o.label}<kbd>${i + 1}</kbd></button>`).join('')}</div>`,
+    opts.map(o => () => {
+      let res = o.go();
+      if (typeof res === 'string') res = { text: res };
+      if (res.fight) { startFight(res.fight); return; }
+      const cont = () => completeNode();
+      screen(`<h2>${ev.title}</h2><div class="panel" style="max-width:600px;text-align:center"><p>${res.text}</p></div>
+        <div class="col" style="margin-top:14px"><button class="opt" data-a="0" data-n="1">Continue<kbd>1</kbd></button></div>`,
+        [() => res.levels ? queueLevelUps(res.levels, cont) : cont()]);
+      inputLock = performance.now() + 300;
+    }));
+  inputLock = performance.now() + 350;
+}
+
+/* ================= LEVEL UPS ================= */
+let lvQueue = 0, lvDone = null, lvOpen = false;
+function queueLevelUps(n, done) { lvQueue += n; if (done) lvDone = done; if (!lvOpen) nextLevelUp(); }
+function buildChoices() {
+  const opts = [], nW = run.weapons.length, nP = Object.keys(run.passives).length;
+  for (const w of run.weapons) {
+    const d = WEAPONS[w.id];
+    if (w.lvl >= 5 && !w.evo && run.passives[d.evo]) opts.push({ k: 'evo', id: w.id, w: 100 });
+    else if (w.lvl < 5) opts.push({ k: 'wup', id: w.id, w: 10 });
+  }
+  if (nW < 5) for (const id in WEAPONS) if (!run.weapons.some(w => w.id === id)) opts.push({ k: 'wnew', id, w: nW < 3 ? 7 : 4 });
+  for (const id in PASSIVES) { const l = run.passives[id] || 0; if (l > 0 && l < PASSIVES[id].max) opts.push({ k: 'pup', id, w: 7 }); else if (l === 0 && nP < 5) opts.push({ k: 'pnew', id, w: 4 }); }
+  const st = calcStats(run);
+  const n = Math.min(5, 3 + (S.meta.choice || 0) + (st.luck >= .3 ? 1 : 0));
+  const res = opts.filter(o => o.k === 'evo').slice(0, n);
+  let rest = opts.filter(o => o.k !== 'evo');
+  while (res.length < n && rest.length) { const o = weighted(rest); res.push(o); rest = rest.filter(x => x !== o); }
+  if (!res.length) res.push({ k: 'heal' }, { k: 'gold' });
+  return res;
+}
+function choiceDesc(o) {
+  if (o.k === 'evo') { const d = WEAPONS[o.id]; return { icon: d.icon, title: d.evoName, sub: '★ EVOLUTION ★', desc: `${d.name} evolves into a much stronger form!`, cls: 'evo' }; }
+  if (o.k === 'wup') { const w = run.weapons.find(x => x.id === o.id), d = WEAPONS[o.id]; return { icon: d.icon, title: d.name, sub: `Level ${w.lvl} → ${w.lvl + 1}`, desc: w.lvl + 1 === 5 ? `Max level! Pair with ${PASSIVES[d.evo].icon} ${PASSIVES[d.evo].name} to evolve.` : 'More damage, faster, bigger.', cls: '' }; }
+  if (o.k === 'wnew') { const d = WEAPONS[o.id]; return { icon: d.icon, title: d.name, sub: 'New weapon', desc: d.desc, cls: 'new' }; }
+  if (o.k === 'pup' || o.k === 'pnew') { const d = PASSIVES[o.id], l = run.passives[o.id] || 0; const ev = Object.values(WEAPONS).find(w => w.evo === o.id); return { icon: d.icon, title: d.name, sub: l ? `Level ${l} → ${l + 1}` : 'New passive', desc: d.desc + (ev ? ` <br><small>(evolves ${ev.icon})</small>` : ''), cls: l ? '' : 'new' }; }
+  if (o.k === 'relic') { const d = RELICS[o.id]; return { icon: d.icon, title: d.name, sub: 'Relic', desc: d.desc, cls: 'relic' }; }
+  if (o.k === 'heal') return { icon: '❤️', title: o.price ? 'Potion' : 'Heal', sub: 'Heal', desc: o.price ? 'Heal 40% of max HP.' : 'Heal 30 HP.', cls: '' };
+  if (o.k === 'gold') return { icon: '🪙', title: 'Gold', sub: 'Gold', desc: '+25 gold.', cls: '' };
+}
+function applyChoice(o) {
+  const before = calcStats(run).maxHp;
+  if (o.k === 'evo') { const w = run.weapons.find(x => x.id === o.id); w.evo = true; w.lvl = 6; S.stats.evolutions++; toast(`★ ${WEAPONS[o.id].evoName}! ★`, '#ffb84a'); }
+  else if (o.k === 'wup') run.weapons.find(x => x.id === o.id).lvl++;
+  else if (o.k === 'wnew') run.weapons.push({ id: o.id, lvl: 1, evo: false });
+  else if (o.k === 'pup' || o.k === 'pnew') run.passives[o.id] = (run.passives[o.id] || 0) + 1;
+  else if (o.k === 'heal') setHp(getHp() + 30);
+  else if (o.k === 'gold') run.gold += 25;
+  const after = calcStats(run).maxHp;
+  if (after > before) setHp(getHp() + after - before);
+  ST = calcStats(run);
+}
+function nextLevelUp() {
+  if (lvQueue <= 0) { lvOpen = false; const d = lvDone; lvDone = null; if (d) d(); return; }
+  lvOpen = true;
+  const choices = buildChoices();
+  const acts = choices.map(o => () => { applyChoice(o); lvQueue--; nextLevelUp(); });
+  acts.push(() => { if (run.rerolls > 0) { run.rerolls--; renderLv(); } });
+  function renderLv() {
+    const ch = buildChoices();
+    acts.splice(0, acts.length, ...ch.map(o => () => { applyChoice(o); lvQueue--; nextLevelUp(); }), () => { if (run.rerolls > 0) { run.rerolls--; renderLv(); } });
+    draw(ch);
+  }
+  function draw(ch) {
+    screen(`<h2>⭐ Level Up! ${lvQueue > 1 ? `<span class="tag">${lvQueue} to pick</span>` : ''}</h2><div class="sub">Level ${run.level} · pick one</div>
+      <div class="row">${ch.map((o, i) => { const d = choiceDesc(o); return `<button class="card opt ${d.cls}" data-a="${i}" data-n="${i + 1}"><div class="ci">${d.icon}</div><div class="ct">${d.title}</div><div class="cs">${d.sub}</div><div class="cd">${d.desc}</div><kbd>${i + 1}</kbd></button>`; }).join('')}</div>
+      <div class="row" style="margin-top:14px"><button data-a="${ch.length}" ${run.rerolls > 0 ? '' : 'disabled'}>🎲 Reroll (R) · ${run.rerolls} left</button></div>`,
+      acts, 'overlay', k => { if (k === 'r') { acts[acts.length - 1](); return true; } if (k === 'escape') return true; });
+    inputLock = performance.now() + 380;
+  }
+  draw(choices);
+}
+
+/* ================= FIGHT ================= */
+const WORLD = 2400;
+function startFight(type) {
+  ST = calcStats(run);
+  const act = run.act, row = run.target ? run.target.r : 0;
+  const actHp = act <= 3 ? 1 + .65 * (act - 1) : 2.3 * Math.pow(1.45, act - 3);
+  const actDmg = act <= 3 ? 1 + .3 * (act - 1) : 1.6 * Math.pow(1.2, act - 3);
+  const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
+  P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color };
+  mode = 'fight'; paused = false; hideUI();
+  if (has('wind')) P.hp = Math.min(ST.maxHp, P.hp + ST.maxHp * .2);
+  P.hp = Math.min(P.hp, ST.maxHp);
+  G = { type, time: 0, now: 0, dur: type === 'boss' ? Infinity : (type === 'elite' ? 45 : 36 + row * 1.5) * (has('hourglass') ? .8 : 1),
+    enemies: [], projs: [], eb: [], pick: [], areas: [], parts: [], texts: [], bolts: [], rings: [],
+    spawnAcc: 0, swarmT: 13, eliteT: type === 'elite' ? [3, 20] : [], ending: 0, tookDmg: false, boss: null, kills: 0, shake: 0,
+    hpMul: (actHp + .05 * row) * heatHp * (1 + .15 * run.curse) * (has('crown') ? 1.15 : 1), dmgMul: actDmg * heatDmg,
+    bossHpMul: actHp * heatHp * (1 + .15 * run.curse), xpScale: 1 + .35 * (act - 1), goldScale: 1 + .3 * (act - 1),
+    banner: { text: type === 'boss' ? '👹 BOSS FIGHT' : type === 'elite' ? '💀 ELITE FIGHT' : `Act ${act} · Floor ${row + 1}`, t: 2.2 } };
+  for (const w of run.weapons) { w.t = .4 + Math.random() * .3; w.ang = 0; }
+  if (type === 'boss') spawnBoss();
+  if (S.stats.runs <= 1 && run.floors === 0) G.banner = { text: 'WASD / Arrows to move · SPACE to dash', t: 4 };
+}
+function spawnBoss() {
+  const kind = BOSS_ORDER[(run.act - 1) % 3], d = BOSSES[kind];
+  const hp = 3000 * G.bossHpMul;
+  const a = Math.random() * Math.PI * 2;
+  const e = makeEnemy('grunt', P.x + Math.cos(a) * 380, P.y + Math.sin(a) * 380);
+  Object.assign(e, { boss: true, kind, name: d.name, r: d.r, hp, maxHp: hp, spd: kind === 'colossus' ? 58 : 45, dmg: 22 * G.dmgMul, color: d.color, xp: 0, state: 'walk', at: 0, t1: 0, t2: 0, t3: 0, sa: 0 });
+  G.boss = e;
+}
+function makeEnemy(type, x, y) {
+  const d = ENEMIES[type];
+  const e = { type, x, y, r: d.r, hp: d.hp * G.hpMul, maxHp: d.hp * G.hpMul, spd: d.spd * (.9 + Math.random() * .2), dmg: d.dmg * G.dmgMul, color: d.color, xp: d.xp,
+    slowT: 0, slowAmt: 0, kx: 0, ky: 0, flash: 0, orbitT: 0, auraT: 0, fireT: 0, boomT: 0, shootT: 1 + Math.random() * 2, dead: false };
+  G.enemies.push(e); return e;
+}
+function spawnPos() {
+  const dist = Math.hypot(VW, VH) / 2 + 40;
+  for (let k = 0; k < 6; k++) {
+    const a = Math.random() * Math.PI * 2;
+    const x = clamp(P.x + Math.cos(a) * dist, 20, WORLD - 20), y = clamp(P.y + Math.sin(a) * dist, 20, WORLD - 20);
+    if (Math.hypot(x - P.x, y - P.y) > 260) return [x, y];
+  }
+  return [clamp(P.x + 400, 20, WORLD - 20), clamp(P.y + 400, 20, WORLD - 20)];
+}
+function pickType() {
+  const t = G.time, a = run.act;
+  return weighted([{ k: 'grunt', w: 10 }, { k: 'runner', w: t > 5 ? 5 : 0 }, { k: 'brute', w: t > 14 ? 1.5 + a : 0 }, { k: 'shooter', w: t > 9 ? 1.5 + a : 0 },
+    { k: 'splitter', w: a >= 2 || t > 24 ? 3 : 0 }, { k: 'exploder', w: a >= 2 || t > 30 ? 2.5 : 0 }]).k;
+}
+function makeElite(type) {
+  const [x, y] = spawnPos();
+  const e = makeEnemy(type, x, y);
+  e.elite = true; e.hp = e.maxHp = e.maxHp * 9; e.r *= 1.7; e.dmg *= 1.5; e.spd *= .9; e.xp *= 10;
+  return e;
+}
+function spawnTick(dt) {
+  if (G.ending) return;
+  const prog = G.dur === Infinity ? .6 : Math.min(1, G.time / G.dur);
+  const rate = (run.act === 1 ? .8 + 2.4 * prog : 1.2 + 2.8 * prog) * (1 + .22 * (run.act - 1)) * (1 + .08 * run.heat) * (G.type === 'boss' ? .45 : 1);
+  G.spawnAcc += rate * dt;
+  while (G.spawnAcc >= 1) { G.spawnAcc--; if (G.enemies.length < 230) { const [x, y] = spawnPos(); makeEnemy(pickType(), x, y); } }
+  G.swarmT -= dt;
+  if (G.swarmT <= 0) {
+    G.swarmT = 13 + Math.random() * 6;
+    const n = 12 + 3 * run.act, type = Math.random() < .5 ? 'grunt' : 'runner';
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; const x = clamp(P.x + Math.cos(a) * 420, 20, WORLD - 20), y = clamp(P.y + Math.sin(a) * 420, 20, WORLD - 20); makeEnemy(type, x, y); }
+    G.banner = { text: '⚠️ SWARM!', t: 1.2 };
+  }
+  while (G.eliteT.length && G.time >= G.eliteT[0]) { G.eliteT.shift(); makeElite(pick(['brute', 'grunt', 'shooter', 'splitter'])); G.banner = { text: '💀 An elite appears!', t: 1.4 }; }
+}
+
+/* ----- combat helpers ----- */
+function nearest(x, y, maxD) { let best = null, bd = maxD * maxD; for (const e of G.enemies) { if (e.dead) continue; const d = (e.x - x) ** 2 + (e.y - y) ** 2; if (d < bd) { bd = d; best = e; } } return best; }
+function berserkMul() { return has('berserk') ? 1 + .8 * (1 - P.hp / ST.maxHp) : 1; }
+function wDmg(base) { return base * ST.might * berserkMul(); }
+function shoot(x, y, a, spd, r, dmg, pierce, life, color, extra) { G.projs.push(Object.assign({ x, y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, r, dmg, pierce, life, color, hits: new Set(), kind: 'bolt' }, extra)); }
+function damageEnemy(e, amt, kx = 0, ky = 0) {
+  if (e.dead) return;
+  let crit = Math.random() < ST.crit;
+  if (crit) amt *= 2;
+  e.hp -= amt; e.flash = .08;
+  if (!e.boss) { const kb = e.elite ? .3 : 1; e.kx += kx * kb; e.ky += ky * kb; }
+  if (G.texts.length < 70) G.texts.push({ x: e.x + (Math.random() - .5) * 10, y: e.y - e.r, t: .6, s: Math.round(amt), c: crit ? '#ffd24a' : '#fff', big: crit });
+  if (e.hp <= 0) killEnemy(e);
+}
+function killEnemy(e, silent) {
+  if (e.dead) return;
+  e.dead = true;
+  if (silent) { burst(e.x, e.y, e.color, 5); return; }
+  G.kills++; run.kills++; S.stats.kills++;
+  burst(e.x, e.y, e.color, e.boss ? 60 : e.elite ? 25 : 7);
+  if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
+  const gc = e.elite ? 1 : .12 * (1 + ST.luck);
+  if (Math.random() < gc) G.pick.push({ x: e.x + 6, y: e.y + 4, v: Math.round((e.elite ? 20 : ri(1, 3)) * G.goldScale), gold: true, mag: false });
+  if (ST.killHeal) P.hp = Math.min(ST.maxHp, P.hp + ST.killHeal);
+  if (has('fang') && Math.random() < .08) P.hp = Math.min(ST.maxHp, P.hp + 2);
+  if (e.type === 'splitter' && !e.boss) for (let i = 0; i < 2; i++) makeEnemy('mini', e.x + (i ? 8 : -8), e.y);
+  if (e.type === 'exploder' && !e.boss) explodeAt(e.x, e.y, 50, 0, '#ff4fa3', e.dmg);
+  if (has('boom') && Math.random() < .25 && !e.boss) explodeAt(e.x, e.y, 55, wDmg(15), '#ffa040');
+  if (e.elite) { G.banner = { text: '💀 Elite defeated!', t: 1.2 }; }
+  if (e.boss) { G.boss = null; startEnding('👑 BOSS DEFEATED!'); }
+}
+function explodeAt(x, y, r, dmg, color, hurtPlayer) {
+  G.rings.push({ x, y, r: 4, max: r, t: .3, color });
+  burst(x, y, color, 10);
+  if (dmg > 0) for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - x, e.y - y) < r + e.r) damageEnemy(e, dmg);
+  if (hurtPlayer && Math.hypot(P.x - x, P.y - y) < r + P.r) hurt(hurtPlayer);
+}
+function burst(x, y, color, n) { for (let i = 0; i < n && G.parts.length < 450; i++) { const a = Math.random() * 6.28, s = 40 + Math.random() * 160; G.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: .3 + Math.random() * .4, c: color, r: 2 + Math.random() * 2 }); } }
+function hurt(d) {
+  if (P.invul > 0 || P.dashT > 0 || G.ending) return;
+  if (has('aegis') && P.aegisT <= 0) { P.aegisT = 12; P.invul = .5; G.rings.push({ x: P.x, y: P.y, r: 10, max: 60, t: .35, color: '#7fe3ff' }); return; }
+  d = Math.max(1, Math.round(d - ST.armor));
+  P.hp -= d; P.invul = .7; G.tookDmg = true; G.shake = 7;
+  G.texts.push({ x: P.x, y: P.y - 20, t: .8, s: '-' + d, c: '#ff6070', big: true });
+  if (P.hp <= 0) {
+    if (run.revives > 0) {
+      run.revives--; P.hp = ST.maxHp * .5; P.invul = 2.5;
+      for (const e of G.enemies) if (!e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 300) killEnemy(e, true);
+      G.rings.push({ x: P.x, y: P.y, r: 10, max: 300, t: .6, color: '#ffe680' }); G.banner = { text: '👼 REVIVED!', t: 1.5 };
+    } else { P.hp = 0; mode = 'dead'; setTimeout(() => { run.hp = 0; endRun('dead'); }, 900); }
+  }
+}
+function dash() {
+  if (P.dashCd > 0 || mode !== 'fight' || paused) return;
+  let dx = P.fx, dy = P.fy;
+  P.dashT = .22; P.dashCd = ST.dashCd; P.dvx = dx * 620; P.dvy = dy * 620;
+  if (has('frostheart')) { for (const e of G.enemies) if (Math.hypot(e.x - P.x, e.y - P.y) < 150) { e.slowT = 2; e.slowAmt = e.boss ? .3 : 1; } G.rings.push({ x: P.x, y: P.y, r: 10, max: 150, t: .3, color: '#7fe3ff' }); }
+}
+function startEnding(text) {
+  if (G.ending) return;
+  G.ending = 1.6; G.banner = { text, t: 2 };
+  for (const e of G.enemies) if (!e.dead && !e.boss) killEnemy(e, true);
+  G.eb.length = 0;
+  for (const p of G.pick) p.mag = true;
+}
+
+/* ----- weapons ----- */
+const WUPD = {
+  wand(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const t = nearest(P.x, P.y, 650); if (!t) { w.t = .1; return; }
+    const L = w.lvl; w.t = (1.0 - .07 * L) * ST.cdMul * (w.evo ? .55 : 1);
+    const n = 1 + Math.floor((L - 1) / 2) + ST.proj + (w.evo ? 2 : 0), a = Math.atan2(t.y - P.y, t.x - P.x);
+    for (let i = 0; i < n; i++) shoot(P.x, P.y, a + (i - (n - 1) / 2) * .14, 460, 5, wDmg(10 + 4 * L) * (w.evo ? 1.4 : 1), (L >= 4 ? 2 : 1) + (w.evo ? 2 : 0), 1.5, '#c9a8ff');
+  },
+  daggers(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = (.62 - .04 * L) * ST.cdMul * (w.evo ? .45 : 1);
+    const n = 1 + Math.floor(L / 2) + ST.proj + (w.evo ? 3 : 0), a = Math.atan2(P.fy, P.fx);
+    for (let i = 0; i < n; i++) shoot(P.x, P.y, a + (i - (n - 1) / 2) * .11, 560, 4, wDmg(7 + 3 * L) * (w.evo ? 1.3 : 1), L >= 5 ? 2 : 1, .9, '#e8f0ff', { kind: 'knife' });
+  },
+  orbit(w, dt) {
+    const L = w.lvl, n = 2 + Math.floor((L - 1) / 2) + ST.proj + (w.evo ? 2 : 0);
+    const rad = (60 + 6 * L) * ST.area * (w.evo ? 1.35 : 1), br = 9 * Math.sqrt(ST.area) * (w.evo ? 1.3 : 1);
+    w.ang = (w.ang || 0) + dt * (3 + .15 * L) * (w.evo ? 1.4 : 1);
+    w.blades = [];
+    const dmg = wDmg(8 + 4 * L) * (w.evo ? 1.5 : 1);
+    for (let i = 0; i < n; i++) {
+      const a = w.ang + i / n * Math.PI * 2, bx = P.x + Math.cos(a) * rad, by = P.y + Math.sin(a) * rad;
+      w.blades.push([bx, by, br]);
+      for (const e of G.enemies) {
+        if (e.dead || e.orbitT > G.now) continue;
+        if ((e.x - bx) ** 2 + (e.y - by) ** 2 < (br + e.r) ** 2) { e.orbitT = G.now + .45; const dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy) || 1; damageEnemy(e, dmg, dx / d * 180, dy / d * 180); }
+      }
+    }
+  },
+  aura(w, dt) {
+    const L = w.lvl; w.rad = (55 + 8 * L) * ST.area * (w.evo ? 1.4 : 1);
+    w.t -= dt; if (w.t > 0) return; w.t = .5 * (w.evo ? .8 : 1);
+    let hit = 0; const dmg = wDmg(4 + 2.5 * L) * (w.evo ? 1.5 : 1);
+    for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < w.rad + e.r) { damageEnemy(e, dmg); hit++; }
+    if (w.evo && hit) P.hp = Math.min(ST.maxHp, P.hp + 1);
+  },
+  lightning(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = (1.5 - .1 * L) * ST.cdMul * (w.evo ? .6 : 1);
+    const strikes = 1 + Math.floor(L / 3) + (w.evo ? 2 : 0), chains = L + (w.evo ? 3 : 0), dmg = wDmg(16 + 7 * L) * (w.evo ? 1.4 : 1);
+    const near = G.enemies.filter(e => !e.dead && Math.abs(e.x - P.x) < VW / 2 + 20 && Math.abs(e.y - P.y) < VH / 2 + 20);
+    for (let s = 0; s < strikes && near.length; s++) {
+      let cur = near[Math.floor(Math.random() * near.length)], px = cur.x, py = cur.y - 400; const hitSet = new Set();
+      for (let c = 0; c <= chains && cur; c++) {
+        G.bolts.push({ x1: px, y1: py, x2: cur.x, y2: cur.y, t: .18 }); damageEnemy(cur, dmg); hitSet.add(cur); px = cur.x; py = cur.y;
+        let nx = null, nd = 160 * 160; for (const e of G.enemies) { if (e.dead || hitSet.has(e)) continue; const d = (e.x - px) ** 2 + (e.y - py) ** 2; if (d < nd) { nd = d; nx = e; } } cur = nx;
+      }
+    }
+  },
+  bomb(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = (2.2 - .15 * L) * ST.cdMul * (w.evo ? .6 : 1);
+    const n = 1 + Math.floor(L / 3) + ST.proj + (w.evo ? 2 : 0), r = (55 + 6 * L) * ST.area * (w.evo ? 1.5 : 1), dmg = wDmg(20 + 10 * L) * (w.evo ? 1.5 : 1);
+    const cands = G.enemies.filter(e => !e.dead && Math.hypot(e.x - P.x, e.y - P.y) < 420);
+    for (let i = 0; i < n; i++) {
+      const t = cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
+      const x = t ? t.x : P.x + (Math.random() - .5) * 400, y = t ? t.y : P.y + (Math.random() - .5) * 400;
+      G.areas.push({ kind: 'bomb', x, y, t: .7, r, dmg, evo: w.evo });
+    }
+  },
+  boomerang(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const t = nearest(P.x, P.y, 600); if (!t) { w.t = .1; return; }
+    const L = w.lvl; w.t = (1.8 - .1 * L) * ST.cdMul * (w.evo ? .7 : 1);
+    const n = 1 + Math.floor((L - 1) / 2) + ST.proj + (w.evo ? 2 : 0), a = Math.atan2(t.y - P.y, t.x - P.x);
+    for (let i = 0; i < n; i++) { const aa = a + (i - (n - 1) / 2) * .5; shoot(P.x, P.y, aa, 400, 11 * Math.sqrt(ST.area) * (w.evo ? 1.4 : 1), wDmg(12 + 5 * L) * (w.evo ? 1.5 : 1), 1e9, 3, '#e0b070', { kind: 'boom', bt: 0, ba: aa, spd: 400 }); }
+  },
+  frost(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = (3.2 - .2 * L) * ST.cdMul * (w.evo ? .7 : 1);
+    const r = (95 + 10 * L) * ST.area * (w.evo ? 1.3 : 1), dmg = wDmg(10 + 5 * L) * (w.evo ? 1.6 : 1);
+    G.rings.push({ x: P.x, y: P.y, r: 10, max: r, t: .35, color: '#9fe8ff', fill: true });
+    for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < r + e.r) { e.slowT = 2; e.slowAmt = e.boss ? .3 : (w.evo ? 1 : .5); damageEnemy(e, dmg); }
+  },
+  fire(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = .22 * ST.cdMul;
+    if (w.lx !== undefined && Math.hypot(P.x - w.lx, P.y - w.ly) < 10) return;
+    w.lx = P.x; w.ly = P.y;
+    G.areas.push({ kind: 'fire', x: P.x, y: P.y, t: (1.6 + .3 * L) * (w.evo ? 1.4 : 1), r: 24 * ST.area * (w.evo ? 1.4 : 1), dmg: wDmg(5 + 3 * L) * (w.evo ? 1.6 : 1) });
+  },
+};
+
+/* ----- update ----- */
+const keys = {};
+function update(dt) {
+  G.time += dt; G.now += dt;
+  if (G.banner) { G.banner.t -= dt; if (G.banner.t <= 0) G.banner = null; }
+  // player
+  let mx = 0, my = 0;
+  if (keys.a || keys.arrowleft) mx--; if (keys.d || keys.arrowright) mx++;
+  if (keys.w || keys.arrowup) my--; if (keys.s || keys.arrowdown) my++;
+  const ml = Math.hypot(mx, my);
+  P.moving = ml > 0;
+  if (ml) { mx /= ml; my /= ml; P.fx = mx; P.fy = my; }
+  if (P.dashT > 0) { P.dashT -= dt; P.x += P.dvx * dt; P.y += P.dvy * dt; if (Math.random() < .8) G.parts.push({ x: P.x, y: P.y, vx: 0, vy: 0, t: .25, c: P.color, r: 6 }); }
+  else { P.x += mx * ST.speed * dt; P.y += my * ST.speed * dt; }
+  P.x = clamp(P.x, P.r, WORLD - P.r); P.y = clamp(P.y, P.r, WORLD - P.r);
+  P.invul -= dt; P.dashCd -= dt; P.aegisT -= dt;
+  if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
+  if (mode !== 'fight') return;
+  // weapons
+  if (!G.ending) for (const w of run.weapons) WUPD[w.id](w, dt);
+  spawnTick(dt);
+  // enemies
+  const chill = 1 - ST.chill;
+  for (const e of G.enemies) {
+    if (e.dead) continue;
+    if (e.slowT > 0) e.slowT -= dt;
+    if (e.flash > 0) e.flash -= dt;
+    const sp = e.spd * (e.slowT > 0 ? 1 - e.slowAmt : 1) * chill;
+    const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy) || 1;
+    if (e.boss) bossAI(e, dt, sp, dx, dy, d);
+    else if (e.type === 'shooter') {
+      const dir = d > 280 ? 1 : d < 200 ? -1 : 0;
+      e.x += dx / d * sp * dir * dt; e.y += dy / d * sp * dir * dt;
+      e.shootT -= dt * (e.slowT > 0 ? .5 : 1);
+      if (e.shootT <= 0 && d < 600) { e.shootT = 2.2 + Math.random(); const a = Math.atan2(dy, dx); const n = e.elite ? 5 : 1; for (let i = 0; i < n; i++) ebullet(e.x, e.y, a + (i - (n - 1) / 2) * .25, 210, e.dmg); }
+    } else { e.x += dx / d * sp * dt; e.y += dy / d * sp * dt; }
+    e.x += e.kx * dt; e.y += e.ky * dt; e.kx *= .85; e.ky *= .85;
+    if (d < e.r + P.r) {
+      if (e.type === 'exploder' && !e.boss) { killEnemy(e); }
+      else { if (has('thorns') && e.boomT <= G.now) { e.boomT = G.now + .4; damageEnemy(e, 30 * ST.might); } hurt(e.dmg); }
+    }
+  }
+  separate();
+  // projectiles
+  for (const p of G.projs) {
+    p.life -= dt;
+    if (p.kind === 'boom') {
+      p.bt += dt;
+      if (p.bt < .6) { const s = p.spd * (1 - p.bt / .6); p.vx = Math.cos(p.ba) * s; p.vy = Math.sin(p.ba) * s; }
+      else { if (!p.back) { p.back = true; p.hits.clear(); } const dx = P.x - p.x, dy = P.y - p.y, d = Math.hypot(dx, dy) || 1, s = Math.min(p.spd * 1.3, (p.bt - .6) * 900); p.vx = dx / d * s; p.vy = dy / d * s; if (d < 20) p.life = 0; }
+    }
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    for (const e of G.enemies) {
+      if (e.dead || p.hits.has(e)) continue;
+      if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < (e.r + p.r) ** 2) {
+        p.hits.add(e); const v = Math.hypot(p.vx, p.vy) || 1;
+        damageEnemy(e, p.dmg, p.vx / v * 120, p.vy / v * 120);
+        if (--p.pierce <= 0) { p.life = 0; break; }
+      }
+    }
+  }
+  G.projs = G.projs.filter(p => p.life > 0);
+  // enemy bullets
+  for (const b of G.eb) {
+    b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
+    if ((b.x - P.x) ** 2 + (b.y - P.y) ** 2 < (b.r + P.r - 3) ** 2) { hurt(b.dmg); b.life = 0; }
+  }
+  G.eb = G.eb.filter(b => b.life > 0);
+  // areas
+  for (const a of G.areas) {
+    a.t -= dt;
+    if (a.kind === 'bomb' && a.t <= 0) { explodeAt(a.x, a.y, a.r, a.dmg, a.evo ? '#ff7040' : '#ffb040'); G.shake = Math.max(G.shake, 3); }
+    if (a.kind === 'fire') for (const e of G.enemies) if (!e.dead && e.fireT <= G.now && (e.x - a.x) ** 2 + (e.y - a.y) ** 2 < (a.r + e.r) ** 2) { e.fireT = G.now + .4; damageEnemy(e, a.dmg); }
+  }
+  G.areas = G.areas.filter(a => a.t > 0);
+  // pickups
+  const mag = ST.magnet;
+  for (const p of G.pick) {
+    const dx = P.x - p.x, dy = P.y - p.y, d = Math.hypot(dx, dy) || 1;
+    if (!p.mag && d < mag) p.mag = true;
+    if (p.mag) { p.sp = (p.sp || 150) + 900 * dt; p.x += dx / d * p.sp * dt; p.y += dy / d * p.sp * dt; }
+    if (d < P.r + 8) { p.got = true; if (p.gold) { const g = Math.max(1, Math.round(p.v * ST.goldMul)); run.gold += g; S.stats.gold += g; } else addXp(p.v); }
+  }
+  G.pick = G.pick.filter(p => !p.got);
+  // fx
+  for (const p of G.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .92; p.vy *= .92; p.t -= dt; }
+  G.parts = G.parts.filter(p => p.t > 0);
+  for (const t of G.texts) { t.y -= 40 * dt; t.t -= dt; } G.texts = G.texts.filter(t => t.t > 0);
+  for (const b of G.bolts) b.t -= dt; G.bolts = G.bolts.filter(b => b.t > 0);
+  for (const r of G.rings) { r.t -= dt; r.r += (r.max - r.r) * Math.min(1, dt * 14); } G.rings = G.rings.filter(r => r.t > 0);
+  G.enemies = G.enemies.filter(e => !e.dead);
+  if (G.shake > 0) G.shake = Math.max(0, G.shake - dt * 30);
+  // end conditions
+  if (!G.ending && G.time >= G.dur) startEnding('✅ CLEARED!');
+  if (G.ending) { G.ending -= dt; if (G.ending <= 0 && !G.pick.length) finishFight(); else if (G.ending <= -2) finishFight(); }
+}
+function ebullet(x, y, a, spd, dmg, r = 6) { if (G.eb.length < 400) G.eb.push({ x, y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, dmg, r, life: 5 }); }
+function separate() {
+  const cell = 44, grid = new Map();
+  for (const e of G.enemies) { if (e.dead) continue; const k = ((e.x / cell) | 0) * 4096 + ((e.y / cell) | 0); let a = grid.get(k); if (!a) grid.set(k, a = []); a.push(e); }
+  for (const a of grid.values()) {
+    if (a.length < 2) continue;
+    for (let i = 0; i < a.length; i++) for (let j = i + 1; j < a.length && j < i + 8; j++) {
+      const p = a[i], q = a[j], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || .01, m = p.r + q.r;
+      if (d < m) { const push = (m - d) * .3 / d; if (!p.boss) { p.x -= dx * push; p.y -= dy * push; } if (!q.boss) { q.x += dx * push; q.y += dy * push; } }
+    }
+  }
+}
+function bossAI(e, dt, sp, dx, dy, d) {
+  const enr = e.hp < e.maxHp / 2 ? .7 : 1;
+  if (e.kind === 'colossus') {
+    if (e.state === 'charge') { e.x += e.cvx * dt; e.y += e.cvy * dt; e.st -= dt; if (e.st <= 0 || e.x < 40 || e.y < 40 || e.x > WORLD - 40 || e.y > WORLD - 40) { e.state = 'walk'; e.at = 0; e.x = clamp(e.x, 40, WORLD - 40); e.y = clamp(e.y, 40, WORLD - 40); for (let i = 0; i < 12; i++) ebullet(e.x, e.y, i / 12 * 6.283, 180, e.dmg * .6); G.shake = 8; } }
+    else if (e.state === 'tele') { e.st -= dt; if (e.st <= 0) { e.state = 'charge'; e.st = .9; e.cvx = Math.cos(e.ca) * 600; e.cvy = Math.sin(e.ca) * 600; } }
+    else { e.x += dx / d * sp * dt; e.y += dy / d * sp * dt; e.at += dt; if (e.at > 3.2 * enr) { e.state = 'tele'; e.st = .8; e.ca = Math.atan2(dy, dx); } }
+    e.t2 += dt; if (e.t2 > 6) { e.t2 = 0; for (let i = 0; i < 5; i++) { const [x, y] = spawnPos(); makeEnemy('brute', x, y); } }
+  } else if (e.kind === 'queen') {
+    e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
+    e.t1 += dt; if (e.t1 > 2.4 * enr) { e.t1 = 0; const n = 14 + run.act * 2, off = Math.random(); for (let i = 0; i < n; i++) ebullet(e.x, e.y, (i + off) / n * 6.283, 170, e.dmg * .6, 7); }
+    e.t2 += dt; if (e.t2 > 4.5 * enr) { e.t2 = 0; for (let i = 0; i < 6; i++) makeEnemy(i % 2 ? 'runner' : 'exploder', e.x + (Math.random() - .5) * 60, e.y + (Math.random() - .5) * 60); }
+  } else {
+    const want = 300, tang = 1;
+    const rx = -dy / d, ry = dx / d, radial = d > want ? 1 : -1;
+    e.x += (dx / d * radial * .6 + rx * tang) * sp * 1.5 * dt; e.y += (dy / d * radial * .6 + ry * tang) * sp * 1.5 * dt;
+    e.t1 += dt; if (e.t1 > .1 * enr) { e.t1 = 0; e.sa += .38; ebullet(e.x, e.y, e.sa, 160, e.dmg * .5); ebullet(e.x, e.y, e.sa + Math.PI, 160, e.dmg * .5); }
+    e.t2 += dt; if (e.t2 > 2 * enr) { e.t2 = 0; const a = Math.atan2(dy, dx); for (let i = -1; i <= 1; i++) ebullet(e.x, e.y, a + i * .2, 280, e.dmg * .7, 8); }
+    e.t3 += dt; if (e.t3 > 7) { e.t3 = 0; burst(e.x, e.y, e.color, 20); const a = Math.random() * 6.283; e.x = clamp(P.x + Math.cos(a) * 320, 60, WORLD - 60); e.y = clamp(P.y + Math.sin(a) * 320, 60, WORLD - 60); burst(e.x, e.y, e.color, 20); }
+  }
+}
+function addXp(v) {
+  run.xp += v * ST.xpMul;
+  let n = 0;
+  while (run.xp >= xpNeed(run.level)) { run.xp -= xpNeed(run.level); run.level++; n++; }
+  if (n) {
+    S.stats.bestLevel = Math.max(S.stats.bestLevel, run.level);
+    paused = true;
+    queueLevelUps(n, () => { paused = false; if (mode === 'fight') hideUI(); for (const k in keys) keys[k] = false; });
+  }
+}
+function finishFight() {
+  if (mode !== 'fight') return;
+  const type = G.type;
+  mode = 'menu';
+  run.hp = Math.max(1, Math.min(P.hp, ST.maxHp));
+  const g = Math.round((8 + 5 * run.act) * ST.goldMul); run.gold += g; S.stats.gold += g;
+  if (!G.tookDmg) S.stats.noHit++;
+  for (const w of run.weapons) { delete w.lx; delete w.ly; delete w.blades; }
+  G = null;
+  if (type === 'elite') { run.elites++; S.stats.elites++; relicChoice(`💀 Elite defeated! +${g} gold`, () => completeNode()); }
+  else if (type === 'boss') bossReward(g);
+  else completeNode(`✅ Fight cleared! +${g} gold`);
+}
+function bossReward(g) {
+  run.bosses++; S.stats.bosses++;
+  healPct(.4);
+  relicChoice(`👑 ${BOSSES[BOSS_ORDER[(run.act - 1) % 3]].name} defeated! +${g} gold, healed 40%`, () => {
+    if (run.act === 3 && !run.won) {
+      run.won = true; S.stats.wins++;
+      if (run.heat >= S.maxHeat && S.maxHeat < 10) { S.maxHeat = run.heat + 1; toast(`🌡️ Heat ${S.maxHeat} unlocked!`, '#ff9a4a'); }
+      if (run.heat >= 10) S.stats.heat10++;
+      checkUnlocks(); checkAch(); save();
+      screen(`<h1>VICTORY!</h1><div class="sub">You conquered the Rift with the ${CHARS[run.char].name}!</div>
+        <div class="panel" style="max-width:560px;text-align:center"><p>You can <b>keep going into Endless mode</b>. Enemies get much stronger each act, but you earn far more shards. Or claim your rewards now.</p></div>
+        <div class="col" style="margin-top:14px"><button class="opt big" data-a="0" data-n="1">♾️ Continue into Endless<kbd>1</kbd></button><button class="opt big" data-a="1" data-n="2">🏆 Claim rewards &amp; end run<kbd>2</kbd></button></div>`,
+        [() => { run.endless = true; nextAct(); }, () => endRun('win')]);
+      inputLock = performance.now() + 500;
+    } else nextAct();
+  });
+}
+function nextAct() {
+  run.act++; run.map = genMap(run.act); run.pos = { r: -1, i: -1 }; run.path = []; run.target = null;
+  S.stats.bestAct = Math.max(S.stats.bestAct, run.act);
+  saveRun(); showMap(`🌍 Act ${run.act}: ${actInfo(run.act).name}${run.act > 3 ? ' (Endless)' : ''}`);
+}
+function calcShards(r) {
+  let s = r.floors * 3 + r.kills / 20 + r.bosses * 20 + r.elites * 5 + (r.won ? 50 : 0) + Math.max(0, r.act - 3) * 30;
+  s *= (1 + .25 * r.heat) * (r.relics.includes('idol') ? 1.3 : 1) * (r.daily ? 1.2 : 1);
+  return Math.round(s);
+}
+function endRun(how, then) {
+  mode = 'menu'; paused = false; G = null;
+  const r = run, shards = calcShards(r);
+  S.shards += shards; S.stats.shardsEarned += shards;
+  if (how === 'dead') S.stats.deaths++;
+  S.stats.bestAct = Math.max(S.stats.bestAct, r.act);
+  if (r.daily) { S.stats.dailies++; S.daily[r.daily] = Math.max(S.daily[r.daily] || 0, r.floors); }
+  checkAch(r);
+  S.run = null; run = null;
+  const newChars = checkUnlocks();
+  save();
+  if (then) { then(); return; }
+  const title = how === 'win' ? '🏆 Run Complete!' : how === 'dead' ? '💀 You Fell' : '🏳️ Run Ended';
+  screen(`<h1 style="font-size:48px">${title}</h1>
+    <div class="panel" style="max-width:520px"><div class="grid" style="width:100%;grid-template-columns:1fr 1fr">
+      <div>Character: <b>${CHARS[r.char].icon} ${CHARS[r.char].name}</b></div><div>Reached: <b>Act ${r.act}</b></div>
+      <div>Floors cleared: <b>${r.floors}</b></div><div>Kills: <b>${r.kills}</b></div>
+      <div>Elites: <b>${r.elites}</b></div><div>Bosses: <b>${r.bosses}</b></div>
+      <div>Level: <b>${r.level}</b></div><div>Relics: <b>${r.relics.length}</b></div>
+    </div>
+    <h2 style="margin-top:14px;color:#7fe3ff">+${shards} 💠 shards</h2>
+    ${newChars.length ? `<p style="text-align:center;color:var(--gold)">🔓 New character: ${newChars.map(k => CHARS[k].icon + ' ' + CHARS[k].name).join(', ')}!</p>` : ''}
+    </div>
+    <div class="col" style="margin-top:14px"><button class="opt big" data-a="0" data-n="1">⚔️ Play again<kbd>1</kbd></button><button class="opt big" data-a="1" data-n="2">💠 Spend shards<kbd>2</kbd></button><button class="opt" data-a="2" data-n="3">🏠 Title<kbd>3</kbd></button></div>`,
+    [() => showCharSelect(false), showUpgrades, showTitle]);
+  inputLock = performance.now() + 700;
+}
+function checkUnlocks() {
+  const out = [];
+  for (const k in CHARS) { const c = CHARS[k]; if (!S.chars[k] && c.unlock && c.unlock.test(S)) { S.chars[k] = true; out.push(k); toast(`🔓 Unlocked ${c.icon} ${c.name}!`, '#ffd24a'); } }
+  if (out.length) save();
+  return out;
+}
+function checkAch(r = run) {
+  let any = false;
+  for (const a of ACHIEVEMENTS) if (!S.ach[a.id] && a.test(S, r)) { S.ach[a.id] = true; S.shards += a.reward; any = true; toast(`🏆 ${a.name} (+${a.reward} 💠)`, '#5ee08a'); }
+  if (any) save();
+}
+function pauseMenu() {
+  if (mode !== 'fight' || paused) return;
+  paused = true;
+  const resume = () => { paused = false; hideUI(); for (const k in keys) keys[k] = false; };
+  const h0 = run.hp; run.hp = P.hp; const bar = statusBar(); run.hp = h0;
+  screen(`<h2>⏸ Paused</h2>${bar}
+    <div class="col"><button class="opt big" data-a="0" data-n="1">▶ Resume (Esc)<kbd>1</kbd></button>
+    <button class="opt" data-a="1" data-n="2">💾 Save &amp; Quit <small style="color:var(--dim)">(restart this fight later)</small><kbd>2</kbd></button>
+    <button class="opt" data-a="2" data-n="3">🏳️ Give up this run<kbd>3</kbd></button></div>`,
+    [resume, () => { mode = 'menu'; paused = false; G = null; showTitle(); }, () => { run.hp = P.hp; endRun('abandon'); }],
+    'overlay', k => { if (k === 'escape' || k === 'p') { resume(); return true; } });
+}
+
+/* ================= RENDER ================= */
+function render() {
+  const act = actInfo(run.act);
+  cx.fillStyle = act.bg; cx.fillRect(0, 0, VW, VH);
+  const sx = G ? (Math.random() - .5) * G.shake : 0, sy = G ? (Math.random() - .5) * G.shake : 0;
+  const ox = Math.round(VW / 2 - P.x + sx), oy = Math.round(VH / 2 - P.y + sy);
+  // grid
+  cx.strokeStyle = act.grid; cx.lineWidth = 1; cx.beginPath();
+  const gs = 80;
+  for (let x = ((ox % gs) + gs) % gs; x < VW; x += gs) { cx.moveTo(x, 0); cx.lineTo(x, VH); }
+  for (let y = ((oy % gs) + gs) % gs; y < VH; y += gs) { cx.moveTo(0, y); cx.lineTo(VW, y); }
+  cx.stroke();
+  cx.save(); cx.translate(ox, oy);
+  cx.strokeStyle = '#ff607088'; cx.lineWidth = 4; cx.strokeRect(0, 0, WORLD, WORLD);
+  const vis = (x, y, m = 60) => x > P.x - VW / 2 - m && x < P.x + VW / 2 + m && y > P.y - VH / 2 - m && y < P.y + VH / 2 + m;
+  if (G) {
+    // areas
+    for (const a of G.areas) {
+      if (!vis(a.x, a.y, a.r)) continue;
+      if (a.kind === 'fire') { cx.globalAlpha = Math.min(.35, a.t); cx.fillStyle = '#ff6a20'; cx.beginPath(); cx.arc(a.x, a.y, a.r, 0, 6.283); cx.fill(); cx.globalAlpha = 1; }
+      else if (a.kind === 'bomb') { cx.strokeStyle = '#ffb04088'; cx.lineWidth = 2; cx.beginPath(); cx.arc(a.x, a.y, a.r * (1 - a.t / .7) , 0, 6.283); cx.stroke(); cx.fillStyle = '#333'; cx.beginPath(); cx.arc(a.x, a.y, 7, 0, 6.283); cx.fill(); cx.fillStyle = '#ff5030'; cx.fillRect(a.x - 1, a.y - 11, 2, 4); }
+    }
+    for (const w of run.weapons) if (w.id === 'aura' && w.rad) { cx.fillStyle = w.evo ? '#ffe68033' : '#fff3a022'; cx.strokeStyle = w.evo ? '#ffe680aa' : '#fff3a066'; cx.lineWidth = 2; cx.beginPath(); cx.arc(P.x, P.y, w.rad, 0, 6.283); cx.fill(); cx.stroke(); }
+    // pickups
+    for (const p of G.pick) {
+      if (!vis(p.x, p.y)) continue;
+      if (p.gold) { cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(p.x, p.y, 5, 0, 6.283); cx.fill(); cx.fillStyle = '#b8901a'; cx.fillRect(p.x - 1, p.y - 3, 2, 6); }
+      else { const big = p.v >= 8, med = p.v >= 3; cx.fillStyle = big ? '#ff5c8a' : med ? '#5ee08a' : '#5cc8ff'; const s = big ? 8 : med ? 6 : 5; cx.beginPath(); cx.moveTo(p.x, p.y - s); cx.lineTo(p.x + s * .7, p.y); cx.lineTo(p.x, p.y + s); cx.lineTo(p.x - s * .7, p.y); cx.closePath(); cx.fill(); }
+    }
+    // enemies
+    for (const e of G.enemies) { if (!vis(e.x, e.y, e.r + 20)) continue; drawEnemy(e); }
+    // enemy bullets
+    cx.fillStyle = '#ff5a6e';
+    for (const b of G.eb) { if (!vis(b.x, b.y)) continue; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 6.283); cx.fill(); }
+    cx.fillStyle = '#ffd0d6';
+    for (const b of G.eb) { if (!vis(b.x, b.y)) continue; cx.beginPath(); cx.arc(b.x, b.y, b.r * .45, 0, 6.283); cx.fill(); }
+    // projectiles
+    for (const p of G.projs) {
+      if (!vis(p.x, p.y)) continue;
+      if (p.kind === 'knife') { const a = Math.atan2(p.vy, p.vx); cx.save(); cx.translate(p.x, p.y); cx.rotate(a); cx.fillStyle = p.color; cx.fillRect(-9, -2, 18, 4); cx.fillStyle = '#8a6a4a'; cx.fillRect(-11, -2.5, 5, 5); cx.restore(); }
+      else if (p.kind === 'boom') { cx.save(); cx.translate(p.x, p.y); cx.rotate(G.now * 18); cx.strokeStyle = p.color; cx.lineWidth = 5; cx.beginPath(); cx.arc(0, 0, p.r, 0, 3.6); cx.stroke(); cx.restore(); }
+      else { cx.fillStyle = p.color; cx.shadowColor = p.color; cx.shadowBlur = 10; cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 6.283); cx.fill(); cx.shadowBlur = 0; }
+    }
+    // orbit blades
+    for (const w of run.weapons) if (w.id === 'orbit' && w.blades) for (const [bx, by, br] of w.blades) { cx.fillStyle = w.evo ? '#ffe680' : '#cfe0ff'; cx.shadowColor = cx.fillStyle; cx.shadowBlur = 12; cx.beginPath(); cx.arc(bx, by, br, 0, 6.283); cx.fill(); cx.shadowBlur = 0; }
+    // rings
+    for (const r of G.rings) { cx.globalAlpha = Math.min(1, r.t * 3); cx.strokeStyle = r.color; cx.lineWidth = 3; cx.beginPath(); cx.arc(r.x, r.y, r.r, 0, 6.283); cx.stroke(); if (r.fill) { cx.fillStyle = r.color + '22'; cx.fill(); } cx.globalAlpha = 1; }
+    // bolts
+    cx.strokeStyle = '#fff47a'; cx.lineWidth = 3; cx.shadowColor = '#fff47a'; cx.shadowBlur = 12;
+    for (const b of G.bolts) { cx.globalAlpha = b.t / .18; cx.beginPath(); cx.moveTo(b.x1, b.y1); const n = 5; for (let i = 1; i < n; i++) cx.lineTo(b.x1 + (b.x2 - b.x1) * i / n + (Math.random() - .5) * 18, b.y1 + (b.y2 - b.y1) * i / n + (Math.random() - .5) * 18); cx.lineTo(b.x2, b.y2); cx.stroke(); }
+    cx.globalAlpha = 1; cx.shadowBlur = 0;
+    // particles
+    for (const p of G.parts) { if (!vis(p.x, p.y)) continue; cx.globalAlpha = Math.min(1, p.t * 3); cx.fillStyle = p.c; cx.fillRect(p.x - p.r / 2, p.y - p.r / 2, p.r, p.r); }
+    cx.globalAlpha = 1;
+  }
+  // player
+  if (!(P.invul > 0 && Math.floor(P.invul * 15) % 2 && P.dashT <= 0) && P.hp > 0) {
+    cx.fillStyle = P.color; cx.shadowColor = P.color; cx.shadowBlur = 14;
+    cx.beginPath(); cx.arc(P.x, P.y, P.r, 0, 6.283); cx.fill(); cx.shadowBlur = 0;
+    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(P.x + P.fx * 6, P.y + P.fy * 6, 4, 0, 6.283); cx.fill();
+    cx.fillStyle = '#0b0d14'; cx.beginPath(); cx.arc(P.x + P.fx * 7.5, P.y + P.fy * 7.5, 2, 0, 6.283); cx.fill();
+  }
+  // dash meter
+  if (P.dashCd > 0) { cx.fillStyle = '#0008'; cx.fillRect(P.x - 16, P.y + 20, 32, 4); cx.fillStyle = '#7fe3ff'; cx.fillRect(P.x - 16, P.y + 20, 32 * (1 - P.dashCd / ST.dashCd), 4); }
+  // texts
+  if (G) { cx.textAlign = 'center'; for (const t of G.texts) { cx.globalAlpha = Math.min(1, t.t * 3); cx.font = `bold ${t.big ? 17 : 13}px system-ui,sans-serif`; cx.fillStyle = '#000'; cx.fillText(t.s, t.x + 1, t.y + 1); cx.fillStyle = t.c; cx.fillText(t.s, t.x, t.y); } cx.globalAlpha = 1; }
+  cx.restore();
+  if (G) drawHUD();
+}
+function drawEnemy(e) {
+  const col = e.flash > 0 ? '#fff' : e.color;
+  cx.fillStyle = col;
+  if (e.boss) {
+    cx.shadowColor = e.color; cx.shadowBlur = 25;
+    if (e.kind === 'colossus' && e.state === 'tele') { cx.strokeStyle = '#ff607099'; cx.lineWidth = e.r * 1.6; cx.beginPath(); cx.moveTo(e.x, e.y); cx.lineTo(e.x + Math.cos(e.ca) * 540, e.y + Math.sin(e.ca) * 540); cx.stroke(); }
+    cx.beginPath(); cx.arc(e.x, e.y, e.r, 0, 6.283); cx.fill(); cx.shadowBlur = 0;
+    const a = Math.atan2(P.y - e.y, P.x - e.x);
+    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(e.x + Math.cos(a) * e.r * .3, e.y + Math.sin(a) * e.r * .3, e.r * .4, 0, 6.283); cx.fill();
+    cx.fillStyle = e.kind === 'eye' ? '#ff2050' : '#111'; cx.beginPath(); cx.arc(e.x + Math.cos(a) * e.r * .45, e.y + Math.sin(a) * e.r * .45, e.r * .18, 0, 6.283); cx.fill();
+    if (e.kind === 'queen') { cx.fillStyle = '#ffd24a'; for (let i = -1; i <= 1; i++) { cx.beginPath(); cx.moveTo(e.x + i * 14 - 6, e.y - e.r + 4); cx.lineTo(e.x + i * 14, e.y - e.r - 12); cx.lineTo(e.x + i * 14 + 6, e.y - e.r + 4); cx.fill(); } }
+    return;
+  }
+  if (e.type === 'brute') { cx.beginPath(); cx.roundRect ? cx.roundRect(e.x - e.r, e.y - e.r, e.r * 2, e.r * 2, 6) : cx.rect(e.x - e.r, e.y - e.r, e.r * 2, e.r * 2); cx.fill(); }
+  else if (e.type === 'shooter') { const a = Math.atan2(P.y - e.y, P.x - e.x); cx.beginPath(); cx.moveTo(e.x + Math.cos(a) * e.r * 1.3, e.y + Math.sin(a) * e.r * 1.3); cx.lineTo(e.x + Math.cos(a + 2.3) * e.r, e.y + Math.sin(a + 2.3) * e.r); cx.lineTo(e.x + Math.cos(a - 2.3) * e.r, e.y + Math.sin(a - 2.3) * e.r); cx.closePath(); cx.fill(); }
+  else { cx.beginPath(); cx.arc(e.x, e.y, e.r, 0, 6.283); cx.fill(); }
+  if (e.type === 'exploder') { cx.fillStyle = Math.floor(G.now * 8) % 2 ? '#fff' : '#ffe14a'; cx.beginPath(); cx.arc(e.x, e.y, e.r * .45, 0, 6.283); cx.fill(); }
+  else if (e.type !== 'shooter') {
+    const a = Math.atan2(P.y - e.y, P.x - e.x), ex = Math.cos(a) * e.r * .35, ey = Math.sin(a) * e.r * .35;
+    cx.fillStyle = '#111'; const s = Math.max(1.6, e.r * .16);
+    cx.fillRect(e.x + ex - e.r * .3 - s / 2, e.y + ey - e.r * .15, s, s); cx.fillRect(e.x + ex + e.r * .3 - s / 2, e.y + ey - e.r * .15, s, s);
+  }
+  if (e.slowT > 0) { cx.strokeStyle = '#9fe8ff'; cx.lineWidth = 2; cx.beginPath(); cx.arc(e.x, e.y, e.r + 2, 0, 6.283); cx.stroke(); }
+  if (e.elite) {
+    cx.strokeStyle = '#ffd24a'; cx.lineWidth = 3; cx.beginPath(); cx.arc(e.x, e.y, e.r + 4, 0, 6.283); cx.stroke();
+    cx.fillStyle = '#0009'; cx.fillRect(e.x - 22, e.y - e.r - 12, 44, 5); cx.fillStyle = '#ffd24a'; cx.fillRect(e.x - 22, e.y - e.r - 12, 44 * Math.max(0, e.hp / e.maxHp), 5);
+  }
+}
+function drawHUD() {
+  const st = ST;
+  // xp bar
+  cx.fillStyle = '#0009'; cx.fillRect(0, 0, VW, 10);
+  cx.fillStyle = '#5cc8ff'; cx.fillRect(0, 0, VW * Math.min(1, run.xp / xpNeed(run.level)), 10);
+  // hp
+  const hw = Math.min(260, VW * .35);
+  cx.fillStyle = '#0009'; cx.fillRect(14, 18, hw, 20);
+  cx.fillStyle = P.hp / st.maxHp < .3 ? '#ff4050' : '#e04858'; cx.fillRect(14, 18, hw * Math.max(0, P.hp / st.maxHp), 20);
+  cx.strokeStyle = '#fff4'; cx.strokeRect(14, 18, hw, 20);
+  cx.font = 'bold 14px system-ui,sans-serif'; cx.textAlign = 'left'; cx.fillStyle = '#fff';
+  cx.fillText(`❤️ ${Math.ceil(P.hp)} / ${st.maxHp}`, 20, 33);
+  cx.fillText(`⭐ Lv ${run.level}   🪙 ${run.gold}   💀 ${G.kills}`, 14, 58);
+  // timer
+  cx.textAlign = 'center'; cx.font = 'bold 22px system-ui,sans-serif';
+  if (G.type !== 'boss') { const left = Math.max(0, Math.ceil(G.dur - G.time)); cx.fillStyle = '#fff'; cx.fillText(`${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`, VW / 2, 36); }
+  cx.font = '13px system-ui,sans-serif'; cx.fillStyle = '#fffa';
+  cx.fillText(`Act ${run.act} · ${actInfo(run.act).name}${G.type === 'elite' ? ' · ELITE' : ''}`, VW / 2, G.type === 'boss' ? 30 : 54);
+  // boss bar
+  if (G.boss) {
+    const b = G.boss, bw = Math.min(560, VW * .7);
+    cx.fillStyle = '#000a'; cx.fillRect(VW / 2 - bw / 2, 40, bw, 16);
+    cx.fillStyle = b.color; cx.fillRect(VW / 2 - bw / 2, 40, bw * Math.max(0, b.hp / b.maxHp), 16);
+    cx.strokeStyle = '#fff6'; cx.strokeRect(VW / 2 - bw / 2, 40, bw, 16);
+    cx.font = 'bold 13px system-ui,sans-serif'; cx.fillStyle = '#fff'; cx.fillText(b.name, VW / 2, 53);
+    const d = Math.hypot(b.x - P.x, b.y - P.y);
+    if (d > Math.min(VW, VH) / 2) { const a = Math.atan2(b.y - P.y, b.x - P.x), r = Math.min(VW, VH) / 2 - 40; cx.save(); cx.translate(VW / 2 + Math.cos(a) * r, VH / 2 + Math.sin(a) * r); cx.rotate(a); cx.fillStyle = '#ff6070'; cx.beginPath(); cx.moveTo(14, 0); cx.lineTo(-8, -9); cx.lineTo(-8, 9); cx.fill(); cx.restore(); }
+  }
+  // weapons / passives
+  cx.textAlign = 'left'; cx.font = '20px system-ui,sans-serif';
+  let x = 14; const y = VH - 16;
+  for (const w of run.weapons) { cx.fillStyle = '#0008'; cx.fillRect(x - 3, y - 24, 34, 30); cx.fillStyle = '#fff'; cx.fillText(WEAPONS[w.id].icon, x, y); cx.font = 'bold 11px system-ui'; cx.fillStyle = w.evo ? '#ffb84a' : '#ffd24a'; cx.fillText(w.evo ? '★' : w.lvl, x + 22, y + 2); cx.font = '20px system-ui,sans-serif'; x += 38; }
+  x += 8;
+  for (const k in run.passives) { cx.fillStyle = '#0008'; cx.fillRect(x - 3, y - 24, 34, 30); cx.fillStyle = '#fff'; cx.fillText(PASSIVES[k].icon, x, y); cx.font = 'bold 11px system-ui'; cx.fillStyle = '#ffd24a'; cx.fillText(run.passives[k], x + 22, y + 2); cx.font = '20px system-ui,sans-serif'; x += 38; }
+  // dash
+  cx.textAlign = 'right'; cx.font = 'bold 13px system-ui,sans-serif'; cx.fillStyle = P.dashCd > 0 ? '#fff6' : '#7fe3ff';
+  cx.fillText(P.dashCd > 0 ? 'DASH ' + P.dashCd.toFixed(1) : 'DASH READY [Space]', VW - 14, VH - 16);
+  cx.fillStyle = '#fff8'; cx.fillText('Esc: pause', VW - 14, 30);
+  // banner
+  if (G.banner) { cx.textAlign = 'center'; cx.globalAlpha = Math.min(1, G.banner.t * 2); cx.font = 'bold 32px system-ui,sans-serif'; cx.fillStyle = '#000a'; cx.fillText(G.banner.text, VW / 2 + 2, VH * .28 + 2); cx.fillStyle = '#fff'; cx.fillText(G.banner.text, VW / 2, VH * .28); cx.globalAlpha = 1; }
+  // low hp vignette
+  if (P.hp / st.maxHp < .3) { cx.strokeStyle = `rgba(255,40,60,${.25 + .15 * Math.sin(G.now * 6)})`; cx.lineWidth = 30; cx.strokeRect(0, 0, VW, VH); }
+}
+const stars = Array.from({ length: 90 }, () => ({ x: Math.random(), y: Math.random(), s: Math.random() * 1.8 + .3, v: Math.random() * .02 + .005 }));
+function renderMenuBg(dt) {
+  const g = cx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, '#0d1020'); g.addColorStop(1, '#150c22');
+  cx.fillStyle = g; cx.fillRect(0, 0, VW, VH);
+  cx.fillStyle = '#9fb4ff';
+  for (const s of stars) { s.y -= s.v * dt; if (s.y < 0) { s.y = 1; s.x = Math.random(); } cx.globalAlpha = .3 + s.s / 3; cx.fillRect(s.x * VW, s.y * VH, s.s, s.s); }
+  cx.globalAlpha = 1;
+}
+
+/* ================= INPUT & LOOP ================= */
+addEventListener('keydown', e => {
+  const tag = e.target && e.target.tagName;
+  if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+  const k = e.key.toLowerCase();
+  if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
+  keys[k] = true;
+  if (mode === 'fight' && !paused) {
+    if (k === ' ' && !e.repeat) dash();
+    if ((k === 'escape' || k === 'p') && !e.repeat) pauseMenu();
+    return;
+  }
+  if (ui.className === 'hidden' || e.repeat && !k.startsWith('arrow')) return;
+  if (performance.now() < inputLock) return;
+  if (keyHook && keyHook(k) === true) return;
+  if (/^[1-9]$/.test(k)) { const b = ui.querySelector(`button[data-n="${k}"]:not([disabled])`); if (b) { b.focus({ preventScroll: true }); b.click(); } return; }
+  if (k.startsWith('arrow')) {
+    const bs = [...ui.querySelectorAll('button:not([disabled])')]; if (!bs.length) return;
+    let i = bs.indexOf(document.activeElement);
+    i = (k === 'arrowup' || k === 'arrowleft') ? (i <= 0 ? bs.length - 1 : i - 1) : (i + 1) % bs.length;
+    bs[i].focus(); return;
+  }
+  if (k === 'enter') { e.preventDefault(); const b = document.activeElement; if (b && b.tagName === 'BUTTON' && ui.contains(b) && !b.disabled) b.click(); }
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; if (mode === 'fight' && !paused) pauseMenu(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && mode === 'fight' && !paused) pauseMenu(); });
+
+let last = performance.now(), saveTimer = 0;
+function loop(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  S.stats.playTime += dt;
+  saveTimer += dt; if (saveTimer > 20) { saveTimer = 0; if (mode !== 'fight') save(); }
+  try {
+    if ((mode === 'fight' || mode === 'dead') && G) { if (!paused && mode === 'fight') update(dt); else if (mode === 'dead') { for (const p of G.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.t -= dt; } } render(); }
+    else renderMenuBg(dt);
+  } catch (err) { console.error(err); }
+  requestAnimationFrame(loop);
+}
+showTitle();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
