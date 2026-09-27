@@ -221,8 +221,13 @@ Twin Kings (hit both or one heals), Spore Choir (clogs a power), Tiny Tyrant (gu
 6. Your playtesting → fixes → more books, powers and bosses.
 7. Online multiplayer (later).
 
-## 15. Open questions for you
-1. When all free AI limits are used up for the day: **stop** until tomorrow, or fall back to a basic keyword narrator?
-2. Should the **first impossible action per page** be a free warning, or always cost the turn?
-3. Narrator strictness at level 1: **generous** (more things count as stretch) or **strict**?
-4. Any specific powers, bosses or objectives from when *you* narrated this game that must be in it?
+## 15. Decisions (answered)
+1. **The game never stops.** It cascades through every free model (Groq big → Groq mid → Gemini Flash-Lite → Groq Llama 8B with ~14,400 free requests/day). A keyword narrator is only an emergency if the internet or every service is down.
+2. **Impossible actions:** the first one in a run is a free warning. After that they always cost the turn.
+3. **Trial run:** the first page of your first book is a tutorial. The narrator is generous and explains each verdict. After that, normal strictness.
+4. No extra content requests. Use the designs above.
+
+## 16. Playtesting help (built into the game)
+- ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.
+- An indicator showing which AI is currently narrating.
+- 🐞 **Report** button: copies your last few turns (what you typed, the verdict, what happened) so you can paste it to Claude with "this was wrong because…".
