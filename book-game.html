@@ -255,42 +255,42 @@ const THEMES = {
   jungle: { name: 'The Jungle of Whispers', icon: '🌴', color: '#2f5d33', hint: 'A leaf is pressed between the pages. Something chatters inside.',
     places: ['a tangle of vines', 'a misty clearing', 'crumbling ruins', 'a roaring waterfall', 'a hollow tree', 'a muddy riverbank', 'a canopy walkway', 'a field of giant flowers'],
     objs: [['vines', '🌿', 'plant'], ['river', '🏞️', 'water'], ['coconuts', '🥥', 'food'], ['mud', '🟫', 'earth sticky'], ['hollow log', '🪵', 'wood'], ['beehive', '🍯', 'animal sticky'], ['totem', '🗿', 'holy earth'], ['dry leaves', '🍂', 'plant fire']],
-    threats: [['Monkey Horde', '🐒', 30, 5, 'animal', 'food sound', ''], ['Jaguar', '🐆', 38, 7, 'animal', 'fire water', ''], ['Vine Snappers', '🌱', 32, 6, '', 'fire ice', 'plant water'], ['Poison Frogs', '🐸', 28, 6, 'animal', 'ice air', 'poison']],
+    threats: [['Monkey Horde', '🐒', 30, 5, 'animal swarm', 'food sound', ''], ['Jaguar', '🐆', 38, 7, 'animal', 'fire water', ''], ['Vine Snappers', '🌱', 32, 6, 'mindless', 'fire ice', 'plant water'], ['Poison Frogs', '🐸', 28, 6, 'animal swarm', 'ice air', 'poison']],
     objectives: ['peace', 'dragon', 'bees', 'ritual', 'feast', 'escort'] },
   sunken: { name: 'The Sunken City', icon: '🌊', color: '#1d4f6e', hint: 'The pages are damp and smell of salt.',
     places: ['a coral plaza', 'a flooded library', 'a sunken ship', 'a kelp forest', 'a glowing grotto', 'a collapsed temple', 'a bubbling vent field', 'a drowned market'],
     objs: [['kelp', '🌿', 'plant'], ['shipwreck', '🚢', 'wood metal'], ['bubble vent', '🫧', 'air water'], ['coral', '🪸', 'earth'], ['anchor chain', '⚓', 'metal'], ['glowing jellies', '🪼', 'electric light'], ['treasure chest', '🧰', 'metal'], ['sand', '🏖️', 'earth']],
-    threats: [['Jellyfish Swarm', '🪼', 30, 6, '', 'ice earth', 'electric water'], ['Angry Crabs', '🦀', 34, 6, 'animal', 'electric sound', 'physical'], ['Pirate Ghosts', '👻', 32, 7, 'social', 'light holy', 'physical death'], ['Sharks', '🦈', 38, 8, 'animal', 'electric sound', 'water']],
+    threats: [['Jellyfish Swarm', '🪼', 30, 6, 'mindless swarm', 'ice earth', 'electric water'], ['Angry Crabs', '🦀', 34, 6, 'animal armored', 'electric sound', 'physical'], ['Pirate Ghosts', '👻', 32, 7, 'social flying', 'light holy', 'physical death'], ['Sharks', '🦈', 38, 8, 'animal', 'electric sound', 'water']],
     objectives: ['bell', 'heist', 'lighthouse', 'trial', 'circus', 'escort'] },
   school: { name: 'The Haunted School', icon: '🏫', color: '#4a2d5a', hint: 'Someone has written DO NOT READ in the margin. Twice.',
     places: ['a dusty hallway', 'the chemistry lab', 'the gym', 'the cafeteria', 'the music room', 'the principal\'s office', 'the locker room', 'the library stacks'],
     objs: [['chalkboard', '🧑‍🏫', 'sound'], ['lockers', '🗄️', 'metal'], ['library books', '📚', 'mind'], ['cafeteria food', '🍝', 'food'], ['candles', '🕯️', 'fire light'], ['old piano', '🎹', 'sound'], ['fire alarm', '🚨', 'sound water'], ['science chemicals', '⚗️', 'poison explosive']],
-    threats: [['Paper Ghosts', '📄', 30, 6, '', 'fire water', 'physical'], ['Hall Monitors', '📏', 32, 6, 'social', 'mind illusion', ''], ['Possessed Desks', '🪑', 36, 7, '', 'fire earth', 'mind'], ['Detention Spirits', '👻', 34, 7, 'social', 'light holy', 'death']],
+    threats: [['Paper Ghosts', '📄', 30, 6, 'mindless flying swarm', 'fire water', 'physical'], ['Hall Monitors', '📏', 32, 6, 'social', 'mind illusion', ''], ['Possessed Desks', '🪑', 36, 7, 'mindless armored', 'fire earth', 'mind'], ['Detention Spirits', '👻', 34, 7, 'social flying', 'light holy', 'death']],
     objectives: ['party', 'trial', 'election', 'heist', 'dawn', 'ritual'] },
   sky: { name: 'The Sky Islands', icon: '☁️', color: '#4f7ea8', hint: 'The book is strangely light. It keeps trying to float away.',
     places: ['a floating meadow', 'a windy cliff', 'a cloud harbor', 'a crystal spire', 'a sky pirate dock', 'a rainbow bridge', 'a giant nest', 'a windmill village'],
     objs: [['clouds', '☁️', 'air water'], ['wind chimes', '🎐', 'sound'], ['floating rocks', '🪨', 'earth gravity'], ['rainbow', '🌈', 'light'], ['giant nest', '🪺', 'animal wood'], ['windmill', '🌬️', 'air wood'], ['hot air balloon', '🎈', 'air fire'], ['crystals', '💎', 'light earth']],
-    threats: [['Harpies', '🦅', 32, 7, 'animal social', 'sound electric', 'air'], ['Storm Sprites', '🌩️', 30, 7, '', 'earth', 'electric air'], ['Sky Pirates', '🏴‍☠️', 36, 7, 'social', 'air gravity', ''], ['Cloud Eels', '🐍', 34, 6, 'animal', 'ice gravity', 'electric']],
+    threats: [['Harpies', '🦅', 32, 7, 'animal social flying', 'sound electric', 'air'], ['Storm Sprites', '🌩️', 30, 7, 'flying mindless', 'earth', 'electric air'], ['Sky Pirates', '🏴‍☠️', 36, 7, 'social', 'air gravity', ''], ['Cloud Eels', '🐍', 34, 6, 'animal flying', 'ice gravity', 'electric']],
     objectives: ['train', 'lighthouse', 'dragon', 'election', 'king', 'escort'] },
   candy: { name: 'The Candy Desert', icon: '🍭', color: '#a8457a', hint: 'The cover is sticky and smells like caramel.',
     places: ['gumdrop dunes', 'a lollipop forest', 'a chocolate river', 'a caramel canyon', 'a candy cane oasis', 'a marshmallow field', 'a licorice maze', 'a soda spring'],
     objs: [['caramel pit', '🟤', 'sticky food'], ['gummy bears', '🧸', 'food elastic'], ['cotton candy', '🍬', 'food air'], ['chocolate river', '🍫', 'food water'], ['rock candy', '💎', 'earth light'], ['soda geyser', '🥤', 'water explosive'], ['marshmallows', '☁️', 'food soft'], ['sprinkles', '✨', 'food chaos']],
-    threats: [['Gummy Golems', '🍬', 36, 7, '', 'fire water', 'physical'], ['Sugar Ants', '🐜', 28, 5, 'animal', 'water sticky', 'food'], ['Licorice Snakes', '🐍', 32, 7, 'animal', 'ice', ''], ['Candy Bandits', '🍭', 34, 6, 'social', 'food illusion', '']],
+    threats: [['Gummy Golems', '🍬', 36, 7, 'mindless', 'fire water', 'physical'], ['Sugar Ants', '🐜', 28, 5, 'animal swarm', 'water sticky', 'food'], ['Licorice Snakes', '🐍', 32, 7, 'animal blind', 'ice', ''], ['Candy Bandits', '🍭', 34, 6, 'social', 'food illusion', '']],
     objectives: ['party', 'feast', 'circus', 'bees', 'volcano', 'king'] },
   clock: { name: 'The Clockwork City', icon: '⚙️', color: '#7a5a2a', hint: 'You can hear ticking from inside the book.',
     places: ['a gear-filled street', 'a steam factory', 'the clock tower base', 'a brass market', 'an oily alley', 'a tram station', 'a copper rooftop', 'the inventor\'s workshop'],
     objs: [['gears', '⚙️', 'metal'], ['steam pipes', '♨️', 'water fire'], ['clock tower', '🕰️', 'time metal'], ['conveyor belt', '🛤️', 'metal'], ['tesla coil', '⚡', 'electric'], ['oil puddle', '🛢️', 'slippery fire'], ['spare springs', '🌀', 'elastic metal'], ['scrap pile', '🔩', 'metal physical']],
-    threats: [['Clockwork Soldiers', '🤖', 36, 7, '', 'electric water', 'mind'], ['Steam Rats', '🐀', 28, 5, 'animal', 'ice', 'fire'], ['Brass Hounds', '🐕', 34, 7, 'animal', 'electric slippery', ''], ['Gear Goblins', '👺', 30, 6, 'social', 'metal water', '']],
+    threats: [['Clockwork Soldiers', '🤖', 36, 7, 'mindless armored', 'electric water', 'mind'], ['Steam Rats', '🐀', 28, 5, 'animal swarm fireproof', 'ice', 'fire'], ['Brass Hounds', '🐕', 34, 7, 'animal armored', 'electric slippery', ''], ['Gear Goblins', '👺', 30, 6, 'social', 'metal water', '']],
     objectives: ['train', 'heist', 'volcano', 'trial', 'dawn', 'ritual'] },
 };
-function mkThreat(t) { return { n: t[0], i: t[1], hp: t[2], dmg: t[3], social: t[4].includes('social'), animal: t[4].includes('animal'), weak: t[5] ? t[5].split(' ') : [], resist: t[6] ? t[6].split(' ') : [] }; }
+function mkThreat(t) { const pr = t[4] ? t[4].split(' ').filter(Boolean) : []; return { n: t[0], i: t[1], hp: t[2], dmg: t[3], props: pr, social: pr.includes('social'), animal: pr.includes('animal'), weak: t[5] ? t[5].split(' ') : [], resist: t[6] ? t[6].split(' ') : [] }; }
 
 /* ---------------- objectives ----------------
    mult = how well each approach moves the meter. Nothing is 0: every approach helps SOMETHING. */
 const OBJ = {
   peace: { n: 'Tribal Peace', i: '🕊️', meter: 'Peace', intro: 'Two tribes — the Red Feathers and the Blue Stones — face each other with spears raised, all over a stolen idol. In the trees, a monkey horde screams, waiting to loot whoever loses.',
     kw: 'tribe tribes chief chiefs warrior warriors red blue feather stone idol peace both people', mult: { persuade: 1.4, entertain: 1.2, trick: 1, knowledge: 1.1, heal: 1, protect: .8, sneak: .5, speed: .6, force: .3 },
-    weak: 'food social holy sound life', resist: 'explosive death', threats: [['Monkey Horde', '🐒', 30, 5, 'animal', 'food sound', '']], spawn: 3, hooks: { anger: 1 },
+    weak: 'food social holy sound life', resist: 'explosive death', threats: [['Monkey Horde', '🐒', 30, 5, 'animal swarm', 'food sound', '']], spawn: 3, hooks: { anger: 1 },
     flavor: ['The chiefs lower their spears — just slightly.', 'Warriors on both sides start whispering. Maybe this war is silly.', 'The two chiefs are almost smiling at each other!'],
     events: [['A hothead throws a spear across the line!', -12], ['The monkeys steal both chiefs\' hats. Everyone laughs a little.', 8], ['Someone finds the idol was just misplaced...', 10]] },
   party: { n: 'Save the Party', i: '🎂', meter: 'Party Mood', intro: 'It is Grumbold the troll\'s birthday. Nobody came, the cake collapsed, and party-crashing goblins are stealing the snacks. If this party stays bad, Grumbold will eat the town.',
@@ -300,12 +300,12 @@ const OBJ = {
     events: [['Grumbold sobs into the ruined cake.', -10], ['A few villagers peek in, curious.', 7]] },
   heist: { n: 'The Owl Museum Heist', i: '🦉', meter: 'Heist', intro: 'The Moonstone sits in a glass case in a museum guarded by owls who never, ever blink. Get it out before the whole flock wakes up. Loud actions raise the ALARM.',
     kw: 'moonstone relic museum case vault gem glass', mult: { sneak: 1.5, trick: 1.3, knowledge: 1.2, speed: 1.1, persuade: .7, entertain: .8, protect: .6, force: .6, heal: .4 },
-    weak: 'dark illusion slippery space size time', resist: 'light sound', threats: [['Owl Guards', '🦉', 32, 6, 'animal', 'dark food', 'light']], spawn: 4, hooks: { alarm: 1 },
+    weak: 'dark illusion slippery space size time', resist: 'light sound', threats: [['Owl Guards', '🦉', 32, 6, 'animal flying', 'dark food', 'light']], spawn: 4, hooks: { alarm: 1 },
     flavor: ['You\'ve mapped the guard patrols.', 'The glass case is open...', 'The Moonstone is in your hands — now get OUT!'],
     events: [['An owl hoots suspiciously.', -6], ['The night shift owl falls asleep.', 8]] },
   volcano: { n: 'Evacuate Mount Grumble', i: '🌋', meter: 'Villagers Saved', intro: 'The volcano is about to erupt, and the villagers refuse to leave without their cheese wheels. When the countdown hits zero, lava starts falling every turn.',
     kw: 'villager villagers people town village cheese family families', mult: { speed: 1.4, protect: 1.3, persuade: 1.1, knowledge: 1, heal: .9, trick: .9, entertain: .8, force: .8, sneak: .4 },
-    weak: 'air water ice earth gravity space animal', resist: '', threats: [['Lava Imps', '🔥', 30, 6, '', 'water ice', 'fire']], spawn: 3, hooks: { clock: 10, clockFx: 'lava' },
+    weak: 'air water ice earth gravity space animal', resist: '', threats: [['Lava Imps', '🔥', 30, 6, 'fireproof', 'water ice', 'fire']], spawn: 3, hooks: { clock: 10, clockFx: 'lava' },
     flavor: ['The first families are running for the hills.', 'Half the village is safe!', 'Just a few stubborn cheese-lovers left!'],
     events: [['The ground shakes. A path is blocked!', -8], ['A villager finds a secret tunnel!', 10]] },
   trial: { n: 'The Goblin Court', i: '⚖️', meter: 'Jury Convinced', intro: 'You stand accused of stealing the Goblin King\'s left sock. The jury hisses. The judge is wearing the right sock and looks furious. Force will not help you here.',
@@ -315,7 +315,7 @@ const OBJ = {
     events: [['A surprise witness points at you!', -12], ['The real sock thief sneezes in the crowd...', 10]] },
   dawn: { n: 'Survive Until Dawn', i: '🌙', meter: 'Night Survived', intro: 'Hold the old watchtower until sunrise. The night crawls closer every turn. The sun rises on its own — you just have to stay alive.',
     kw: 'dawn sun sunrise tower night', mult: { protect: .4, knowledge: .3, entertain: .2, heal: .2, force: .2, trick: .3, persuade: .2, sneak: .3, speed: .2 },
-    weak: 'light holy fire time', resist: '', threats: [['Ghouls', '🧟', 34, 7, '', 'light holy fire', 'death dark poison']], spawn: 2, hooks: { auto: 9 },
+    weak: 'light holy fire time', resist: '', threats: [['Ghouls', '🧟', 34, 7, 'mindless', 'light holy fire', 'death dark poison']], spawn: 2, hooks: { auto: 9 },
     flavor: ['Midnight. The worst is still coming.', 'The sky is turning grey...', 'You can see the sun!'],
     events: [['A howl — more are coming!', -4], ['A rooster crows early!', 8]] },
   dragon: { n: 'Tame the Young Dragon', i: '🐉', meter: 'Trust', intro: 'A young dragon has crash-landed, hurt and terrified. It breathes fire at anything that moves. Poachers are closing in. Hurting it ruins its trust.',
@@ -340,22 +340,22 @@ const OBJ = {
     events: [['A clown honks a giant horn. The crowd boos YOU.', -10], ['The ringmaster yells encouragement from the cannon.', 7]] },
   bell: { n: 'Raise the Sunken Bell', i: '🔔', meter: 'Bell Raised', intro: 'The great bell of the city lies at the bottom of the harbor, surrounded by glowing jellyfish. Raise it and ring it, and the city wakes.',
     kw: 'bell harbor chain city bottom', mult: { force: 1, knowledge: 1.1, speed: 1, protect: .9, trick: .9, persuade: .8, entertain: .8, sneak: .6, heal: .5 },
-    weak: 'air gravity ice animal elastic metal space water', resist: '', threats: [['Jellyfish Swarm', '🪼', 30, 6, '', 'ice earth', 'electric water']], spawn: 3, hooks: {},
+    weak: 'air gravity ice animal elastic metal space water', resist: '', threats: [['Jellyfish Swarm', '🪼', 30, 6, 'mindless swarm', 'ice earth', 'electric water']], spawn: 3, hooks: {},
     flavor: ['The bell shifts in the sand.', 'The bell is rising!', 'The bell breaks the surface!'],
     events: [['The chain snaps!', -10], ['A friendly whale nudges the bell upward.', 10]] },
   election: { n: 'Elect Mayor Frog', i: '🐸', meter: 'Votes', intro: 'Sir Ribbit is a lovely frog and a terrible candidate. The election is today, and his rival is a very persuasive toad. Dirty tricks might backfire.',
     kw: 'frog ribbit voter voters crowd town election mayor rival toad', mult: { persuade: 1.5, entertain: 1.3, knowledge: 1, trick: 1, heal: .7, protect: .6, speed: .6, force: .3, sneak: .5 },
-    weak: 'social sound food light animal', resist: '', threats: [['Toad Campaigners', '🐸', 28, 5, 'social', 'sound', '']], spawn: 3, hooks: { anger: 1, scandal: 1 },
+    weak: 'social sound food light animal', resist: '', threats: [['Toad Campaigners', '🐸', 28, 5, 'social animal', 'sound', '']], spawn: 3, hooks: { anger: 1, scandal: 1 },
     flavor: ['A few voters wave little frog flags.', 'It\'s neck and neck!', 'The crowd is chanting RIB-BIT! RIB-BIT!'],
     events: [['The toad spreads a nasty rumor.', -12], ['Sir Ribbit catches a fly mid-speech. The crowd loves it!', 9]] },
   king: { n: 'Thaw the Frozen King', i: '🧊', meter: 'Thawed', intro: 'Kind King Fenwick has been frozen solid by a curse. Frost wraiths guard him. Careful: FORCE on the king can crack him!',
     kw: 'king fenwick statue curse frozen', mult: { heal: 1.4, knowledge: 1.1, protect: .9, persuade: .8, entertain: .8, trick: .6, speed: .6, force: .5, sneak: .4 },
-    weak: 'fire light life holy sound time', resist: 'ice', threats: [['Frost Wraiths', '🌬️', 32, 7, '', 'fire light', 'ice']], spawn: 3, hooks: { fragile: 1 },
+    weak: 'fire light life holy sound time', resist: 'ice', threats: [['Frost Wraiths', '🌬️', 32, 7, 'flying', 'fire light', 'ice']], spawn: 3, hooks: { fragile: 1 },
     flavor: ['The king\'s fingers twitch.', 'The king blinks!', 'The king is shivering — and smiling!'],
     events: [['A cold wind blows. The ice thickens.', -10], ['The castle cook brings hot cocoa.', 8]] },
   bees: { n: 'Bee Diplomacy', i: '🐝', meter: 'Honey Earned', intro: 'The village needs honey for medicine. The Bee Queen does not share, and attacking the hive only brings more bees.',
     kw: 'bee bees queen hive honey', mult: { persuade: 1.3, entertain: 1.2, sneak: 1.1, trick: 1.1, knowledge: 1, heal: .9, protect: .7, speed: .8, force: .3 },
-    weak: 'plant sound food light life', resist: 'poison', threats: [['Bee Soldiers', '🐝', 26, 6, 'animal', 'air', 'poison']], spawn: 3, hooks: { anger: 1, angerSpawn: 1 },
+    weak: 'plant sound food light life', resist: 'poison', threats: [['Bee Soldiers', '🐝', 26, 6, 'animal flying swarm', 'air', 'poison']], spawn: 3, hooks: { anger: 1, angerSpawn: 1 },
     flavor: ['The bees buzz a little calmer.', 'The Queen is curious about you.', 'The bees are practically offering you honey!'],
     events: [['A drone panics and sounds the alarm!', -10], ['A flower patch blooms nearby. The bees are happy.', 8]] },
   feast: { n: 'Feed the Giant', i: '🍽️', meter: 'Giant Full', intro: 'A hungry giant is sitting on the only bridge out. He will not move until he is FULL. Raccoons keep stealing his food.',
@@ -365,12 +365,12 @@ const OBJ = {
     events: [['The giant\'s stomach ROARS.', -8], ['A farmer drops off a cart of turnips!', 9]] },
   lighthouse: { n: 'Relight the Lighthouse', i: '🗼', meter: 'Lighthouse Lit', intro: 'A storm rages. Ships are heading for the rocks and the lighthouse flame has gone out. Storm waves crash over you every turn.',
     kw: 'lighthouse lamp flame ships ship tower lens', mult: { knowledge: 1.1, speed: 1.1, force: .8, protect: 1.1, trick: .8, entertain: .9, persuade: .6, heal: .6, sneak: .5 },
-    weak: 'fire light electric holy air', resist: 'water', threats: [['Storm Gulls', '🐦', 28, 6, 'animal', 'electric', 'air']], spawn: 3, hooks: { hazard: ['Storm waves', 4] },
+    weak: 'fire light electric holy air', resist: 'water', threats: [['Storm Gulls', '🐦', 28, 6, 'animal flying', 'electric', 'air']], spawn: 3, hooks: { hazard: ['Storm waves', 4] },
     flavor: ['A spark in the lamp!', 'The lens is turning!', 'A beam cuts through the storm!'],
     events: [['A huge wave smashes the stairs!', -10], ['Lightning hits the tower — the lamp flickers on!', 9]] },
   escort: { n: 'Escort Sir Shellington', i: '🐌', meter: 'Distance', intro: 'Sir Shellington, a snail knight, must deliver an urgent message. He is very, very slow. Snatchers want to carry him off — each one near him pushes him back.',
     kw: 'snail shellington knight message escort sir', mult: { speed: 1.4, protect: 1.3, trick: 1, knowledge: 1, persuade: .9, entertain: .9, heal: .8, force: .8, sneak: .9 },
-    weak: 'water slime slippery elastic air gravity space', resist: '', threats: [['Snail Snatchers', '🦅', 30, 6, 'animal', 'sound', '']], spawn: 3, hooks: { escort: 1 },
+    weak: 'water slime slippery elastic air gravity space', resist: '', threats: [['Snail Snatchers', '🦅', 30, 6, 'animal flying', 'sound', '']], spawn: 3, hooks: { escort: 1 },
     flavor: ['Sir Shellington is making progress!', 'Halfway there!', 'The castle is in sight!'],
     events: [['Sir Shellington stops to eat a leaf.', -8], ['A tailwind! Sir Shellington zooms (slowly).', 8]] },
 };
@@ -388,19 +388,19 @@ const NPCS = [['a talking mushroom', '🍄'], ['a lost ghost', '👻'], ['a wise
 
 /* ---------------- bosses ---------------- */
 const BOSSES = {
-  mirror: { n: 'The Mirror Knight', i: '🪞', g: 'reflect', hp: 1, dmg: 1, intro: 'A knight of polished mirrors. It mirrors your last KIND of move: use the same approach twice in a row and it bounces back at you. Keep changing HOW you fight.', weak: 'sound earth', resist: 'light' },
-  judge: { n: 'The Clockwork Judge', i: '🕰️', g: 'judge', hp: .85, dmg: 1, intro: 'Each turn it FORBIDS one approach. And once per phase it rewinds the first strong hit. Bait it.', weak: 'chaos water', resist: 'time' },
-  hive: { n: 'The Hive Mother', i: '🐝', g: 'hive', hp: .8, dmg: .9, intro: 'She is made of a million insects. Single hits barely matter — go wide, or turn the swarm on itself.', weak: 'fire air sound', resist: 'poison' },
-  understudy: { n: 'The Understudy', i: '🎭', g: 'copy', hp: .85, dmg: 1, intro: 'It copies the power you used last round and resists it. Switch powers, or use items and scene objects between power moves.', weak: 'chaos', resist: '' },
-  librarian: { n: 'The Librarian', i: '📚', g: 'quiet', hp: .95, dmg: 1, intro: 'SHHH. Loud actions fill the Noise meter. At 100, the whole library falls on you. Quiet approaches hit harder.', weak: 'water fire', resist: 'mind' },
-  absorber: { n: 'The Absorber', i: '🧽', g: 'absorb', hp: 1, dmg: 1, intro: 'It eats the traits you hit it with — traits in its stomach hurt it less. Feed it 4 DIFFERENT traits in total and it gets BLOATED and vulnerable. Scene objects and items add new traits!', weak: '', resist: '' },
-  twins: { n: 'The Twin Kings', i: '👑', g: 'twins', hp: 1.1, dmg: 1, intro: 'The Sun King and the Moon King. If only one of them gets hurt in a round, the other heals. Hit both — or go wide.', weak: 'dark light', resist: '' },
-  spore: { n: 'The Spore Choir', i: '🍄', g: 'spore', hp: 1, dmg: 1, intro: 'Its spores clog one of your powers each round. A clogged power works at half strength and stings you. Use other powers, items, or the scene.', weak: 'fire air', resist: 'poison plant' },
-  tyrant: { n: 'The Tiny Tyrant', i: '🐭', g: 'guards', hp: .5, dmg: .8, intro: 'Adorable. Tiny. Protected by two enormous Royal Brutes. While a guard stands, the Tyrant cannot be touched.', weak: 'size', resist: '' },
-  witch: { n: 'The Weather Witch', i: '🧙‍♀️', g: 'weather', hp: 1, dmg: 1, intro: 'She changes the weather every round. Weather boosts some traits and weakens others. Read the sky.', weak: 'earth', resist: 'air' },
-  gambler: { n: 'The Gambler God', i: '🎲', g: 'gamble', hp: 1, dmg: 1, intro: 'Every hit is a coin flip. Win: big damage. Lose: nothing. Cheating (Trick) always wins but raises his Suspicion...', weak: 'luck', resist: '' },
-  maestro: { n: 'The Maestro', i: '🎻', g: 'tempo', hp: 1, dmg: 1, intro: 'He calls a TEMPO each round: LOUD, SOFT, FAST or STEADY. Match it for double effect. Break it and he punishes you.', weak: 'sound', resist: '' },
-  nesting: { n: 'The Nesting Queen', i: '🪆', g: 'nesting', hp: .45, dmg: 1, intro: 'Crack her open and there is a smaller queen inside — with a different trick. Three layers.', weak: '', resist: '' },
+  mirror: { n: 'The Mirror Knight', i: '🪞', g: 'reflect', props: 'armored', hp: 1, dmg: 1, intro: 'A knight of polished mirrors. It mirrors your last KIND of move: use the same approach twice in a row and it bounces back at you. Keep changing HOW you fight.', weak: 'sound earth', resist: 'light' },
+  judge: { n: 'The Clockwork Judge', i: '🕰️', g: 'judge', props: 'social', hp: .85, dmg: 1, intro: 'Each turn it FORBIDS one approach. And once per phase it rewinds the first strong hit. Bait it.', weak: 'chaos water', resist: 'time' },
+  hive: { n: 'The Hive Mother', i: '🐝', g: 'hive', props: 'swarm flying', hp: .8, dmg: .9, intro: 'She is made of a million insects. Single hits barely matter — go wide, or turn the swarm on itself.', weak: 'fire air sound', resist: 'poison' },
+  understudy: { n: 'The Understudy', i: '🎭', g: 'copy', props: 'social', hp: .85, dmg: 1, intro: 'It copies the power you used last round and resists it. Switch powers, or use items and scene objects between power moves.', weak: 'chaos', resist: '' },
+  librarian: { n: 'The Librarian', i: '📚', g: 'quiet', props: 'social', hp: .95, dmg: 1, intro: 'SHHH. Loud actions fill the Noise meter. At 100, the whole library falls on you. Quiet approaches hit harder.', weak: 'water fire', resist: 'mind' },
+  absorber: { n: 'The Absorber', i: '🧽', g: 'absorb', props: 'mindless', hp: 1, dmg: 1, intro: 'It eats the traits you hit it with — traits in its stomach hurt it less. Feed it 4 DIFFERENT traits in total and it gets BLOATED and vulnerable. Scene objects and items add new traits!', weak: '', resist: '' },
+  twins: { n: 'The Twin Kings', i: '👑', g: 'twins', props: 'social', hp: 1.1, dmg: 1, intro: 'The Sun King and the Moon King. If only one of them gets hurt in a round, the other heals. Hit both — or go wide.', weak: 'dark light', resist: '' },
+  spore: { n: 'The Spore Choir', i: '🍄', g: 'spore', props: 'mindless', hp: 1, dmg: 1, intro: 'Its spores clog one of your powers each round. A clogged power works at half strength and stings you. Use other powers, items, or the scene.', weak: 'fire air', resist: 'poison plant' },
+  tyrant: { n: 'The Tiny Tyrant', i: '🐭', g: 'guards', props: 'social', hp: .5, dmg: .8, intro: 'Adorable. Tiny. Protected by two enormous Royal Brutes. While a guard stands, the Tyrant cannot be touched.', weak: 'size', resist: '' },
+  witch: { n: 'The Weather Witch', i: '🧙‍♀️', g: 'weather', props: 'social flying', hp: 1, dmg: 1, intro: 'She changes the weather every round. Weather boosts some traits and weakens others. Read the sky.', weak: 'earth', resist: 'air' },
+  gambler: { n: 'The Gambler God', i: '🎲', g: 'gamble', props: 'social', hp: 1, dmg: 1, intro: 'Every hit is a coin flip. Win: big damage. Lose: nothing. Cheating (Trick) always wins but raises his Suspicion...', weak: 'luck', resist: '' },
+  maestro: { n: 'The Maestro', i: '🎻', g: 'tempo', props: 'social', hp: 1, dmg: 1, intro: 'He calls a TEMPO each round: LOUD, SOFT, FAST or STEADY. Match it for double effect. Break it and he punishes you.', weak: 'sound', resist: '' },
+  nesting: { n: 'The Nesting Queen', i: '🪆', g: 'nesting', props: 'social', hp: .45, dmg: 1, intro: 'Crack her open and there is a smaller queen inside — with a different trick. Three layers.', weak: '', resist: '' },
 };
 const WEATHERS = [
   { n: 'Rain', i: '🌧️', up: ['water', 'electric', 'plant'], down: ['fire'] },
@@ -417,6 +417,185 @@ const TEMPOS = {
   STEADY: { aps: ['protect', 'knowledge'], traits: ['earth', 'metal', 'ice'] },
 };
 const LOUD_TRAITS = ['sound', 'explosive', 'fire', 'electric', 'chaos'];
+
+/* =====================================================================
+   POWER SHEETS — what each power can REALISTICALLY do.
+   nat: obvious uses (full power)      str: [use, min level] (60%, riskier)
+   imp: hard limits (fails)             needs: env tags (any one) for full natural power
+   sig: signature rule (engine hook)    weak: counters
+   ===================================================================== */
+const SHEETS = {};
+function SH(id, nat, str, imp, needs, sig, weak) { SHEETS[id] = { nat, str, imp, needs, sig, weak }; }
+SH('fire', ['fire blasts and fireballs', 'walls or rings of flame', 'light and warmth', 'burning through wood, rope, plants, ice', 'smoke'],
+  [['controlling or redirecting existing fires', 3], ['a smoke screen', 2], ['fire shaped into animals, whips or ropes', 5], ['a fire jet to propel yourself', 4], ['boiling water or steam underwater', 3]],
+  ['anything cold', 'healing', 'working normally underwater', 'solid objects made of fire'], ['!underwater'], 'Fire SPREADS: burning targets keep burning for 2 rounds.', 'water, rain, fireproof enemies');
+SH('water', ['splashing, soaking, pushing with waves', 'water jets', 'putting out fire', 'making things slippery or muddy', 'drowning small areas'],
+  [['a water shield or bubble', 2], ['a whirlpool or tidal wave', 4], ['water shaped into hands or creatures', 5], ['pulling water out of the air', 3], ['healing by cleansing wounds', 3]],
+  ['creating fire', 'drying things', 'solid permanent walls'], ['water'], 'SOAKS targets (wet for 2 rounds): wet enemies take +50% from lightning and ice.', 'cold (freezes), deserts, lightning');
+SH('wind', ['gusts that push and knock over', 'whirlwinds', 'blowing away gas, smoke, fog', 'boosting jumps and speed', 'carrying sound far'],
+  [['flying short distances', 3], ['a tornado', 4], ['an air cushion or shield against projectiles', 2], ['sucking the air away from a fire', 3], ['wind-blade cuts', 5]],
+  ['lifting enormously heavy objects', 'healing', 'solid walls', 'working in a sealed airless place'], ['!underwater'], 'SPEED: speed moves also make the whole team harder to hit.', 'heavy armored enemies, enclosed spaces');
+SH('earth', ['throwing rocks and boulders', 'stone walls and pillars', 'shaking the ground', 'opening pits and tunnels', 'mud'],
+  [['sand or dust clouds', 2], ['stone armor', 3], ['an earthquake', 5], ['a stone golem', 6], ['sensing footsteps through the ground', 2]],
+  ['anything where there is no ground (open sky, deep water)', 'healing', 'flying'], ['ground'], 'SOLID: earth walls are the strongest shields (+30%).', 'flying enemies, sky and water levels');
+SH('lightning', ['lightning bolts', 'chain strikes between targets', 'stunning', 'overloading machines and electronics', 'lighting up darkness', 'a burst of speed'],
+  [['a crackling fence or trap that shocks whoever crosses', 3], ['magnetizing metal', 4], ['riding a bolt to teleport a short way', 6], ['restarting a stopped heart or machine', 5]],
+  ['anything solid (no lightning walls that block)', 'healing flesh', 'silence or stealth'], [], 'ACTS FIRST: can interrupt a charging boss attack. CHAINS to wet or metal targets.', 'grounded or rubber targets; hurts you if YOU are in water');
+SH('plants', ['vines that grab and bind', 'thorn walls', 'climbing vines and ladders', 'hiding in foliage', 'growing fruit and food'],
+  [['healing herbs', 2], ['cracking stone with roots', 3], ['plant creatures', 5], ['a giant tree bridge or fortress', 6], ['spore clouds that make things sleepy', 4]],
+  ['growing plants on bare metal or in open sky without soil/water above small size', 'fire', 'anything made of metal'], ['soil', 'water'], 'SEEDS GROW: a planted seed attacks every round and gets stronger.', 'fire, cold');
+SH('ice', ['freezing water and enemies', 'ice walls and domes', 'icicles', 'slippery ice floors', 'cooling things down'],
+  [['an ice bridge over water or gaps', 2], ['ice armor', 3], ['a blizzard', 5], ['ice sculptures and decoys', 3]],
+  ['heat or fire', 'healing burns fast', 'working in extreme heat without a water source'], [], 'LASTING: ice shields stay up for the next round too.', 'fire, heat');
+SH('light', ['blinding flashes', 'light beams', 'glowing and lighting dark places', 'revealing hidden things', 'warm gentle healing light'],
+  [['illusions made of light', 3], ['a laser that burns', 4], ['a hard-light shield', 4], ['bending light to become invisible', 6]],
+  ['darkness or shadows', 'physical lifting or pushing'], [], 'REVEAL & BLIND: light study also stuns a target for a round.', 'blind enemies, darkness-eaters');
+SH('shadow', ['hiding in shadows', 'darkness clouds', 'shadow tendrils that trip and hold', 'scaring', 'sneaking'],
+  [['stepping between shadows (short teleport)', 4], ['shadow copies as decoys', 3], ['swallowing light sources', 3], ['a shadow blade', 5]],
+  ['healing', 'bright light', 'working well in blazing sunlight'], [], 'DARKNESS: +40% in dark places, weaker in bright ones.', 'light, fire');
+SH('strength', ['punching, lifting, throwing heavy things', 'holding doors, blocking with your body', 'jumping far', 'breaking walls'],
+  [['throwing an enemy into another', 2], ['a shockwave punch', 4], ['stopping a charging giant or vehicle', 5]],
+  ['ranged magic', 'healing', 'anything you cannot physically reach'], [], 'TIRELESS: costs NO energy, but only works up close.', 'flying and distant enemies');
+SH('pigeons', ['asking birds what they have seen', 'scouting the area', 'distracting with a flapping flock', 'carrying tiny objects', 'sending messages'],
+  [['coordinated pecking attacks', 3], ['a pigeon spy network across the level', 5], ['pigeons stealing an object', 2]],
+  ['fighting big enemies directly', 'anything where no birds could be (deep underwater, sealed rooms) above small'], ['birds', 'outdoor'], 'INFORMATION: study with pigeons reveals far more of the map, weaknesses — even Host trap hints.', 'cats, storms, indoors');
+SH('chair', ['summoning one sturdy wooden chair anywhere you can see', 'sitting, standing on it, blocking with it', 'throwing it'],
+  [['a chair at an absurd height or position', 3], ['a chair made of a different material', 5], ['a chair that appears under a falling enemy/object', 2]],
+  ['more than one chair at a time', 'any other furniture or object', 'a giant chair above your size level'], [], 'THE CHAIR STAYS: it becomes a scene object anyone can use later.', 'it is a chair');
+SH('slippery', ['making floors and objects slippery', 'slipping out of grabs', 'sliding fast', 'making enemies fall over'],
+  [['a slippery ramp to launch yourself', 3], ['making a weapon slip from a hand', 2]],
+  ['damaging things directly', 'building anything', 'healing'], [], 'SLIP: tricks and speed with slipperiness knock enemies down (they lose a turn).', 'flying enemies, grippy things');
+SH('sneeze', ['a sneeze that blasts air', 'knocking things over', 'blowing out candles and smoke', 'a startling noise'],
+  [['a sneeze that launches you backwards', 2], ['a controlled sneeze-shockwave', 4]],
+  ['stealth', 'healing', 'building anything'], [], 'STARTLE: a sneeze can stun the target for a round.', 'being quiet');
+SH('bread', ['making any kind of bread', 'bread gifts and bait', 'soft cushions of dough', 'a doorstop loaf'],
+  [['bread armor', 2], ['sticky wet-dough traps', 3], ['a giant bread wall or fortress', 6], ['bread golem', 7]],
+  ['explosions', 'sharp weapons', 'anything that is not bread'], [], 'FOOD: calms animals and hungry enemies; teammates who eat it heal.', 'rain makes it soggy');
+SH('pitch', ['beautiful singing', 'perfectly copying any sound', 'shattering glass with a note', 'calming or rallying people'],
+  [['a sonic blast', 3], ['a hypnotic lullaby', 4], ['imitating someone\'s voice to fool others', 2]],
+  ['making objects', 'healing wounds physically'], [], 'VOICE: persuade and entertain with song are extra effective on social enemies.', 'deaf or mindless enemies');
+SH('rubber', ['stretching limbs far', 'bouncing high', 'absorbing punches', 'squeezing through gaps'],
+  [['slingshotting yourself or allies', 2], ['wrapping around an enemy', 3], ['becoming a giant rubber trampoline or net', 4]],
+  ['cutting or burning', 'ranged attacks without contact'], [], 'BOUNCY: protecting with rubber bounces part of the damage back.', 'sharp things, fire');
+SH('glitter', ['clouds of glitter', 'dazzling shiny displays', 'making things sparkle', 'blinding with sparkles'],
+  [['glitter trails that track enemies', 2], ['a glitter storm', 4]],
+  ['real damage', 'healing', 'solid objects'], [], 'DAZZLE: glitter tricks blind enemies for a round.', 'blind enemies, wind');
+SH('tiny', ['shrinking yourself very small', 'squeezing into tiny spaces', 'hiding anywhere', 'riding on things unnoticed'],
+  [['shrinking an object you touch', 4], ['shrinking an enemy', 7]],
+  ['getting bigger', 'hitting hard while tiny'], [], 'UNNOTICED: sneaking while tiny makes you untargetable for two rounds.', 'being stepped on');
+SH('bubbles', ['blowing bubbles of any size', 'floating in a bubble', 'trapping small things in bubbles', 'soapy distractions'],
+  [['a bubble shield', 2], ['a bubble that carries an ally', 3], ['a giant bubble prison', 5]],
+  ['sharp or heavy attacks', 'anything that lasts after being popped'], [], 'FLOAT: bubbles can lift allies out of danger.', 'sharp things');
+SH('grandma', ['cooking delicious food instantly', 'comforting meals', 'feasts for crowds', 'the smell of cookies that draws anyone'],
+  [['food that makes people sleepy', 3], ['spicy food that burns enemies', 3], ['a banquet that ends a fight', 5]],
+  ['direct damage (without food)', 'anything not food'], [], 'COMFORT: food heals the whole team and calms hungry or social enemies.', 'mindless enemies');
+SH('magnet', ['pulling and pushing metal', 'disarming metal weapons', 'sticking to metal walls', 'finding metal objects'],
+  [['flying on metal debris', 4], ['crushing metal together', 3], ['a shield of floating scrap', 3]],
+  ['affecting anything non-metal', 'healing'], ['metal'], 'MAGNETIC: huge bonus against armored and machine enemies.', 'places with no metal');
+SH('goo', ['sticky goo globs', 'gluing enemies in place', 'goo walls', 'slippery-slimy floors'],
+  [['a goo trampoline', 2], ['goo creatures', 5], ['goo that hardens into armor', 4]],
+  ['anything clean or fast', 'healing'], [], 'STUCK: goo attacks glue enemies in place (they lose a turn).', 'fire, water washes it off');
+SH('balloons', ['balloon animals', 'floating balloons', 'loud pops', 'cheerful party decorations'],
+  [['a balloon bridge or raft', 3], ['giant balloon decoys', 3], ['floating away holding balloons', 4]],
+  ['real damage', 'anything heavy', 'anything sharp'], [], 'PARTY: entertaining with balloons is extra effective.', 'sharp things, wind');
+SH('bees', ['summoning a swarm of bees', 'stinging', 'buzzing to scare', 'making honey', 'pollinating plants'],
+  [['a bee cloud that hides you', 3], ['bees carrying things', 4], ['bees scouting', 2]],
+  ['healing big wounds', 'working underwater'], ['!underwater'], 'SWARM: bees keep stinging for 2 rounds after you send them.', 'smoke, cold, water');
+SH('smell', ['smelling anything, tracking scents', 'sniffing out lies and hidden things', 'finding food and people'],
+  [['smelling fear or emotions', 3], ['tracking invisible things', 4]],
+  ['any physical effect', 'damage'], [], 'TRACKER: study with smell finds hidden threats and the goal.', 'strong smells, wind');
+SH('voice', ['convincing people', 'commanding attention', 'calming crowds', 'confident speeches'],
+  [['making an enemy doubt itself', 3], ['a voice so commanding it stuns', 5]],
+  ['affecting mindless things', 'physical effects'], [], 'CHARISMA: persuasion is doubled on social enemies.', 'mindless or deaf enemies');
+SH('dance', ['dancing brilliantly', 'dodging with dance moves', 'making others dance along', 'dance-fighting kicks'],
+  [['a dance that hypnotizes a crowd', 4], ['a spinning kick tornado', 4]],
+  ['staying still or silent', 'building things'], [], 'CONTAGIOUS: dancing enemies lose their next turn.', 'mindless enemies');
+SH('duck', ['your loyal duck: quacking, pecking, distracting', 'scouting', 'swimming', 'carrying small items'],
+  [['the duck fetching an object', 2], ['the duck leading enemies away', 3]],
+  ['the duck fighting huge enemies alone', 'more ducks'], [], 'LOYAL: the duck stays and helps every round for 2 rounds after a command.', 'foxes');
+SH('necro', ['raising the fallen as minions', 'commanding bones', 'talking to ghosts and the dead', 'fear and dread'],
+  [['a wall of bones', 2], ['borrowing a ghost\'s memories', 4], ['a bone dragon', 7], ['draining life', 5]],
+  ['healing the living', 'being kind to the living (persuading them fails)', 'raising things that never died'], ['remains'], 'MINIONS PERSIST: raised dead keep fighting every round.', 'holy and light, places with no dead');
+SH('gravity', ['making things heavy or light', 'pulling and crushing', 'floating', 'dropping enemies to the floor'],
+  [['flying', 3], ['a gravity well that pulls everything in', 5], ['reversing gravity in an area', 7]],
+  ['healing', 'creating matter', 'affecting light or sound'], [], 'CRUSH: grounds flying enemies.', 'very light enemies');
+SH('time', ['skipping yourself a few seconds ahead', 'slowing a single target', 'aging or un-aging small objects'],
+  [['rewinding the last round of damage for the team', 3], ['freezing a boss for a moment', 6], ['seeing a few seconds into the future', 4]],
+  ['direct damage', 'changing anything more than one round ago'], [], 'REWIND: protect/heal with time undoes last round\'s damage (2× per page).', 'high energy cost');
+SH('shape', ['turning into animals and creatures', 'disguising as other people', 'growing claws, wings or gills'],
+  [['becoming an object', 4], ['becoming a giant creature', 6], ['copying an enemy exactly', 5]],
+  ['turning others into things', 'becoming pure energy'], [], 'ADAPT: shapeshift into something that ignores the terrain.', 'being found out');
+SH('weather', ['rain, wind, fog, hail, lightning storms', 'changing temperature', 'sunshine'],
+  [['a tornado', 4], ['a focused lightning strike', 3], ['a blizzard', 5]],
+  ['working indoors above small size', 'precise small tasks'], ['outdoor'], 'FORECAST: weather effects hit every enemy in the area.', 'indoors');
+SH('tk', ['lifting and throwing objects with your mind', 'pushing and pulling', 'holding enemies in place', 'floating yourself'],
+  [['a telekinetic shield', 3], ['crushing', 4], ['lifting something enormous', 6]],
+  ['reading minds', 'creating matter'], [], 'THROW ANYTHING: scene objects used with telekinesis get a big bonus.', 'mental shields');
+SH('illusion', ['illusions of anything', 'fake copies and decoys', 'hiding things', 'fake noises and sights'],
+  [['illusions that seem to have weight', 5], ['making someone see their worst fear', 4], ['a whole fake room', 5]],
+  ['real damage', 'fooling blind or mindless things', 'healing'], [], 'DECEIVE: illusion tricks make enemies attack the wrong target.', 'blind or mindless enemies');
+SH('mindread', ['reading thoughts', 'knowing intentions and next moves', 'finding lies'],
+  [['planting a small thought', 4], ['reading a crowd at once', 3], ['seeing memories', 5]],
+  ['physical effects', 'reading mindless things'], [], 'FORESIGHT: study reveals a boss\'s next move and gimmick.', 'mindless enemies');
+SH('portals', ['opening portals to places you can see', 'teleporting yourself', 'dropping things through portals'],
+  [['portals to places you have been', 3], ['redirecting attacks through portals', 4], ['a portal trap', 5]],
+  ['portals to places you have never seen', 'damage without redirecting something'], [], 'REDIRECT: portal protection sends attacks back at enemies.', 'moving targets');
+SH('giant', ['growing huge', 'stomping, lifting enormous things', 'being a wall for your team'],
+  [['growing just one body part', 3], ['growing an object', 5]],
+  ['sneaking', 'fitting in small spaces', 'being gentle and quiet'], [], 'MASSIVE: protect as a giant covers the whole team.', 'small spaces, swarms');
+SH('healing', ['healing wounds', 'curing sickness and poison', 'restoring energy', 'calming pain'],
+  [['healing a whole group at once', 3], ['bringing someone back from knocked-out', 2], ['healing plants and objects', 3]],
+  ['damage', 'raising the dead'], [], 'MEDIC: heals are much stronger and can revive teammates.', 'undead');
+SH('luck', ['things randomly going your way', 'lucky dodges', 'finding useful things lying around'],
+  [['making an enemy trip or misfire', 2], ['winning any game of chance', 3]],
+  ['guaranteed specific outcomes', 'creating things from nothing'], [], 'FLUKE: every roll is a good roll.', 'nothing (it is luck)');
+SH('duckarmy', ['commanding hundreds of ducks', 'a quacking stampede', 'ducks swarming enemies', 'ducks carrying things together'],
+  [['a duck tower to climb', 3], ['ducks forming a raft or bridge', 3], ['a duck tornado', 6]],
+  ['stealth', 'anything subtle'], [], 'LEGION: ducks keep fighting for 2 rounds.', 'foxes, loud noises');
+SH('blackhole', ['a tiny black hole that sucks things in', 'pulling enemies together', 'eating projectiles'],
+  [['a black hole shield', 4], ['a bigger black hole', 6]],
+  ['anything gentle', 'healing', 'giving things back'], [], 'SINGULARITY: area attacks pull all enemies together (+20% on everyone).', 'huge energy use');
+SH('dragon', ['becoming a dragon: flying, breathing fire, clawing, roaring', 'carrying allies on your back'],
+  [['a partial transformation (just wings or breath)', 2], ['dragon fear that makes enemies flee', 4]],
+  ['sneaking', 'small spaces', 'underwater fire breath'], [], 'DRAGON: flying and fire breath at once — ignores terrain.', 'ice, dragon-slayers');
+// Fused powers merge sheets
+function fuseSheets(A, B) {
+  A = A || { nat: [], str: [], imp: [], needs: [], sig: '', weak: '' }; B = B || A;
+  const natAll = [...A.nat, ...B.nat];
+  const strAll = [...A.str, ...B.str];
+  // a stretch for one power that is natural-ish for the other gets easier
+  const str = strAll.map(([t, l]) => [t, Math.max(1, l - 1)]);
+  const imp = [...A.imp, ...B.imp].filter(x => !natAll.some(n => n.split(' ')[0] === x.split(' ')[0]));
+  const nA = A.needs || [], nB = B.needs || [];
+  const pos = nA.some(x => !x.startsWith('!')) && nB.some(x => !x.startsWith('!')) ? [...new Set([...nA, ...nB].filter(x => !x.startsWith('!')))] : []; // a fusion only needs something if BOTH halves did
+  const neg = nA.filter(x => x.startsWith('!') && nB.includes(x));
+  return { nat: natAll, str, imp, needs: [...pos, ...neg], sig: [A.sig, B.sig].filter(Boolean).join(' AND '), weak: [A.weak, B.weak].join('; ') };
+}
+function sheetOf(pw) { if (pw.fused) return pw.fused.sheet || fuseSheets(SHEETS[(pw.fused.src || [])[0]], SHEETS[(pw.fused.src || [])[1]]); return SHEETS[pw.id]; }
+const srcIds = pw => pw.fused ? (pw.fused.src || []) : [pw.id];
+
+/* ---------------- environment tags ---------------- */
+const THEME_ENV = {
+  jungle: ['outdoor', 'ground', 'soil', 'birds', 'water'],
+  sunken: ['underwater', 'water', 'ground', 'dark'],
+  school: ['indoor', 'ground', 'dark', 'metal'],
+  sky: ['outdoor', 'high', 'birds', 'air'],
+  candy: ['outdoor', 'ground', 'soil', 'dry'],
+  clock: ['indoor', 'ground', 'metal'],
+};
+const TRAIT_ENV = { water: ['water'], earth: ['ground', 'soil'], metal: ['metal'], plant: ['soil'], wood: ['wood'], animal: ['birds'], death: ['remains'], dark: ['dark'], fire: ['fire'] };
+function envOf(C) {
+  const e = new Set(THEME_ENV[R.book] || []);
+  (C ? C.objs : []).forEach(o => o.traits.forEach(t => (TRAIT_ENV[t] || []).forEach(x => e.add(x))));
+  if (R.level && R.level.kind === 'host') { ['indoor', 'ground', 'bright'].forEach(x => e.add(x)); e.delete('dark'); e.delete('outdoor'); e.delete('birds'); e.delete('water'); e.delete('underwater'); }
+  return [...e];
+}
+function needsMet(sheet, env) {
+  const n = (sheet && sheet.needs) || [];
+  const pos = n.filter(x => !x.startsWith('!')), neg = n.filter(x => x.startsWith('!')).map(x => x.slice(1));
+  if (neg.some(x => env.includes(x))) return false;
+  return !pos.length || pos.some(x => env.includes(x));
+}
 
 /* =====================================================================
    ENGINE
@@ -465,6 +644,7 @@ function startPage() {
   R.players.forEach(p => { if (p.out) return; scaleStats(p); p.hp = p.maxHp; p.en = p.maxEn; p.ko = false; p.st = {}; p.score = 0; });
   const entry = R.plan[R.page - 1];
   const seed = (Math.random() * 2e9) | 0;
+  R.trial = R.page === 1 && R.vol === 1 && !S.tutorialDone;
   R.level = genLevel(entry, seed);
   R.level.snap = JSON.stringify(R.players.map(p => ({ items: p.items })));
   R.screen = 'level'; R.cur = firstAlive();
@@ -498,6 +678,7 @@ function genLevel(entry, seed) {
   logL(L, 'big', `📖 ${th.name} — Page ${R.page}`);
   logL(L, 'nar', `You open your eyes in ${C(sx, sy).place}. Somewhere in this land waits ${goalName}. Explore to find it.`);
   logL(L, 'sys', 'Move with the arrow buttons or type "go north". Type anything creative when you meet trouble.');
+  if (R.trial) logL(L, 'note', '📘 <b>Tutorial page.</b> The narrator will explain every verdict: ✅ <b>Natural</b> (an obvious use of your power — full strength), 🌀 <b>Stretch</b> (clever but bends your power — weaker, costs more, can backfire, needs a higher level), ❌ <b>Impossible</b> (your power just can\'t do that — fails). On this page nothing costs you a turn by accident.');
   return L;
 }
 function revealAround(L, x, y, r) { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const nx = x + dx, ny = y + dy; if (nx >= 0 && ny >= 0 && nx < L.w && ny < L.h && Math.abs(dx) + Math.abs(dy) <= r) L.cells[ny * L.w + nx].seen = true; } }
@@ -532,8 +713,8 @@ function mkChallenge(kind, cell) {
     C.flavorGiven = 0;
   } else if (kind === 'boss') {
     const id = L.entry.b, d = BOSSES[id], guardian = L.entry.t === 'guardian';
-    const hp = Math.round((100 + 25 * R.page) * d.hp * (1 + .3 * (R.vol - 1)) * (.5 + .5 * np()) * (guardian ? .6 : 1));
-    const b = C.boss = { id, n: d.n, i: d.i, g: d.g, hp, maxHp: hp, dmg: Math.round((5 + .4 * R.page) * d.dmg * dmgMul() * (guardian ? .85 : 1)), weak: d.weak ? d.weak.split(' ') : [], resist: d.resist ? d.resist.split(' ') : [], tele: 0, phase: 0, useAp: {}, useTr: {}, guardian };
+    const hp = Math.round((88 + 21 * R.page) * d.hp * (1 + .3 * (R.vol - 1)) * (.5 + .5 * np()) * (guardian ? .5 : 1));
+    const b = C.boss = { id, n: d.n, i: d.i, g: d.g, props: (d.props || '').split(' ').filter(Boolean), hp, maxHp: hp, dmg: Math.round((5 + .4 * R.page) * d.dmg * dmgMul() * (guardian ? .85 : 1)), weak: d.weak ? d.weak.split(' ') : [], resist: d.resist ? d.resist.split(' ') : [], tele: 0, phase: 0, useAp: {}, useTr: {}, guardian };
     C.title = (guardian ? 'Guardian: ' : '') + d.n; C.icon = d.i; C.desc = d.intro;
     const mem = S.bossMem[id];
     if (mem) { b.memAp = mem.ap; b.memTr = mem.tr; }
@@ -632,72 +813,6 @@ function traitsOf(p, P, C) {
   if (!P.powers.length && !P.items.length) tr.add('physical');
   return [...tr];
 }
-function evaluate(pi, P, C) {
-  const p = R.players[pi], notes = [], ap = P.ap;
-  let apt = 0, lvl = 1, luck = false;
-  const pws = P.powers.map(i => p.powers[i]);
-  // spores clog a power
-  if (C && C.spored && C.spored[pi] !== undefined) {
-    const k = P.powers.indexOf(C.spored[pi]);
-    if (k >= 0) { notes.push(`🍄 Your ${pdef(p.powers[C.spored[pi]]).name} is clogged with spores! It sputters at half strength and stings you.`); hurtP(pi, 3, 'spore', true); P.spored = true; }
-  }
-  pws.forEach(pw => { const d = pdef(pw); apt = Math.max(apt, d.apt[ap]); lvl = Math.max(lvl, pw.lvl); if (d.traits.includes('luck')) luck = true; });
-  if (pws.length === 2) { apt += 1; notes.push('⚡ Power combo! Two powers at once.'); }
-  if (!pws.length) { apt = 1; lvl = 1; if (P.notOwned) notes.push(`🙃 You don't have ${P.notOwned}! You improvise without a power. (Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')})`); }
-  let itemBonus = 0;
-  P.items.forEach(i => { itemBonus += ITEMS[p.items[i].id].apt[ap] || 0; });
-  apt += Math.min(2, itemBonus);
-  // scale & energy
-  let scale = P.scale;
-  if (!pws.length && SCALE_ORDER.indexOf(scale) > 1) { scale = 'normal'; notes.push('Without a power you can\'t make it that big.'); }
-  const req = SCALES[scale].lvl;
-  if (pws.length && lvl < req) {
-    let s = SCALE_ORDER.indexOf(scale); while (s > 1 && SCALES[SCALE_ORDER[s]].lvl > lvl) s--;
-    notes.push(`📏 Your power is only level ${lvl} — "${scale}" needs level ${req}. It comes out ${SCALE_ORDER[s]} instead.`);
-    scale = SCALE_ORDER[s];
-  }
-  let cost = pws.length ? Math.round(SCALES[scale].cost * (pws.length === 2 ? 1.5 : 1)) : 0;
-  while (cost > p.en && SCALE_ORDER.indexOf(scale) > 0) { scale = SCALE_ORDER[SCALE_ORDER.indexOf(scale) - 1]; cost = Math.round(SCALES[scale].cost * (pws.length === 2 ? 1.5 : 1)); }
-  if (cost > p.en) { notes.push('😮‍💨 Out of energy! You improvise without powers. (Try "rest".)'); apt = 1 + Math.min(2, itemBonus); cost = 0; P.powers = []; pws.length = 0; }
-  p.en -= cost;
-  let score = 3 + apt * 4 * (1 + .35 * (lvl - 1));
-  if (P.spored) score *= .5;
-  // scene objects
-  const ptr = new Set(pws.flatMap(pw => pdef(pw).traits));
-  P.objs.forEach(i => {
-    const o = C.objs[i]; score += 3;
-    if (o.traits.some(t => ptr.has(t)) || (o.traits.includes('death') && ptr.has('summon'))) { score += 5; notes.push(`🌟 Clever! The ${o.n} supercharges your power.`); }
-    else notes.push(`👍 Using the ${o.n} — nice thinking.`);
-  });
-  score *= SCALES[scale].mul;
-  // novelty (the creativity engine)
-  const L = R.level;
-  const itemIds = P.items.map(i => p.items[i].id);
-  const echo = itemIds.includes('echo');
-  const sig = ap + '|' + pws.map(pw => pw.id).sort().join('+') + '|' + (P.form || '-') + '|' + itemIds.filter(x => x !== 'echo').sort().join('+');
-  L.nov[pi] = L.nov[pi] || {};
-  const cnt = L.nov[pi][sig] || 0;
-  let nov = cnt === 0 ? 1.25 : [1, .72, .5, .36, .26][Math.min(cnt - 1, 4)];
-  if (echo && cnt > 0) { nov = 1; notes.push('🔁 The Echo Charm repeats your move perfectly.'); }
-  if (cnt === 0) notes.push('✨ Creative! New idea bonus.');
-  else if (nov < .9) notes.push(`🥱 You\'ve done that ${cnt} time${cnt > 1 ? 's' : ''} already. It\'s getting predictable.`);
-  if (p.st.lastAp === ap && p.st.lastAp2 === ap) { nov *= .85; notes.push(`(Third ${AP[ap].n} in a row — mix it up!)`); }
-  L.nov[pi][sig] = cnt + 1;
-  score *= nov;
-  // detail — reward using the scene & describing your idea
-  const parts = [P.ap, pws.length, P.form, P.target, P.objs.length, P.items.length, P.scale !== 'normal'].filter(Boolean).length;
-  score *= Math.min(1.25, .85 + .07 * parts);
-  if (p.st.insight) { score *= 1.35; notes.push('🔍 Your insight pays off (+35%).'); p.st.insight = false; }
-  if (p.st.ambush) { score *= 1.3; notes.push('🥷 Striking from hiding (+30%).'); p.st.ambush = false; }
-  const roll = luck ? 1 + rnd() * .25 : .8 + rnd() * .4;
-  score *= roll;
-  let crit = false;
-  if (rnd() < (luck ? .2 : .08)) { score *= 1.5; crit = true; }
-  // consume items
-  P.items.forEach(i => { p.items[i].uses--; });
-  p.items = p.items.filter(it => it.uses > 0);
-  return { score, notes, traits: traitsOf(p, P, C || { objs: [] }), scale, crit, pws, cost, sig };
-}
 function traitMul(traits, weak, resist, notes, name) {
   let m = 1;
   const w = traits.filter(t => weak.includes(t)), r = traits.filter(t => resist.includes(t));
@@ -724,6 +839,7 @@ function hurtP(pi, dmg, src, direct) {
   }
   dmg = Math.max(0, Math.round(dmg));
   p.hp -= dmg;
+  if (R.level) { R.level.dmgRound = R.level.dmgRound || {}; R.level.dmgRound[pi] = (R.level.dmgRound[pi] || 0) + dmg; }
   if (p.hp <= 0) { p.hp = 0; p.ko = true; log('bad', `💫 ${esc(p.name)} is knocked out!`); }
   return dmg;
 }
@@ -762,35 +878,6 @@ function pwPhrase(p, P, ev) {
 }
 
 /* ---------------- ACT: the heart of the game ---------------- */
-function act(text) {
-  const L = R.level, pi = R.cur, p = R.players[pi];
-  if (!text.trim()) return;
-  if (L.kind === 'host') return hostAct(text);
-  const C = L.ch;
-  const P = parse(text, p, C);
-  if (!C) { // exploring
-    if (P.dir && (P.move || !P.ap)) return moveParty(P.dir);
-    log('you', `${esc(p.name)}: “${esc(text)}”`);
-    if (P.items.some(i => p.items[i].id === 'mapscrap')) { useMapScrap(p, P); return save(); }
-    if (P.ap === 'knowledge') { revealAround(L, L.x, L.y, 2); log('nar', `${esc(p.name)} scouts the area. The land around you becomes clearer.`); return save(); }
-    if (P.rest || P.ap === 'heal') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
-    log('nar', pick(['Nothing here needs that right now. Keep exploring!', 'You practice a bit. The birds are impressed. Now — which way?', 'The narrator nods politely. Try moving: north, south, east, or west.']));
-    return save();
-  }
-  if (P.rest) { log('you', `${esc(p.name)}: “${esc(text)}”`); p.en = Math.min(p.maxEn, p.en + 9); healP(pi, 10); log('nar', `${esc(p.name)} catches their breath. (+9 energy, +10 HP)`); return endTurn(); }
-  if (!P.ap) {
-    log('you', `${esc(p.name)}: “${esc(text)}”`);
-    log('note', `🤔 The narrator raises an eyebrow: <i>what are you trying to DO?</i> Try a verb like ${APS.map(a => '“' + AP[a].ex + '”').slice(0, 5).join(', ')}… (tap the chips below for ideas). No turn used.`);
-    return save();
-  }
-  log('you', `${esc(p.name)}: “${esc(text)}”`);
-  if (P.guessed) log('note', `🤔 The narrator reads that as a <b>${AP[P.ap].n}</b> move.`);
-  if (C.boss) bossPreCheck(pi, P, C);
-  const ev = evaluate(pi, P, C);
-  resolve(pi, P, ev, C);
-  p.st.lastAp2 = p.st.lastAp; p.st.lastAp = P.ap;
-  if (!checkWin()) endTurn();
-}
 function resolve(pi, P, ev, C) {
   const p = R.players[pi], ap = P.ap, notes = ev.notes;
   let tgt = P.target;
@@ -803,6 +890,7 @@ function resolve(pi, P, ev, C) {
   }
   if (C.boss && C.boss.g === 'guards' && tgt.type === 'boss' && liveThreats.length && !['protect', 'sneak', 'speed', 'knowledge', 'heal'].includes(ap)) { notes.push('🛡️ A Royal Brute steps in the way! Deal with the guards first.'); tgt = { type: 'threat', t: liveThreats[0] }; }
   const T = tgt.type === 'threat' ? tgt.t.n : tgt.type === 'boss' ? C.boss.n : mainName;
+  ev.score *= sigPre(pi, P, ev, C, tgt, notes);
   log('nar', fmt(pick(OPEN[ap]), { N: `<b>${esc(p.name)}</b>`, PW: pwPhrase(p, P, ev), T }) + ' ' + tierLine(ev.score) + (ev.crit ? ' <b>CRITICAL!</b>' : ''));
   let sc = ev.score;
   const eff = [];
@@ -829,6 +917,7 @@ function resolve(pi, P, ev, C) {
       // revive a KO'd friend
       const ko = R.players.findIndex(q => q.ko && !q.out);
       if (ko >= 0 && sc > 12) { R.players[ko].ko = false; R.players[ko].hp = Math.round(R.players[ko].maxHp * .3); eff.push(`✨ ${R.players[ko].name} is back on their feet!`); }
+      sigPost(pi, P, ev, C, tgt, eff, notes);
       log('eff', eff.join(' · ')); notes.length && log('note', notes.join(' '));
       return;
     }
@@ -868,6 +957,7 @@ function resolve(pi, P, ev, C) {
   } else if (tgt.type === 'boss') {
     bossHit(pi, P, ev, C, tgt, eff, notes);
   }
+  sigPost(pi, P, ev, C, tgt, eff, notes);
   if (eff.length) log('eff', eff.join(' · '));
   if (notes.length) log('note', notes.join(' '));
 }
@@ -894,11 +984,19 @@ function worldPhase() {
   const L = R.level, C = L.ch;
   if (!C || R.screen !== 'level') return;
   C.round++;
+  L.dmgRound = {};
+  // burning / soaked enemies
+  const dots = [];
+  C.threats.concat(C.boss ? [C.boss] : []).forEach(t => {
+    if (t.burn > 0 && (t.hp > 0)) { t.burn--; if (t === C.boss) dmgBoss(C, t.burnDmg, 1); else t.hp -= t.burnDmg; dots.push(`🔥 ${t.n} burns −${t.burnDmg}`); }
+    if (t.wet > 0) t.wet--;
+  });
+  if (dots.length) log('eff', dots.join(' · '));
   const lines = [];
   // escaped encounter?
   if (C.kind === 'enc' && C.escaped) { finishChallenge(true); return; }
   // minions
-  C.minions.forEach(m => { const t = C.threats.find(t => t.hp > 0); if (t) { t.hp -= m.dmg; lines.push(`🧟 ${m.owner}'s summons hit ${t.n} −${m.dmg}`); if (t.hp <= 0) lines.push(`${t.n} falls!`); } else if (C.boss) { dmgBoss(C, m.dmg, 1); lines.push(`🧟 ${m.owner}'s summons hit ${C.boss.n} −${m.dmg}`); } m.t--; });
+  C.minions.forEach(m => { const w = m.what || 'summons'; const t = C.threats.find(t => t.hp > 0); if (t) { t.hp -= m.dmg; lines.push(`${esc(m.owner)}'s ${w} hit ${t.n} −${m.dmg}`); if (t.hp <= 0) lines.push(`${t.n} falls!`); } else if (C.boss) { dmgBoss(C, m.dmg, 1); lines.push(`${esc(m.owner)}'s ${w} hit ${C.boss.n} −${m.dmg}`); } m.t--; if (m.grow) m.dmg = Math.round(m.dmg * m.grow); });
   C.minions = C.minions.filter(m => m.t > 0);
   if (lines.length) log('eff', lines.join(' · '));
   if (checkWin()) return;
@@ -925,7 +1023,7 @@ function worldPhase() {
       if (C.clock === 3) log('bad', `⏰ 3 turns left!`);
       if (C.clock <= 0) {
         if (hk.clockFx === 'lava') { targets().forEach(i => { const d = hurtP(i, 8 * dmgMul(), 'hazard'); log('bad', `🌋 Lava rains down on ${esc(R.players[i].name)} −${d}`); }); C.clock = 0; }
-        if (hk.clockFx === 'summon' && !C.summoned) { C.summoned = true; const t = mkThreatInst(['Summoned Horror', '👹', 80, 11, '', 'light holy', 'dark death']); C.threats.push(t); log('big', '👹 The ritual completes! A HORROR crawls out of the circle!'); C.clock = null; }
+        if (hk.clockFx === 'summon' && !C.summoned) { C.summoned = true; const t = mkThreatInst(['Summoned Horror', '👹', 80, 11, 'mindless', 'light holy', 'dark death']); C.threats.push(t); log('big', '👹 The ritual completes! A HORROR crawls out of the circle!'); C.clock = null; }
         if (hk.clockFx === 'crash') { targets().forEach(i => { const d = hurtP(i, 14 * dmgMul(), 'crash'); log('bad', `💥 CRASH! ${esc(R.players[i].name)} −${d}`); }); C.meter.v = Math.max(0, C.meter.v - Math.round(C.meter.goal * .2)); C.clock = 6; log('bad', 'The train is back on the rails and racing again — 6 turns!'); }
       }
     }
@@ -935,7 +1033,8 @@ function worldPhase() {
   if (C.boss) bossWorld(C, targets);
   // cleanup statuses
   C.shield = C.shieldNext; C.shieldNext = 0;
-  R.players.forEach(q => { q.st.hidden = false; q.st.dodge = false; if (!q.ko) q.en = Math.min(q.maxEn, q.en + 4); });
+  R.players.forEach(q => { q.st.hidden = q.st.hideT > 0; if (q.st.hideT) q.st.hideT--; q.st.dodge = false; if (!q.ko) q.en = Math.min(q.maxEn, q.en + 4); });
+  L.lastDmg = L.dmgRound || {};
   C.threats = C.threats.filter(t => t.hp > 0);
   if (alive().length === 0) return failLevel();
   checkWin();
@@ -976,6 +1075,7 @@ function levelComplete(C) {
   giveGold(base);
   if (winner) winner.gold += Math.round(base * .5);
   S.stats.levels++;
+  if (R.trial) { S.tutorialDone = true; R.trial = false; }
   if (C.kind === 'boss') {
     S.stats.bosses++;
     const b = C.boss; const topAp = Object.entries(b.useAp).sort((a, c) => c[1] - a[1])[0]; const topTr = Object.entries(b.useTr).sort((a, c) => c[1] - a[1])[0];
@@ -1040,8 +1140,8 @@ function moveParty(d) {
   else if (c.t === 'enc') { L.ch = mkChallenge('enc', c); log('big', `${L.ch.icon} ${L.ch.title}!`); log('nar', `In ${c.place}, ${L.ch.desc}`); }
   else if (c.t === 'obs') { L.ch = mkChallenge('obs', c); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); }
   else if (c.t === 'goal') {
-    if (L.entry.t === 'obj') { L.ch = mkChallenge('obj', c); L.ch.objs = c.objs.slice(); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); }
-    else { L.ch = mkChallenge('boss', c); log('big', `${L.ch.icon} ${L.ch.title.toUpperCase()}`); log('nar', L.ch.desc); if (L.ch.boss.memAp || L.ch.boss.memTr) log('bad', `😈 "I remember you. Last time you beat me with ${[L.ch.boss.memAp && AP[L.ch.boss.memAp].n.toLowerCase(), L.ch.boss.memTr].filter(Boolean).join(' and ')}. That won't work twice." (Those now do half damage.)`); bossAnnounce(L.ch); }
+    if (L.entry.t === 'obj') { L.ch = mkChallenge('obj', c); L.ch.objs = c.objs.slice(); log('big', `${L.ch.icon} ${L.ch.title}`); log('nar', L.ch.desc); introFor(L.ch); }
+    else { L.ch = mkChallenge('boss', c); log('big', `${L.ch.icon} ${L.ch.title.toUpperCase()}`); log('nar', L.ch.desc); if (L.ch.boss.memAp || L.ch.boss.memTr) log('bad', `😈 "I remember you. Last time you beat me with ${[L.ch.boss.memAp && AP[L.ch.boss.memAp].n.toLowerCase(), L.ch.boss.memTr].filter(Boolean).join(' and ')}. That won't work twice." (Those now do half damage.)`); bossAnnounce(L.ch); introFor(L.ch); }
   }
   R.cur = firstAlive();
   save();
@@ -1053,6 +1153,275 @@ function useMapScrap(p, P) {
   log('nar', '🗺️ You unfold the map scrap. Most of the land is revealed!');
 }
 function addItem(p, id) { const e = p.items.find(i => i.id === id); if (e) e.uses += ITEMS[id].uses; else p.items.push({ id, uses: ITEMS[id].uses }); }
+
+/* =====================================================================
+   VERDICTS — natural / stretch / impossible, checked by the engine.
+   ===================================================================== */
+const hasSig = (pws, id) => pws.some(pw => srcIds(pw).includes(id));
+function targetProps(P, C) {
+  if (!C || !P.target) return [];
+  if (P.target.type === 'threat') return P.target.t.props || [];
+  if (P.target.type === 'boss') return C.boss.props || [];
+  return [];
+}
+function defaultTarget(P, C) {
+  if (!C) return null;
+  const ap = P.ap, live = C.threats.filter(t => t.hp > 0);
+  if (C.kind === 'enc') return live.length ? { type: 'threat', t: live[0] } : null;
+  if (live.length && (ap === 'force' || ((ap === 'trick' || ap === 'entertain') && (C.mult ? (C.mult[ap] || 1) < 1 : false)))) return { type: 'threat', t: live[0] };
+  return C.boss ? { type: 'boss' } : { type: 'main' };
+}
+function validateVerdict(pi, P, C) {
+  const p = R.players[pi], pws = P.powers.map(i => p.powers[i]), notes = [];
+  let v = P.verdict || 'natural';
+  const env = envOf(C);
+  const lvl = pws.length ? Math.max(...pws.map(pw => pw.lvl)) : 1;
+  if (v !== 'impossible') {
+    const unmet = pws.filter(pw => !needsMet(sheetOf(pw), env));
+    if (unmet.length && v === 'natural') { v = 'stretch'; P.minLevel = Math.max(P.minLevel || 1, 1); notes.push(`🌍 ${unmet.map(pw => pdef(pw).name).join(' & ')} is weaker here (needs: ${(sheetOf(unmet[0]).needs || []).map(x => x.replace('!', 'no ')).join(' or ')}) — counts as a stretch.`); }
+    const tp = targetProps(P, C);
+    const tname = P.target && P.target.type === 'threat' ? P.target.t.n : C && C.boss ? C.boss.n : 'it';
+    if (P.ap === 'persuade' && tp.includes('mindless')) { v = 'impossible'; P.why = `${tname} has no mind to reason with.`; P.hint = 'Trick it, trap it, avoid it, or fight it instead.'; }
+    else if (P.ap === 'trick' && tp.includes('blind') && pws.some(pw => srcIds(pw).some(x => ['illusion', 'light', 'glitter', 'shadow'].includes(x)))) { v = 'impossible'; P.why = `${tname} is blind — visual tricks do nothing.`; P.hint = 'Use sound, smell, or something it can feel.'; }
+    else if (P.ap === 'knowledge' && tp.includes('mindless') && hasSig(pws, 'mindread')) { v = 'impossible'; P.why = 'There are no thoughts in there to read.'; P.hint = 'Study how it moves instead of what it thinks.'; }
+    else if (P.ap === 'entertain' && tp.includes('mindless') && v === 'natural') { v = 'stretch'; P.minLevel = 2; notes.push(`🧟 ${tname} is mindless — hard to entertain.`); }
+    else if (P.ap === 'force' && tp.includes('flying') && !['beam', 'ball', 'wave', 'trap'].includes(P.form) && pws.length && pws.every(pw => pdef(pw).traits.every(t => ['earth', 'physical', 'plant', 'size', 'elastic', 'food', 'wood'].includes(t))) && v === 'natural') { v = 'stretch'; P.minLevel = 2; notes.push(`🦅 ${tname} is flying — hard to reach from the ground.`); }
+  }
+  if (v === 'stretch' && !R.trial) {
+    const need = clamp(P.minLevel || 2, 1, 9);
+    if (pws.length && lvl < need) { v = 'fizzle'; P.need = need; }
+  }
+  return { v, notes };
+}
+
+/* ---------------- scoring ---------------- */
+function evaluate(pi, P, C) {
+  const p = R.players[pi], notes = [], ap = P.ap;
+  let apt = 0, lvl = 1, luck = false;
+  const pws = P.powers.map(i => p.powers[i]);
+  if (C && C.spored && C.spored[pi] !== undefined && P.powers.includes(C.spored[pi])) {
+    notes.push(`🍄 Your ${pdef(p.powers[C.spored[pi]]).name} is clogged with spores! It sputters at half strength and stings you.`); hurtP(pi, 3, 'spore', true); P.spored = true;
+  }
+  pws.forEach(pw => { const d = pdef(pw); apt = Math.max(apt, d.apt[ap]); lvl = Math.max(lvl, pw.lvl); if (d.traits.includes('luck')) luck = true; });
+  if (pws.length && P.verdict === 'natural') apt = Math.max(apt, 2); // the judge says it's an obvious use
+  if (pws.length === 2) { apt += 1; notes.push('⚡ Power combo! Two powers at once.'); }
+  if (!pws.length) { apt = 1; lvl = 1; }
+  let itemBonus = 0;
+  P.items.forEach(i => { itemBonus += ITEMS[p.items[i].id].apt[ap] || 0; });
+  apt += Math.min(2, itemBonus || (P.items.length ? 1 : 0));
+  // size vs level & energy
+  let scale = P.scale;
+  if (!pws.length && SCALE_ORDER.indexOf(scale) > 1) { scale = 'normal'; notes.push('Without a power you can\'t make it that big.'); }
+  const req = SCALES[scale].lvl;
+  if (pws.length && lvl < req && !R.trial) {
+    let s = SCALE_ORDER.indexOf(scale); while (s > 1 && SCALES[SCALE_ORDER[s]].lvl > lvl) s--;
+    notes.push(`📏 Your power is only level ${lvl} — "${scale}" needs level ${req}. It comes out ${SCALE_ORDER[s]} instead.`);
+    scale = SCALE_ORDER[s];
+  }
+  const free = hasSig(pws, 'strength') && pws.length === 1;
+  const vmul = P.verdict === 'stretch' ? 1.5 : 1;
+  const costOf = s => free ? 0 : Math.round(SCALES[s].cost * (pws.length === 2 ? 1.5 : 1) * vmul);
+  let cost = pws.length ? costOf(scale) : 0;
+  while (cost > p.en && SCALE_ORDER.indexOf(scale) > 0) { scale = SCALE_ORDER[SCALE_ORDER.indexOf(scale) - 1]; cost = costOf(scale); }
+  if (cost > p.en) { notes.push('😮‍💨 Out of energy! You improvise without powers. (Try "rest".)'); apt = 1 + Math.min(2, itemBonus); cost = 0; P.powers = []; pws.length = 0; }
+  p.en -= cost;
+  let score = 3 + apt * 4 * (1 + .35 * (lvl - 1));
+  if (P.spored) score *= .5;
+  const ptr = new Set(pws.flatMap(pw => pdef(pw).traits));
+  P.objs.forEach(i => {
+    const o = C.objs[i]; score += 3;
+    if (o.traits.some(t => ptr.has(t)) || (o.traits.includes('death') && ptr.has('summon'))) { score += 5; notes.push(`🌟 The ${o.n} supercharges your power!`); }
+    else notes.push(`👍 Using the ${o.n}.`);
+  });
+  score *= SCALES[scale].mul;
+  // repetition (engine-tracked, can't be talked around)
+  const L = R.level;
+  const itemIds = P.items.map(i => p.items[i].id);
+  const echo = itemIds.includes('echo');
+  const sig = ap + '|' + pws.map(pw => pw.id).sort().join('+') + '|' + (P.form || '-') + '|' + itemIds.filter(x => x !== 'echo').sort().join('+');
+  L.nov[pi] = L.nov[pi] || {};
+  const cnt = L.nov[pi][sig] || 0;
+  let nov = cnt === 0 ? 1.1 : [1, .72, .5, .36, .26][Math.min(cnt - 1, 4)];
+  if (echo && cnt > 0) { nov = 1; notes.push('🔁 The Echo Charm repeats your move perfectly.'); }
+  else if (nov < .9) notes.push(`🥱 You've done that ${cnt} time${cnt > 1 ? 's' : ''} already — it's getting predictable.`);
+  if (p.st.lastAp === ap && p.st.lastAp2 === ap) { nov *= .85; notes.push(`(Third ${AP[ap].n} in a row — mix it up!)`); }
+  L.nov[pi][sig] = cnt + 1;
+  score *= nov;
+  // creativity (judged)
+  const c = P.creativity || 3;
+  score *= .75 + .12 * c;
+  if (c >= 4) notes.push(c === 5 ? '🎨 BRILLIANT idea! (creativity 5/5)' : '🎨 Creative! (4/5)');
+  else if (c <= 1) notes.push('🎨 Pretty generic… be more specific or use the scene. (1/5)');
+  if (P.verdict === 'stretch') { score *= .7; }
+  if (p.st.insight) { score *= 1.35; notes.push('🔍 Your insight pays off (+35%).'); p.st.insight = false; }
+  if (p.st.ambush) { score *= 1.3; notes.push('🥷 Striking from hiding (+30%).'); p.st.ambush = false; }
+  score *= luck ? 1 + rnd() * .25 : .8 + rnd() * .4;
+  let crit = false;
+  if (rnd() < (luck ? .2 : .08)) { score *= 1.5; crit = true; }
+  P.items.forEach(i => { p.items[i].uses--; });
+  p.items = p.items.filter(it => it.uses > 0);
+  return { score, notes, traits: traitsOf(p, P, C || { objs: [] }), scale, crit, pws, cost, sig, lvl };
+}
+
+/* ---------------- signature rules (what makes powers different) ---------------- */
+function sigPre(pi, P, ev, C, tgt, notes) {
+  const pws = ev.pws, ap = P.ap, env = envOf(C);
+  const tp = tgt && tgt.type === 'threat' ? (tgt.t.props || []) : tgt && tgt.type === 'boss' ? (C.boss.props || []) : [];
+  const tobj = tgt && tgt.type === 'threat' ? tgt.t : tgt && tgt.type === 'boss' ? C.boss : null;
+  let m = 1;
+  if (hasSig(pws, 'shadow')) { if (env.includes('dark')) { m *= 1.4; notes.push('🌑 The darkness feeds your shadows (+40%).'); } else if (env.includes('bright')) m *= .8; }
+  if (hasSig(pws, 'magnet') && tp.includes('armored')) { m *= 1.6; notes.push('🧲 Magnetism wrecks armor!'); }
+  if ((hasSig(pws, 'voice') || hasSig(pws, 'pitch')) && ['persuade', 'entertain'].includes(ap) && tp.includes('social')) { m *= 1.6; notes.push('🗣️ Your voice works wonders on them.'); }
+  if ((hasSig(pws, 'bread') || hasSig(pws, 'grandma')) && ap === 'persuade' && (tp.includes('animal') || tp.includes('social'))) { m *= 1.4; notes.push('🍞 Nobody refuses food.'); }
+  if (tobj && tobj.wet > 0 && ev.traits.some(t => t === 'electric' || t === 'ice')) { m *= 1.5; notes.push('💧 It\'s soaked — that hits extra hard!'); }
+  if (hasSig(pws, 'tk') && P.objs.length) { m *= 1.3; notes.push('🧠 Hurling scene objects with your mind!'); }
+  if (hasSig(pws, 'balloons') && ap === 'entertain') m *= 1.3;
+  if (hasSig(pws, 'healing') && ap === 'heal') m *= 1.5;
+  if (hasSig(pws, 'earth') && ap === 'protect') m *= 1.3;
+  if (hasSig(pws, 'gravity') && tp.includes('flying')) { m *= 1.4; notes.push('🌌 Gravity drags it out of the sky!'); }
+  if (hasSig(pws, 'blackhole') && P.form && FORMS[P.form].kind === 'area') m *= 1.2;
+  if (tp.includes('fireproof') && ev.traits.includes('fire')) { m *= .2; notes.push('🔥 It\'s fireproof!'); }
+  if (tp.includes('armored') && ap === 'force' && !(P.form && FORMS[P.form].kind === 'focus') && !hasSig(pws, 'magnet')) { m *= .6; notes.push('🛡️ Armor soaks the blow (focused attacks work better).'); }
+  return m;
+}
+function sigPost(pi, P, ev, C, tgt, eff, notes) {
+  const p = R.players[pi], pws = ev.pws, ap = P.ap, L = R.level, lvl = ev.lvl || 1;
+  const tobj = tgt && tgt.type === 'threat' ? tgt.t : tgt && tgt.type === 'boss' ? C.boss : null;
+  const alive = C.threats.filter(t => t.hp > 0);
+  if (hasSig(pws, 'lightning')) {
+    if (C.boss && C.boss.tele && ['force', 'trick', 'speed'].includes(ap)) { C.boss.tele = 0; eff.push('⚡ TOO FAST! You interrupt the charging attack!'); }
+    if (tgt && tgt.type === 'threat') alive.filter(t => t !== tgt.t && (t.wet > 0 || (t.props || []).includes('armored'))).forEach(t => { const d = Math.round(ev.score * .4); t.hp -= d; eff.push(`⚡ chains to ${t.n} −${d}`); });
+  }
+  if (hasSig(pws, 'water') && tobj && ['force', 'trick'].includes(ap)) { tobj.wet = 2; eff.push('💧 soaked'); }
+  if (hasSig(pws, 'fire') && tobj && ap === 'force' && !(tobj.props || []).includes('fireproof')) { tobj.burn = 2; tobj.burnDmg = 2 + 2 * lvl; eff.push('🔥 burning'); }
+  if (hasSig(pws, 'plants') && ['force', 'trick', 'protect'].includes(ap)) { C.minions.push({ owner: p.name, dmg: 2 + lvl, t: 4, grow: 1.4, what: 'growing vines' }); eff.push('🌱 a seed is planted'); }
+  if (hasSig(pws, 'necro') && ['force', 'trick', 'protect'].includes(ap)) { const r = C.objs.findIndex(o => o.n === 'remains'); if (r >= 0) C.objs.splice(r, 1); C.minions.push({ owner: p.name, dmg: 3 + 2 * lvl, t: 99, what: 'undead minions' }); eff.push('💀 the dead rise to serve you'); }
+  if ((hasSig(pws, 'bees') || hasSig(pws, 'duck') || hasSig(pws, 'duckarmy')) && ['force', 'trick'].includes(ap)) { const k = hasSig(pws, 'duckarmy') ? 2 : 1; C.minions.push({ owner: p.name, dmg: (2 + lvl) * k, t: 2, what: hasSig(pws, 'bees') ? 'bees' : 'ducks' }); eff.push(hasSig(pws, 'bees') ? '🐝 the bees keep stinging' : '🦆 the ducks keep attacking'); }
+  if (hasSig(pws, 'chair') && !C.objs.some(o => o.n === 'chair')) { C.objs.push({ n: 'chair', i: '🪑', traits: ['wood', 'physical'] }); eff.push('🪑 the chair is now part of the scene'); }
+  if ((hasSig(pws, 'pigeons') || hasSig(pws, 'smell')) && ap === 'knowledge' && L.kind === 'map') { revealAround(L, L.x, L.y, 3); L.cells[L.goal[1] * L.w + L.goal[0]].seen = true; eff.push('🗺️ your scouts reveal the land and the goal'); }
+  if (hasSig(pws, 'time') && ['protect', 'heal'].includes(ap) && (L.rewinds || 0) < 2 && L.lastDmg) { L.rewinds = (L.rewinds || 0) + 1; R.players.forEach((q, i) => { const h = healP(i, L.lastDmg[i] || 0); if (h) eff.push(`⏳ ${q.name} +${h} (rewound)`); }); }
+  if ((hasSig(pws, 'bread') || hasSig(pws, 'grandma')) && ['heal', 'persuade'].includes(ap)) R.players.forEach((q, i) => { if (i !== pi) { const h = healP(i, 4 + 2 * lvl); if (h) eff.push(`🍞 ${q.name} eats (+${h})`); } });
+  if (tobj && tgt.type === 'threat' && ['trick', 'force', 'entertain'].includes(ap) && pws.some(pw => srcIds(pw).some(x => ['slippery', 'goo', 'dance', 'sneeze', 'glitter'].includes(x)))) { tgt.t.stun = Math.max(tgt.t.stun, 1); eff.push(`💫 ${tgt.t.n} loses a turn`); }
+  if (tobj && tgt.type === 'threat' && ap === 'trick' && hasSig(pws, 'illusion')) { tgt.t.stun = 2; eff.push('🎭 it attacks thin air for 2 turns'); }
+  if (tobj && tgt.type === 'threat' && ap === 'knowledge' && hasSig(pws, 'light')) { tgt.t.stun = Math.max(tgt.t.stun, 1); eff.push('🌟 blinded for a turn'); }
+  if (hasSig(pws, 'ice') && ap === 'protect') { C.shieldNext += Math.round(ev.score * .8); eff.push('❄️ the ice holds for another round'); }
+  if (hasSig(pws, 'wind') && ap === 'speed') { R.players.forEach(q => q.st.dodge = true); eff.push('🌪️ the whole team is harder to hit'); }
+  if (hasSig(pws, 'tiny') && ap === 'sneak') { p.st.hideT = 2; eff.push('🐜 unnoticed for 2 rounds'); }
+  if (hasSig(pws, 'mindread') && ap === 'knowledge' && C.boss) eff.push(`🔮 You read its mind: ${bossHint(C)} ${C.boss.tele ? 'It is about to unleash its big attack!' : (C.round % 3 === 2 ? 'It will charge a big attack next round.' : 'No big attack coming yet.')}`);
+}
+
+/* ---------------- the turn ---------------- */
+let BUSY = false;
+async function act(text) {
+  if (BUSY || !R || !R.level || !String(text).trim()) return;
+  BUSY = true;
+  try { await actInner(String(text).slice(0, 400)); }
+  catch (e) { console.error(e); log('sys', '⚠️ Something went wrong with that turn: ' + esc(e.message)); save(); }
+  finally { BUSY = false; UI.thinking = false; if (typeof render === 'function' && curView === 'level') render(); }
+}
+async function actInner(text) {
+  const L = R.level, pi = R.cur, p = R.players[pi];
+  const host = L.kind === 'host', C = host ? null : L.ch;
+  const P0 = parse(text, p, C);
+  // quick local commands (no AI needed)
+  if (P0.dir && (P0.move || (!P0.ap && P0.toks.length <= 3))) return host ? hostMove(P0.dir) : moveParty(P0.dir);
+  if (!host && !C) {
+    log('you', `${esc(p.name)}: “${esc(text)}”`);
+    if (P0.items.some(i => p.items[i].id === 'mapscrap')) { useMapScrap(p, P0); return save(); }
+    if (P0.ap === 'knowledge') { const pig = p.powers.some(pw => srcIds(pw).some(x => x === 'pigeons' || x === 'smell')); revealAround(L, L.x, L.y, pig ? 3 : 2); if (pig) L.cells[L.goal[1] * L.w + L.goal[0]].seen = true; log('nar', `${esc(p.name)} scouts the area${pig ? ' with a little help from their friends' : ''}. The land around you becomes clearer.`); return save(); }
+    if (P0.rest || P0.ap === 'heal') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
+    log('nar', pick(['Nothing here needs that right now. Keep exploring!', 'You practice a bit. The birds are impressed. Now — which way?', 'The narrator nods politely. Try moving: north, south, east, or west.']));
+    return save();
+  }
+  if (P0.rest && P0.toks.length <= 3) return doRest(pi, text, host);
+  // ---- ask the Judge ----
+  let P = P0, J = null, via = null;
+  if (aiReady()) {
+    UI.thinking = true; render();
+    try { const r = await aiJudge(pi, C, text); J = r.j; via = r.via; } catch (e) { AIC.lastErr = e.message; }
+    UI.thinking = false;
+  }
+  if (J) {
+    if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(No turn used.)</span>`); return save(); }
+    P = fromJudge(J, p, C, P0);
+    if (P.move && P.dir) return host ? hostMove(P.dir) : log('note', 'Something is blocking the way! Deal with it first (sneaking or speed can slip past).') || save();
+    if (P.rest) return doRest(pi, text, host);
+  } else {
+    fallbackVerdict(P, p);
+    if (aiReady()) log('sys', '📴 The AI narrator is unavailable right now — using the basic narrator.');
+  }
+  if (!P.ap) {
+    log('you', `${esc(p.name)}: “${esc(text)}”`);
+    log('note', `🤔 The narrator raises an eyebrow: <i>what are you trying to DO?</i> Try a verb like “blast”, “distract”, “befriend”, “protect”, “study”… No turn used.`);
+    return save();
+  }
+  log('you', `${esc(p.name)}: “${esc(text)}”`);
+  if (!host) P.target = P.target || defaultTarget(P, C);
+  const val = validateVerdict(pi, P, C);
+  P.verdict = val.v;
+  const dbg = { text, via: via ? via.p + '/' + via.m : 'keyword', judge: J, verdict: P.verdict, why: P.why || '' };
+  (L.debug = L.debug || []).push(dbg); if (L.debug.length > 8) L.debug.shift();
+  val.notes.forEach(n => log('note', n));
+  if (R.trial && P.verdict !== 'fizzle' && P.verdict !== 'impossible') log('note', `📘 <b>Tutorial:</b> that's <b>${{ natural: '✅ Natural', stretch: '🌀 a Stretch' }[P.verdict]}</b>${P.why ? ' — ' + esc(P.why.replace(/[.!]+$/, '')) : ''}.${P.verdict === 'stretch' ? ' Stretches are weaker, cost more energy and can backfire — and normally need a higher power level.' : ''}`);
+  // ---- impossible ----
+  if (P.verdict === 'impossible') {
+    const msg = `❌ <b>Impossible.</b> ${esc(P.why || 'Your power can\'t do that.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''}`;
+    if (R.trial || !R.warned) { if (!R.trial) R.warned = true; log('note', msg + (R.trial ? ' <span class="small">(Tutorial: no turn lost.)</span>' : ' <span class="small">(Free warning — from now on, impossible actions cost your turn.)</span>')); return save(); }
+    log('bad', msg + ' You lose your turn.');
+    return finishTurn(pi, P, host);
+  }
+  if (P.verdict === 'fizzle') {
+    p.en = Math.max(0, p.en - 2);
+    log('bad', `🌀 That's a <b>stretch</b> that needs power level ${P.need} — it fizzles out. ${P.why ? '(' + esc(P.why) + ')' : ''} Upgrade your power in the shop to pull it off.`);
+    return finishTurn(pi, P, host);
+  }
+  if (!host && C.boss) bossPreCheck(pi, P, C);
+  const ev = evaluate(pi, P, host ? { objs: [] } : C);
+  if (P.verdict === 'stretch' && !R.trial && ev.pws.length && rnd() < Math.max(.05, .3 - .03 * ev.lvl)) {
+    const d = hurtP(pi, 4 + 2 * ev.lvl, 'backfire', true);
+    log('bad', `💥 The stretch BACKFIRES! Your power slips out of control. ${esc(p.name)} −${d} HP.`);
+    story(pi, P, text, 'The stretch backfired and hurt ' + p.name + '. Nothing else happened.', J, L.log.length - 1);
+    return finishTurn(pi, P, host);
+  }
+  const mark = L.log.length;
+  if (host) hostResolve(pi, P, ev); else resolve(pi, P, ev, C);
+  if (J) {
+    const outcome = L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500);
+    UI.thinking = true; render();
+    await story(pi, P, text, outcome, J, mark);
+    UI.thinking = false;
+  }
+  p.st.lastAp2 = p.st.lastAp; p.st.lastAp = P.ap;
+  if (host) return hostTick();
+  if (!checkWin()) endTurn();
+}
+async function story(pi, P, text, outcome, J, idx) {
+  if (!J || !aiReady()) return;
+  const C = R.level.ch;
+  try {
+    const s = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome, scene: C ? C.title : 'The Unseen Host\'s white hall', villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined });
+    if (s && R.level.log[idx] && R.level.log[idx].c === 'nar') R.level.log[idx].h = esc(s);
+    else if (s) R.level.log.splice(idx, 0, { c: 'nar', h: esc(s) });
+  } catch (e) { AIC.lastErr = e.message; }
+}
+function doRest(pi, text, host) {
+  const p = R.players[pi];
+  log('you', `${esc(p.name)}: “${esc(text)}”`);
+  p.en = Math.min(p.maxEn, p.en + 9); healP(pi, 10);
+  log('nar', `${esc(p.name)} catches their breath. (+9 energy, +10 HP)`);
+  if (host) return hostTick();
+  return endTurn();
+}
+function finishTurn(pi, P, host) {
+  const p = R.players[pi];
+  p.st.lastAp2 = p.st.lastAp; p.st.lastAp = P.ap;
+  if (host) return hostTick();
+  if (!checkWin()) endTurn();
+}
+async function introFor(C) {
+  const s = await aiIntro(C.kind, C.title, C.desc);
+  if (s) { log('nar', `<i>${esc(s)}</i>`); save(); if (curView === 'level') render(); }
+}
 
 /* =====================================================================
    BOSSES — every boss has a gimmick that punishes spamming one idea.
@@ -1072,7 +1441,7 @@ function setupBoss(C) {
   const b = C.boss;
   C.roundPowers = []; C.spored = {};
   if (b.g === 'twins') { b.hp = b.maxHp = Math.round(b.maxHp * .5); b.hp2 = b.maxHp2 = b.hp; b.hitR = { 1: 0, 2: 0 }; }
-  if (b.g === 'guards') { b.guardT = 6; for (let i = 0; i < 2; i++) C.threats.push(mkThreatInst(['Royal Brute', '🦍', 28, 6, 'social', 'size slippery', ''])); }
+  if (b.g === 'guards') { b.guardT = 6; for (let i = 0; i < 2; i++) C.threats.push(mkThreatInst(['Royal Brute', '🦍', 28, 6, 'social armored', 'size slippery', ''])); }
   if (b.g === 'nesting') { b.layers = shuffle(['reflect', 'quiet', 'absorb', 'tempo', 'weather']).slice(0, 3); b.layer = 0; b.sub = b.layers[0]; }
   initGimmick(C, gm(b));
   nextRoundRules(C);
@@ -1173,7 +1542,7 @@ function bossHit(pi, P, ev, C, tgt, eff, notes) {
   }
   if (g === 'tempo') {
     const T = TEMPOS[b.tempo], match = T.aps.includes(ap) || ev.traits.some(t => T.traits.includes(t));
-    if (match) { m *= 1.8; notes.push(`🎻 On tempo! (${b.tempo})`); } else { m *= .5; const d = hurtP(pi, 5, 'tempo', true); notes.push(`🎻 Off tempo! The Maestro's baton smacks you −${d}.`); }
+    if (match) { m *= 1.8; notes.push(`🎻 On tempo! (${b.tempo})`); } else { m *= .65; const d = hurtP(pi, 3, 'tempo', true); notes.push(`🎻 Off tempo! The Maestro's baton smacks you −${d}.`); }
   }
   if (g === 'weather') {
     const W = b.weather;
@@ -1198,8 +1567,8 @@ function bossWorld(C, targets) {
     b.hitR = { 1: 0, 2: 0 };
   }
   if (g === 'quiet') { if (C.noise >= 100) { targets().forEach(i => { const d = hurtP(i, 18 * dmgMul(), 'hazard'); log('bad', `📚 THE BOOKS FALL! ${esc(R.players[i].name)} −${d}`); }); C.noise = 30; } else C.noise = Math.max(0, C.noise - 10); }
-  if (b.g === 'guards') { b.guardT--; if (b.guardT <= 0) { b.guardT = 6; if (C.threats.filter(t => t.hp > 0).length < 1) { C.threats.push(mkThreatInst(['Royal Brute', '🦍', 28, 6, 'social', 'size slippery', ''])); log('bad', '🦍 Another Royal Brute marches in!'); } } }
-  if (g === 'hive' && C.round % 3 === 0 && C.threats.filter(t => t.hp > 0).length < 2) { C.threats.push(mkThreatInst(['Bee Drones', '🐝', 20, 5, 'animal', 'fire air sound', 'poison'])); log('bad', '🐝 The Hive Mother releases a cloud of drones!'); }
+  if (b.g === 'guards') { b.guardT--; if (b.guardT <= 0) { b.guardT = 6; if (C.threats.filter(t => t.hp > 0).length < 1) { C.threats.push(mkThreatInst(['Royal Brute', '🦍', 28, 6, 'social armored', 'size slippery', ''])); log('bad', '🦍 Another Royal Brute marches in!'); } } }
+  if (g === 'hive' && C.round % 3 === 0 && C.threats.filter(t => t.hp > 0).length < 2) { C.threats.push(mkThreatInst(['Bee Drones', '🐝', 20, 5, 'animal flying swarm', 'fire air sound', 'poison'])); log('bad', '🐝 The Hive Mother releases a cloud of drones!'); }
   if (g === 'gamble' && b.susp >= 100) { targets().forEach(i => { const d = hurtP(i, 22 * dmgMul(), 'smite', true); log('bad', `🎲 "CHEATER!" The Gambler God smites ${esc(R.players[i].name)} −${d}`); }); b.susp = 20; }
   // attack
   if (b.tele) {
@@ -1291,14 +1660,8 @@ function hostMove(d) {
   log('note', hostClue(L, false));
   hostTick();
 }
-function hostAct(text) {
-  const L = R.level, pi = R.cur, p = R.players[pi];
-  const P = parse(text, p, null);
-  if (P.dir && (P.move || !P.ap)) return hostMove(P.dir);
-  log('you', `${esc(p.name)}: “${esc(text)}”`);
-  if (P.rest) { p.en = Math.min(p.maxEn, p.en + 9); healP(pi, 6); log('nar', `${esc(p.name)} rests a moment. (+9 energy, +6 HP)`); return hostTick(); }
-  if (!P.ap) { log('note', '🤔 The Host taps his invisible foot. <i>"Well? Do something! Perform! Or move along."</i> (Try "perform", "juggle", "tell a joke", "listen", or move.) No turn used.'); return save(); }
-  const ev = evaluate(pi, P, { objs: [] });
+function hostResolve(pi, P, ev) {
+  const L = R.level, p = R.players[pi];
   const ap = P.ap;
   log('nar', fmt(pick(OPEN[ap]), { N: `<b>${esc(p.name)}</b>`, PW: pwPhrase(p, P, ev), T: 'the empty hall' }));
   if (['entertain', 'trick', 'persuade'].includes(ap)) {
@@ -1327,7 +1690,6 @@ function hostAct(text) {
   } else if (ap === 'protect') { p.st.trapShield = true; log('eff', '🛡️ Your next trap will be blocked.'); }
   else if (ap === 'speed') { p.st.leap = true; log('eff', '💨 Your next move leaps TWO tiles (skipping the one in between).'); }
   else if (ap === 'heal') { const h = healP(pi, ev.score * .8); log('eff', `💚 +${h} HP`); }
-  hostTick();
 }
 function hostTick() {
   const L = R.level;
@@ -1363,6 +1725,190 @@ function hostWin() {
 }
 
 /* =====================================================================
+   AI NARRATOR — free cloud models (Groq main, Gemini backup).
+   Keys live ONLY in this browser (separate from the save/backup code).
+   The AI judges and narrates. The ENGINE decides every number.
+   ===================================================================== */
+const KEYS_KEY = 'bookGameKeys_v1';
+let KEYS = (() => { try { return Object.assign({ groq: '', gemini: '', chains: null, on: true }, JSON.parse(localStorage.getItem(KEYS_KEY) || '{}')); } catch (e) { return { groq: '', gemini: '', chains: null, on: true }; } })();
+function saveKeys() { try { localStorage.setItem(KEYS_KEY, JSON.stringify(KEYS)); } catch (e) {} }
+const PROV = {
+  groq: { n: 'Groq', base: 'https://api.groq.com/openai/v1' },
+  gemini: { n: 'Gemini', base: 'https://generativelanguage.googleapis.com/v1beta/openai' },
+};
+const PREF = {
+  judge: [['groq', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'qwen/qwen3-32b']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite', 'gemini-flash-latest', 'gemini-2.5-flash']], ['groq', ['llama-3.1-8b-instant']]],
+  story: [['groq', ['llama-3.1-8b-instant', 'openai/gpt-oss-20b']], ['gemini', ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite']], ['groq', ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b']]],
+};
+const AIC = { cool: {}, dead: {}, badKey: {}, last: null, lastErr: '' };
+const aiReady = () => KEYS.on !== false && (KEYS.groq || KEYS.gemini);
+function chainFor(role) {
+  const out = [];
+  const resolved = KEYS.chains && KEYS.chains[role];
+  if (resolved && resolved.length) return resolved.filter(x => KEYS[x.p]);
+  PREF[role].forEach(([p, ms]) => { if (KEYS[p]) ms.forEach(m => out.push({ p, m })); });
+  return out;
+}
+async function chat(p, m, messages, o = {}) {
+  const body = { model: m, messages, temperature: o.temp ?? .4, max_tokens: o.max ?? 400 };
+  if (o.json) body.response_format = { type: 'json_object' };
+  if (p === 'groq' && m.startsWith('openai/gpt-oss')) body.reasoning_effort = 'low';
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), o.timeout || 25000);
+  try {
+    let res = await fetch(PROV[p].base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEYS[p] }, body: JSON.stringify(body), signal: ctl.signal });
+    if (res.status === 400 && o.json) { delete body.response_format; delete body.reasoning_effort; res = await fetch(PROV[p].base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + KEYS[p] }, body: JSON.stringify(body), signal: ctl.signal }); }
+    if (!res.ok) { const t = await res.text().catch(() => ''); const err = new Error(`${PROV[p].n} ${res.status}: ${t.slice(0, 160)}`); err.status = res.status; err.body = t; err.retry = +res.headers.get('retry-after') || 0; throw err; }
+    const data = await res.json();
+    const txt = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!txt) throw new Error('empty reply');
+    return txt;
+  } finally { clearTimeout(to); }
+}
+async function ai(role, messages, o) {
+  const now = Date.now();
+  for (const { p, m } of chainFor(role)) {
+    const k = p + '|' + m;
+    if (AIC.badKey[p] || AIC.dead[k] || (AIC.cool[k] || 0) > now) continue;
+    try { const text = await chat(p, m, messages, o); AIC.last = { p, m, role }; return { text, p, m }; }
+    catch (e) {
+      AIC.lastErr = e.message;
+      if (e.status === 401 || e.status === 403) AIC.badKey[p] = true;
+      else if (e.status === 404) AIC.dead[k] = true;
+      else if (e.status === 429) { const daily = /day|daily|RPD|TPD/i.test(e.body || ''); AIC.cool[k] = now + (daily ? 3 * 3600e3 : Math.max(20, e.retry || 60) * 1000); }
+      else AIC.cool[k] = now + 15e3; // network hiccup / timeout
+    }
+  }
+  throw new Error('No AI available: ' + AIC.lastErr);
+}
+function parseJSON(t) { try { return JSON.parse(t); } catch (e) {} const a = t.indexOf('{'), b = t.lastIndexOf('}'); if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (e) {} } return null; }
+async function testAI() {
+  const lines = [];
+  const chains = { judge: [], story: [] };
+  for (const p of ['groq', 'gemini']) {
+    if (!KEYS[p]) { lines.push(`⚪ ${PROV[p].n}: no key`); continue; }
+    let avail = null;
+    try { const r = await fetch(PROV[p].base + '/models', { headers: { Authorization: 'Bearer ' + KEYS[p] } }); if (r.ok) { const d = await r.json(); avail = (d.data || []).map(x => (x.id || '').replace(/^models\//, '')); } else if (r.status === 401 || r.status === 403) { lines.push(`❌ ${PROV[p].n}: key rejected (${r.status}). Double-check you copied it fully.`); continue; } } catch (e) { }
+    let okModel = null;
+    for (const role of ['judge', 'story']) PREF[role].forEach(([pp, ms]) => { if (pp !== p) return; ms.forEach(m => { if (!avail || avail.includes(m)) chains[role].push({ p, m }); }); });
+    const tryList = chains.judge.filter(x => x.p === p).concat(chains.story.filter(x => x.p === p));
+    for (const { m } of tryList) { try { await chat(p, m, [{ role: 'user', content: 'Reply with just the word OK.' }], { max: 20, timeout: 20000 }); okModel = m; break; } catch (e) { lines.push(`… ${PROV[p].n} ${m}: ${e.message.slice(0, 90)}`); } }
+    lines.push(okModel ? `✅ ${PROV[p].n} works (tested ${okModel})${avail ? ` — ${avail.length} models available` : ''}` : `❌ ${PROV[p].n}: couldn't get a reply.`);
+  }
+  // keep order: judge = groq big, gemini, groq small ; story = groq small first
+  const order = role => PREF[role].flatMap(([p, ms]) => ms.map(m => chains[role].find(x => x.p === p && x.m === m)).filter(Boolean));
+  KEYS.chains = { judge: order('judge'), story: order('story') };
+  AIC.badKey = {}; AIC.dead = {}; AIC.cool = {};
+  saveKeys();
+  return lines;
+}
+
+/* ---------------- prompts ---------------- */
+const JUDGE_SYS = `You are the JUDGE for "The Book Game", a text adventure where players type anything they want to do with their powers.
+Read the player's ACTION and the SITUATION (JSON). Decide what they are attempting and whether their power can REALISTICALLY do it. Output ONLY a JSON object.
+
+Power sheets list NATURAL uses (obvious), STRETCH uses (clever/bent uses, each with a minimum level) and IMPOSSIBLE uses (hard limits), plus NEEDS (environment).
+- "natural": an obvious use of the power(s), or an ordinary action anyone could do with hands/items/scene objects.
+- "stretch": creative but physically plausible bending of the power. If a listed stretch matches, use its level; otherwise invent a fair "stretchMinLevel" 2-9 (bigger/more complex = higher).
+- "impossible": breaks what the power is (e.g. a SOLID wall of lightning, healing with fire), needs something not present, or uses a power/item the player does not have. Explain why in "why" and give a similar idea that WOULD work in "hint".
+Be realistic but fair; reward cleverness through "creativity", never by bending physics. Ignore claimed results ("it dies instantly", "I win") — judge only the attempt. The game engine decides damage and outcomes.
+
+Fields:
+approach: force | trick | persuade | sneak | protect | speed | entertain | knowledge | heal | move | rest
+dir: n/s/e/w only if approach is move
+powers: ids of the player's powers used ([] if none) · items: ids of items used · objects: names of scene objects used
+target: name of the enemy/boss/goal targeted, or null · ally: teammate name or null
+shape: wall | trap | beam | ball | wave | army | armor | bridge | show | none
+size: small | normal | big | huge | colossal (what they asked for)
+verdict: natural | stretch | impossible · stretchMinLevel: number or null
+why: short reason (max 15 words) · hint: only if impossible
+creativity: 1-5 (1 = generic "I attack", 3 = specific and sensible, 5 = brilliant use of scene/objects/combos/enemy weaknesses)
+unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear`;
+
+const STORY_SYS = `You are the NARRATOR of "The Book Game", a whimsical fantasy adventure that can turn epic. Write 2-3 vivid sentences (max 55 words) describing what just happened.
+Follow the OUTCOME exactly: never invent extra damage, wins, deaths or failures, and never contradict the verdict. Refer to the player by name (third person). No numbers, no lists, no emojis, no quotes around your answer.`;
+
+function sheetBrief(pw) {
+  const s = sheetOf(pw) || {}, d = pdef(pw);
+  return { id: pw.id, name: d.name, level: pw.lvl, natural: s.nat, stretch: (s.str || []).map(([t, l]) => `${t} (Lv ${l})`), impossible: s.imp, needs: s.needs, signature: s.sig };
+}
+function situationFor(pi, C) {
+  const L = R.level, p = R.players[pi];
+  const sit = {
+    tutorial: !!R.trial,
+    player: { name: p.name, energy: p.en, powers: p.powers.map(sheetBrief), items: p.items.map(it => ({ id: it.id, name: ITEMS[it.id].n, note: ITEMS[it.id].d })) },
+    teammates: R.players.filter(q => q !== p && !q.out).map(q => q.name),
+    env: envOf(C),
+  };
+  if (L.kind === 'host') { sit.scene = 'An endless white hall of trapped tiles. An invisible, easily bored showman called the Host watches. Entertaining him earns clues.'; sit.targets = [{ name: 'the Host', properties: ['invisible', 'social'] }]; sit.objects = []; }
+  else if (C) {
+    sit.scene = `${C.title}: ${C.desc}`.slice(0, 400);
+    sit.objects = C.objs.map(o => o.n);
+    sit.targets = C.threats.filter(t => t.hp > 0).map(t => ({ name: t.n, properties: t.props || [] }));
+    if (C.boss) sit.targets.push({ name: C.boss.n, boss: true, properties: C.boss.props || [], rule: BOSSES[C.boss.id].intro });
+    if (C.kind === 'obj') sit.goal = `${C.meter.n} (move it by any sensible approach)`;
+  }
+  return sit;
+}
+async function aiJudge(pi, C, text) {
+  const msg = [{ role: 'system', content: JUDGE_SYS }, { role: 'user', content: 'SITUATION: ' + JSON.stringify(situationFor(pi, C)) + '\nACTION: ' + text }];
+  const r = await ai('judge', msg, { json: true, max: 450, temp: .2 });
+  const j = parseJSON(r.text);
+  if (!j) throw new Error('bad JSON from ' + r.m);
+  return { j, via: r };
+}
+async function aiStory(info) {
+  const r = await ai('story', [{ role: 'system', content: STORY_SYS }, { role: 'user', content: JSON.stringify(info) }], { max: 150, temp: .9 });
+  return r.text.trim().replace(/^["“]|["”]$/g, '');
+}
+async function aiIntro(kind, title, desc) {
+  if (!aiReady()) return null;
+  try {
+    const r = await ai('story', [{ role: 'system', content: 'You are the narrator of "The Book Game", a whimsical fantasy adventure. Write 2 short vivid sentences (max 45 words) introducing this scene, adding ONE surprising flavorful twist detail (flavor only, no new rules). No numbers, no emojis.' }, { role: 'user', content: JSON.stringify({ kind, title, setup: desc, world: THEMES[R.book] && THEMES[R.book].name }) }], { max: 120, temp: 1 });
+    return r.text.trim();
+  } catch (e) { return null; }
+}
+
+/* ---------------- turning AI output into an engine action ---------------- */
+const norm = s => String(s || '').toLowerCase().trim();
+function fromJudge(J, p, C, P0) {
+  const P = Object.assign({}, P0, { ap: null, powers: [], items: [], objs: [], form: null, formWord: '', scale: 'normal', target: null, ally: undefined, verdict: 'natural', creativity: 3, fromAI: true });
+  const ap = norm(J.approach);
+  if (ap === 'move') { P.move = true; P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[norm(J.dir)] || P0.dir; return P; }
+  if (ap === 'rest') { P.rest = true; return P; }
+  P.ap = APS.includes(ap) ? ap : P0.ap;
+  (J.powers || []).forEach(x => { const s = norm(x); const i = p.powers.findIndex(pw => pw.id === s || norm(pdef(pw).name) === s || srcIds(pw).includes(s) || norm(pdef(pw).name).includes(s)); if (i >= 0 && !P.powers.includes(i) && P.powers.length < 2) P.powers.push(i); });
+  (J.items || []).forEach(x => { const s = norm(x); const i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(ITEMS[it.id].n) === s || norm(ITEMS[it.id].n).includes(s))); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
+  const objs = C ? C.objs : [];
+  (J.objects || []).forEach(x => { const s = norm(x); const i = objs.findIndex(o => norm(o.n) === s || s.includes(norm(o.n)) || norm(o.n).includes(s)); if (i >= 0 && !P.objs.includes(i) && P.objs.length < 2) P.objs.push(i); });
+  if (C && J.target) {
+    const s = norm(J.target);
+    const t = C.threats.find(t => t.hp > 0 && (norm(t.n).includes(s) || s.includes(norm(t.n)) || nameWords(t.n).some(w => s.includes(w))));
+    if (t) P.target = { type: 'threat', t };
+    else if (C.boss) { if (C.boss.g === 'twins' && /sun/.test(s)) P.target = { type: 'boss', which: 1 }; else if (C.boss.g === 'twins' && /moon/.test(s)) P.target = { type: 'boss', which: 2 }; else P.target = { type: 'boss' }; }
+    else if (C.kind === 'obj' || C.kind === 'obs') P.target = { type: 'main' };
+  }
+  if (J.ally) { const i = R.players.findIndex(q => norm(q.name) === norm(J.ally)); if (i >= 0 && R.players[i] !== p) P.ally = i; }
+  const sh = norm(J.shape); P.form = FORMS[sh] ? sh : null; P.formWord = P.form ? (P0.formWord || sh) : '';
+  const sz = norm(J.size); P.scale = SCALES[sz] ? sz : 'normal';
+  const v = norm(J.verdict); P.verdict = ['natural', 'stretch', 'impossible'].includes(v) ? v : 'natural';
+  P.minLevel = +J.stretchMinLevel || null;
+  P.why = String(J.why || '').slice(0, 160); P.hint = String(J.hint || '').slice(0, 200);
+  P.creativity = clamp(Math.round(+J.creativity || 3), 1, 5);
+  if ((J.powers || []).length && !P.powers.length) { P.verdict = 'impossible'; P.why = P.why || 'You don\'t have that power.'; P.hint = P.hint || `Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')}.`; }
+  return P;
+}
+/* emergency keyword judge (only if every AI is unavailable) */
+function fallbackVerdict(P, p) {
+  P.verdict = 'natural'; P.creativity = 2 + (P.objs.length ? 1 : 0) + (P.powers.length === 2 ? 1 : 0) + (P.form ? 1 : 0);
+  if (P.powers.length) {
+    const best = Math.max(...P.powers.map(i => pdef(p.powers[i]).apt[P.ap] || 0));
+    if (best === 1) { P.verdict = 'stretch'; P.minLevel = 2; P.why = 'That bends what your power usually does.'; }
+    if (best === 0) { P.verdict = 'stretch'; P.minLevel = 3; P.why = 'That is a big stretch for this power.'; }
+  }
+  if (P.notOwned) { P.verdict = 'impossible'; P.why = `You don't have ${P.notOwned}.`; P.hint = `Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')}.`; }
+}
+
+/* =====================================================================
    UI
    ===================================================================== */
 const app = $('#app');
@@ -1384,11 +1930,16 @@ const A = {
   setmode: v => { UI.setupMode = v; render('setup'); },
   start: () => { document.querySelectorAll('.pname').forEach((el, i) => UI.names[i] = el.value.trim().slice(0, 14) || `Player ${i + 1}`); newRun(UI.names.slice(0, UI.setupN), UI.setupMode); render(); },
   book: v => { chooseBook(v); render(); },
-  send: () => { const i = $('#cmd'); if (!i) return; const t = i.value; i.value = ''; act(t); render(); },
+  send: () => { const i = $('#cmd'); if (!i || BUSY) return; const t = i.value; if (!t.trim()) return; i.value = ''; act(t); },
   mv: v => { moveParty(v); render(); },
   chip: v => { const i = $('#cmd'); i.value = (i.value.trim() + ' ' + v).trim() + ' '; i.focus(); },
   idea: () => { const i = $('#cmd'); i.value = makeIdea(); i.focus(); },
-  rest: () => { act('rest'); render(); },
+  rest: () => { act('rest'); },
+  settings: () => render('settings'),
+  savekeys: () => { KEYS.groq = $('#kgroq').value.trim(); KEYS.gemini = $('#kgem').value.trim(); saveKeys(); UI.msg = 'Keys saved on this computer.'; render('settings'); },
+  testai: async () => { KEYS.groq = $('#kgroq').value.trim(); KEYS.gemini = $('#kgem').value.trim(); saveKeys(); UI.msg = '⏳ Testing… (this can take ~10 seconds)'; render('settings'); const lines = await testAI(); UI.msg = lines.join('<br>'); render('settings'); },
+  aion: () => { KEYS.on = KEYS.on === false; saveKeys(); render('settings'); },
+  report: () => { const L = R.level; const txt = ['BOOK GAME BUG REPORT', `Book: ${THEMES[R.book].name} p${R.page} vol${R.vol}`, `Players: ${R.players.map(p => `${p.name} [${p.powers.map(pw => pdef(pw).name + ' Lv' + pw.lvl).join(', ')}]`).join(' | ')}`, `AI: ${AIC.last ? AIC.last.p + '/' + AIC.last.m : 'none'} ${AIC.lastErr ? '(last error: ' + AIC.lastErr.slice(0, 120) + ')' : ''}`, '--- recent turns ---', ...(L.debug || []).map(d => `> "${d.text}"  via ${d.via}  verdict=${d.verdict}  why=${d.why}  judge=${JSON.stringify(d.judge || {})}`), '--- log ---', ...L.log.slice(-15).map(l => l.h.replace(/<[^>]+>/g, ''))].join('\n'); const done = () => toast('🐞 Report copied! Paste it to Claude with what should have happened.'); if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => { prompt('Copy this report:', txt); }); else prompt('Copy this report:', txt); },
   quit: () => { save(); R = null; render('title'); },
   toshop: () => { R.screen = 'shop'; R.shopTab = R.players.findIndex(p => !p.out); R.shopItems = shuffle(Object.keys(ITEMS)).slice(0, 6); UI.fuseSel = []; save(); render(); },
   tab: v => { R.shopTab = +v; UI.fuseSel = []; render(); },
@@ -1409,7 +1960,7 @@ const A = {
 document.addEventListener('keydown', e => {
   const i = $('#cmd');
   if (i && document.activeElement === i) {
-    if (e.key === 'Enter') { e.preventDefault(); A.send(); return; }
+    if (e.key === 'Enter') { e.preventDefault(); if (!BUSY) A.send(); return; }
     if (!i.value && e.key.startsWith('Arrow') && R && R.level && (!R.level.ch || R.level.kind === 'host')) { e.preventDefault(); A.mv({ ArrowUp: 'n', ArrowDown: 's', ArrowLeft: 'w', ArrowRight: 'e' }[e.key]); }
   }
 });
@@ -1423,6 +1974,7 @@ function render(view) {
   if (v === 'help') return helpView();
   if (v === 'codex') return codexView();
   if (v === 'backup') return backupView();
+  if (v === 'settings') return settingsView();
   if (!R) return titleView();
   if (v === 'books') return booksView();
   if (v === 'level') return levelView();
@@ -1436,6 +1988,7 @@ function titleView() {
   <div class="col">
     ${S.run ? `<button class="big gold" data-a="cont">▶ Continue <span class="small">— ${esc(THEMES[S.run.book] ? THEMES[S.run.book].name : 'choosing a book')}, page ${S.run.page}</span></button>` : ''}
     <button class="big" data-a="newgame">📚 New Game ${S.run ? '<span class="small">(replaces current run)</span>' : ''}</button>
+    <button class="big ${aiReady() ? '' : 'gold'}" data-a="settings">⚙️ Settings — AI Narrator ${aiReady() ? `<span class="small">(${KEYS.on === false ? 'off' : 'ready'})</span>` : '<span class="small">— set this up first!</span>'}</button>
     <button class="big" data-a="help">❓ How to Play</button>
     <button class="big" data-a="codex">📜 Power Codex <span class="small">${Object.keys(S.codex).length}/${Object.keys(POWERS).length}</span></button>
     <button class="big" data-a="backup">💾 Stats & Save Backup</button>
@@ -1457,6 +2010,8 @@ function helpView() {
   app.innerHTML = `<h2>How to Play</h2><div class="panel help" style="max-width:820px"><ul>
   <li><b>Pick a book.</b> Each book is a world with 6 pages (levels). You start with a random power.</li>
   <li><b>Explore</b> the map (arrow buttons, arrow keys, or type "go north"). Find the page's goal: an objective, a Guardian, the Unseen Host, or the Boss.</li>
+  <li><b>The AI narrator</b> (free — set it up in ⚙️ Settings) reads anything you type and judges it against your power: ✅ <b>Natural</b> (full strength), 🌀 <b>Stretch</b> (weaker, riskier, needs a higher level), ❌ <b>Impossible</b> (fails and costs your turn — you get one free warning per run). Your first page ever is a tutorial.</li>
+  <li><b>Every power has its own rules</b> — see the Power Codex: what it does naturally, its stretches, its limits, what it needs from the world, and a unique signature.</li>
   <li><b>Type what you do, in your own words.</b> Example: <i>"I build a big wall of fire between us and the monkeys"</i> or <i>"I use the vines and my plants to tie up the jaguar"</i>.</li>
   <li>The Narrator reads your <b>approach</b> (💥 force, 🃏 trick, 🤝 persuade, 🥷 sneak, 🛡️ protect, 💨 speed, 🎭 entertain, 🔍 knowledge, 💚 heal), your <b>powers</b>, <b>items</b>, <b>scene objects</b>, the <b>shape</b> (wall, beam, wave, trap, army, bridge…) and <b>size</b> (small → colossal; bigger needs higher power levels and more energy).</li>
   <li><b>Every approach is useful in every situation.</b> Traits (fire, food, sound…) are bonuses, never requirements. Any power can win.</li>
@@ -1469,7 +2024,7 @@ function helpView() {
   </ul></div><div class="col" style="margin-top:12px"><button data-a="home">← Back</button></div>`;
 }
 function codexView() {
-  const list = Object.values(POWERS).map(p => S.codex[p.id] ? `<div class="panel"><b>${p.icon} ${p.name}</b> <span class="tag">${p.tier}</span><br><span class="small">${p.desc}</span><br>${p.traits.map(t => `<span class="tag">${t}</span>`).join('')}<br><span class="small">Best at: ${APS.filter(a => p.apt[a] >= 2).map(a => AP[a].i).join(' ')}</span></div>` : `<div class="panel small">❔ ??? <span class="tag">${p.tier}</span></div>`).join('');
+  const list = Object.values(POWERS).map(p => S.codex[p.id] ? `<div class="panel"><b>${p.icon} ${p.name}</b> <span class="tag">${p.tier}</span><br><span class="small">${p.desc}</span><br>${p.traits.map(t => `<span class="tag">${t}</span>`).join('')}<br><span class="small">✅ ${SHEETS[p.id].nat.join('; ')}<br>🌀 ${SHEETS[p.id].str.map(x => x[0] + ' (Lv ' + x[1] + ')').join('; ')}<br>❌ ${SHEETS[p.id].imp.join('; ')}<br>⭐ ${SHEETS[p.id].sig}</span></div>` : `<div class="panel small">❔ ??? <span class="tag">${p.tier}</span></div>`).join('');
   app.innerHTML = `<h2>📜 Power Codex</h2><div class="sub">Powers you've discovered.</div><div class="grid2">${list}</div><div class="col" style="margin-top:12px"><button data-a="home">← Back</button></div>`;
 }
 function backupView() {
@@ -1484,6 +2039,20 @@ function backupView() {
   <div class="col" style="margin-top:12px"><button data-a="home">← Back</button></div>`;
   UI.msg = '';
 }
+function settingsView() {
+  app.innerHTML = `<h2>⚙️ AI Narrator Settings</h2><div class="panel" style="max-width:720px;width:100%">
+  <p>The narrator uses <b>free</b> AI services. Your keys are saved <b>only in this browser</b> on this computer. They are never included in backup codes or bug reports. Never share them.</p>
+  <p><b>Groq key</b> (main): <a href="https://console.groq.com/keys" target="_blank" style="color:var(--blue)">console.groq.com/keys</a></p>
+  <input id="kgroq" type="password" autocomplete="off" style="width:100%" placeholder="gsk_..." value="${esc(KEYS.groq)}">
+  <p><b>Gemini key</b> (backup): <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue)">aistudio.google.com/apikey</a></p>
+  <input id="kgem" type="password" autocomplete="off" style="width:100%" placeholder="AIza..." value="${esc(KEYS.gemini)}">
+  <div class="row" style="justify-content:flex-start;margin-top:10px"><button class="gold" data-a="testai">🧪 Save & Test AI</button><button data-a="savekeys">💾 Save only</button><button data-a="aion">${KEYS.on === false ? '▶ Turn AI narrator ON' : '⏸ Turn AI narrator OFF'}</button></div>
+  ${UI.msg ? `<p class="ent">${UI.msg}</p>` : ''}
+  <p class="small">Status: ${KEYS.on === false ? 'AI narrator is OFF (basic narrator).' : aiReady() ? `AI narrator ON${AIC.last ? ` — last used ${AIC.last.p}/${AIC.last.m}` : ''}.` : 'No keys yet.'}${KEYS.chains ? ` Judge chain: ${KEYS.chains.judge.map(x => x.m.split('/').pop()).join(' → ') || '—'}.` : ''}</p>
+  <p class="small">If one AI hits its free daily limit the game automatically switches to the next one. On free tiers these companies may use what you type to improve their AI, so don't type personal information.</p>
+  </div><div class="col" style="margin-top:12px"><button data-a="${R && R.screen === 'level' ? 'cont' : 'home'}">← Back</button></div>`;
+  UI.msg = '';
+}
 function booksView() {
   app.innerHTML = `<h2>${R.vol > 1 ? `Volume ${R.vol} — ` : ''}Choose a Book</h2><div class="sub">Three books sit on a dusty shelf. You can't read the titles. Pick one.</div>
   <div class="row">${R.books.map((k, i) => { const t = THEMES[k]; return `<button class="book" data-a="book" data-v="${k}" style="background:linear-gradient(135deg,${t.color},#1a120a)"><span class="bn">BOOK ${['I', 'II', 'III'][i]}</span><span class="bi">${['📕', '📗', '📘'][i]}</span><span class="bt">"${t.hint}"</span></button>`; }).join('')}</div>
@@ -1495,13 +2064,13 @@ function levelView() {
   const prevVal = $('#cmd') ? $('#cmd').value : '';
   const th = THEMES[R.book];
   app.innerHTML = `<div class="lv">
-  <div class="topbar"><b>${th.icon} ${th.name}</b><span>Page ${R.page}/6</span>${R.vol > 1 ? `<span>Vol ${R.vol}</span>` : ''}<span>${goldStr()}</span>${R.mode !== 'solo' ? `<span class="tag">${R.mode}</span>` : ''}<span class="sp"></span><button data-a="help">❓</button><button data-a="quit">💾 Save & Quit</button></div>
+  <div class="topbar"><b>${th.icon} ${th.name}</b><span>Page ${R.page}/6</span>${R.vol > 1 ? `<span>Vol ${R.vol}</span>` : ''}<span>${goldStr()}</span>${R.mode !== 'solo' ? `<span class="tag">${R.mode}</span>` : ''}<span class="sp"></span><span class="tag" title="Which AI is narrating">${aiReady() ? `🧠 ${AIC.last ? AIC.last.m.split('/').pop() : 'AI ready'}` : '📴 basic narrator'}</span><button data-a="report" title="Copy a bug report">🐞</button><button data-a="settings" title="Settings">⚙️</button><button data-a="help">❓</button><button data-a="quit">💾 Save & Quit</button></div>
   <div class="cols">
     <div class="panel scene">${L.kind === 'host' ? hostPanel(L) : C ? challengePanel(C) : mapPanel(L)}</div>
     <div>
       <div class="log" id="log">${L.log.map(l => `<p class="${l.c}">${l.h}</p>`).join('')}</div>
-      <div class="turn">✍️ <b style="color:${p.color}">${esc(p.name)}</b>, what do you do? <span class="small">(⚡${p.en}/${p.maxEn} energy)</span></div>
-      <div class="inbox"><input id="cmd" autocomplete="off" placeholder="Describe your action… e.g. I use my ${pdef(p.powers[0]).name.toLowerCase()} to build a wall" value="${esc(prevVal)}"><button class="gold" data-a="send">Go ➤</button></div>
+      <div class="turn">${UI.thinking || BUSY ? '✍️ <i>The narrator is thinking…</i>' : `✍️ <b style="color:${p.color}">${esc(p.name)}</b>, what do you do? <span class="small">(⚡${p.en}/${p.maxEn} energy)</span>`}</div>
+      <div class="inbox"><input id="cmd" autocomplete="off" ${BUSY ? 'disabled' : ''} placeholder="Describe your action in your own words…" value="${esc(prevVal)}"><button class="gold" data-a="send" ${BUSY ? 'disabled' : ''}>Go ➤</button></div>
       ${chipsHtml(p, L, C)}
     </div>
     <div>${R.players.map((q, i) => playerCard(q, i)).join('')}</div>
@@ -1660,7 +2229,7 @@ function fusionPreview(a, b) {
   const key = [a.id, b.id].sort().join('+');
   const sp = SPECIAL_FUSIONS[key];
   const apt = {}; APS.forEach(k => apt[k] = Math.min(3, Math.max(da.apt[k], db.apt[k])));
-  return { id: 'fuse:' + key + ':' + Date.now().toString(36), name: sp ? sp[0] : `${da.adj} ${db.noun}`, icon: sp ? sp[1] : '🧬', traits: [...new Set(da.traits.concat(db.traits))], apt, kw: [...new Set(da.kw.concat(db.kw))], adj: da.adj, noun: db.noun, desc: `A fusion of ${da.name} and ${db.name}.`, tier: 'fused' };
+  return { id: 'fuse:' + key + ':' + Date.now().toString(36), src: [...srcIds(a), ...srcIds(b)], sheet: fuseSheets(sheetOf(a), sheetOf(b)), name: sp ? sp[0] : `${da.adj} ${db.noun}`, icon: sp ? sp[1] : '🧬', traits: [...new Set(da.traits.concat(db.traits))], apt, kw: [...new Set(da.kw.concat(db.kw))], adj: da.adj, noun: db.noun, desc: `A fusion of ${da.name} and ${db.name}.`, tier: 'fused' };
 }
 function doFuse() {
   const p = R.players[R.shopTab], w = wallet(p);

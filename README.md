@@ -4,23 +4,19 @@ Two single-file games that run offline in any browser, including on a school Chr
 Email yourself the `.html` file, download it, and open it from the Files app.
 
 ## 📖 The Book Game — `book-game.html`
-An imagination-driven text adventure. Pick one of three mysterious books, get a random power, and
-**type what you want to do in your own words**. The Narrator reads your sentence and works out:
+An imagination-driven text adventure with a **free AI narrator**. Pick one of three mysterious books, get a random power,
+and **type anything you want to do**. The AI Judge rules each action ✅ Natural, 🌀 Stretch (weaker, riskier, needs a
+higher power level) or ❌ Impossible for *your* power at *your* level in *this* place. The game engine does all the math,
+so the AI can't be talked into "I win".
 
-- **Approach:** force, trick, persuade, sneak, protect, speed, entertain, knowledge, or heal
-- **Powers:** mention two in one sentence for a combo
-- **Items** and **scene objects:** "…using the river"
-- **Shape:** wall, beam, wave, trap, army, bridge, show…
-- **Size:** small → colossal, limited by your power level and energy
-
-Every approach is useful in every situation, traits are bonuses (never requirements), and new ideas beat repeats.
-
-- 6 worlds, 16 objective types, 13 bosses with unique gimmicks that remember how you beat them, plus **The Unseen Host**.
-- The Unseen Host is an invisible showman in a trapped white hall. Entertain him for clues and touch him to win.
-- Gold buys power upgrades, the Cheap and Golden power wheels, creative items, and **power fusion**.
-- 1–4 players hot-seat on one keyboard: **co-op** (shared gold) or **versus** (own gold, top scorer bonus).
-- Dying costs a quarter of your gold, and retrying costs a fee (same map, same traps). If you can't pay, the run is over.
-- Save backup code: **Stats & Save Backup**.
+- **Setup (once):** get free keys from [Groq](https://console.groq.com/keys) (main) and [Google AI Studio](https://aistudio.google.com/apikey) (backup).
+  Open the game in Chrome, go to ⚙️ Settings, paste them, and press **Save & Test AI**.
+  Keys stay in your browser only. They're never in backup codes or bug reports.
+- **Free-limit fallback:** if one model hits its free daily limit, the game automatically switches to the next one.
+- **Every power has a sheet:** natural uses, stretches (with minimum level), hard limits, environment needs, and a unique signature rule. See the Power Codex in-game.
+- 6 worlds, 16 objective types, 13 adaptive bosses, the Unseen Host, wheels, fusion, items, and 1–4 player hot-seat co-op/versus.
+- 🐞 in-game button copies a bug report (last turns + AI verdicts) to paste to Claude.
+- Design document: [`docs/book-game-design.md`](docs/book-game-design.md)
 
 ## ⚔️ Rift Runners — `rift-runners.html`
 Action roguelite with a strategy map. WASD/arrows to move, Space to dash, Esc to pause.

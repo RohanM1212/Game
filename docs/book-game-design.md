@@ -1,6 +1,6 @@
 # The Book Game: Design Document (v2, AI Narrator)
 
-> Status: **DRAFT for review.** Nothing here is built yet. Change anything.
+> Status: **v2 built** (`book-game.html`). Real-AI playtesting in progress.
 > Plays at home in Chrome on Windows, with free cloud AI and no Claude usage.
 
 ---
