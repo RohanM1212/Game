@@ -1,22 +1,27 @@
-# Rift Runners
+# Games
 
-An action roguelite with route-planning strategy, all in one file: **`rift-runners.html`**.
-It runs offline in any browser, including on a school Chromebook.
+Two single-file games that run offline in any browser, including on a school Chromebook.
+Email yourself the `.html` file, download it, and open it from the Files app.
 
-## Getting it onto a Chromebook
-1. Download `rift-runners.html` (from this repo, or from the email you sent yourself).
-2. Email it to yourself as an attachment, or put it in Google Drive.
-3. On the Chromebook, download the attachment and open it from the **Files** app. It opens in Chrome.
+## 📖 The Book Game — `book-game.html`
+An imagination-driven text adventure. Pick one of three mysterious books, get a random power, and
+**type what you want to do in your own words**. The Narrator reads your sentence and works out:
 
-No internet is needed after that.
+- **Approach:** force, trick, persuade, sneak, protect, speed, entertain, knowledge, or heal
+- **Powers:** mention two in one sentence for a combo
+- **Items** and **scene objects:** "…using the river"
+- **Shape:** wall, beam, wave, trap, army, bridge, show…
+- **Size:** small → colossal, limited by your power level and energy
 
-## Saving
-- Progress saves automatically in the browser.
-- To keep a backup, go to **Stats & Save Backup** and copy the save code. Email it to yourself or paste it in a Google Doc.
-  If school wipes the browser data, or you download a new version of the game, paste the code back in to restore your progress.
+Every approach is useful in every situation, traits are bonuses (never requirements), and new ideas beat repeats.
 
-## Controls
-- **Move:** WASD or arrow keys
-- **Dash:** Space
-- **Pause:** Esc or P
-- **Menus:** number keys, arrows + Enter, or click
+- 6 worlds, 16 objective types, 13 bosses with unique gimmicks that remember how you beat them, plus **The Unseen Host**.
+- The Unseen Host is an invisible showman in a trapped white hall. Entertain him for clues and touch him to win.
+- Gold buys power upgrades, the Cheap and Golden power wheels, creative items, and **power fusion**.
+- 1–4 players hot-seat on one keyboard: **co-op** (shared gold) or **versus** (own gold, top scorer bonus).
+- Dying costs a quarter of your gold, and retrying costs a fee (same map, same traps). If you can't pay, the run is over.
+- Save backup code: **Stats & Save Backup**.
+
+## ⚔️ Rift Runners — `rift-runners.html`
+Action roguelite with a strategy map. WASD/arrows to move, Space to dash, Esc to pause.
+Save backup code: **Stats & Save Backup**.
