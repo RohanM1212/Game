@@ -34,14 +34,12 @@ A co-op action roguelite. Fully offline: one file, no internet needed (sound is 
 - **Rooms with goals:** ⏳ survive, 🎯 hunt the marked beasts, 💎 defend the crystal, 🌀 capture the portal, ✨ collect the sparks.
 - **Arenas with stuff:** pillars block enemy shots, 🛢️ barrels explode, a ⛲ healing shrine, and a hazard per biome (bushes, lava, ice, darkness, storms).
 - **Every runner has an ultimate** (Bulwark Slam, Arrow Rain, Meteor, Carpet Bomb, Firestorm, Blood Moon, Blizzard, Thunderstorm, Cyclone, Jackpot).
-- **🃏 Squad & Packs (collect them all):** 42 squad members in 5 rarities — Common, Uncommon, Rare, Epic and ✨Legendary✨ (0.5% a pull,
-  with pity: an Epic every 10 pulls at most, a Legendary every 60). Open packs with 💎 gems (earned every run, from Skirmishes and a daily free pull)
-  or with 🪙 gold in a run (shop and 🎁 Pack Machine doors). Duplicates power a member up from ★1 to ★5. Every member has its own special
-  (summon wolves, rift-swap the enemy rows, revive allies, freeze the whole team, a Lucky Cat jackpot...).
-- **🛡️ Tactical Skirmishes:** place up to 6 members on a 2×3 board (front row takes the hits), build element and class synergies
-  (🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥), pick a tactic, and press 📯 Rally once at the right moment. Wins give gold, gems and sometimes a member.
-- **🐾 Buddy:** each player brings one member into the action rooms; it fights next to you and uses a class skill every few seconds.
+- **🃏 Squad & Packs:** collect squad members in 5 rarities (Common → ✨Legendary✨) from packs bought with 💎 gems or 🪙 gold.
+  Duplicates add stars, battles add levels, and rarer members are much stronger. Each player brings one as a 🐾 Buddy into runs.
+- **🗼 Rift Tower (side mode, from the title screen):** turn-based squad battles — choose Attack, Special or Guard for each member,
+  use the element wheel (🔥 > 🗡️ > ✨ > ⚡ > ❄️ > 🔥) and rows (melee must hit the front row). Climbing the tower gives gems, packs,
+  and blessings that make every run stronger. There are a few secrets to find.
 - **Element sets:** weapons are 🔥 fire, ❄️ frost, ⚡ storm, 🗡️ blade or ✨ arcane; own 2 or 4 of one element for a set bonus. Plus evolutions, relics, and new enemies with tells (chargers, snipers, healers, summoners, bats).
 - **Online co-op (experimental):** two computers connect by swapping two codes (no server). Works best at home; school Wi-Fi often blocks it.
 - Progress, upgrades and unlocks save in the browser; **Stats → Save Backup** gives a code to move it. Old saves carry over.
-- Robot testers (for developers): `node tools/playtest-rift/bot.js solo 3` plays whole runs at high speed; `online.js` tests online play; `shots.js` takes screenshots.
+- Robot testers (for developers): `node tools/playtest-rift/bot.js solo 3` plays whole runs at high speed; `online.js` tests online play; `shots.js` takes screenshots; `squad-test.js` tests packs, the tower and buddies and prints a balance table.

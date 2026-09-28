@@ -17,7 +17,7 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       S.seenHelp = true; S.chars = Object.fromEntries(Object.keys(CHARS).map(k => [k, true]));
       const ids = Object.keys(CHARS), pickC = () => ids[Math.floor(Math.random() * ids.length)];
       window.BOT = { rooms: 0, log: [], simT: 0 };
-      const so = skirmishOver; window.skirmishOver = function (r) { BOT.sk = BOT.sk || { win: 0, lose: 0 }; BOT.sk[r]++; return so.apply(this, arguments); };
+      const po = pullOne; window.pullOne = function () { const r = po.apply(this, arguments); BOT.rar = BOT.rar || [0, 0, 0, 0, 0]; BOT.rar[r.r]++; return r; };
       const oh = hideUI; window.hideUI = function () { if (lvOpen && BOT.log.length < 3) BOT.log.push(new Error().stack.split('\n').slice(1, 6).join(' | ')); return oh.apply(this, arguments); };
       // bot controls: dodge enemies and bullets, chase the room goal, walk into doors, fire ultimates
       window.readInput = i => {
@@ -42,11 +42,9 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       window.BOT.menu = () => { // click through menus sensibly
         const bs = [...ui.querySelectorAll('button:not([disabled])')];
         const bad = /Give up|Save &|Reroll|Title|Spend shards|Claim|Tab|Volume|Music|shake|Recruit|Sell|empty|buddy|Squad pack|front|back|^\s*P[12]\b/;
-        const skip = document.querySelector('#bcv') && bs.find(b => /Skip/.test(b.textContent)); if (skip) return skip.click();
+        const tease = ui.querySelector('.packtease'); if (tease) return tease.click();
         if (/Pack Machine/.test(ui.innerText)) { const bp = bs.find(b => /Basic Pack/.test(b.textContent) && /gold/.test(b.textContent)); if (bp && !BOT.boughtPack) { BOT.boughtPack = true; BOT.packs = (BOT.packs || 0) + 1; return bp.click(); } BOT.boughtPack = false; const lv = bs.find(b => /Leave/.test(b.textContent)); if (lv) return lv.click(); return; }
         if (document.querySelector('.pullrow')) { BOT.cards = (BOT.cards || 0) + 1; const b = bs.find(b => /Reveal all|Continue/.test(b.textContent)); if (b) return b.click(); }
-        if (/Pick a tactic/.test(ui.innerText) && !BOT.tac) { BOT.tac = true; const tb = bs.filter(b => /All-Out|Hold|Focus|Ambush|Second Wind/.test(b.textContent)); if (tb.length) return tb[Math.floor(Math.random() * tb.length)].click(); }
-        if (/Pick a tactic/.test(ui.innerText)) BOT.tac = false;
         const leave = bs.find(b => /Leave shop/.test(b.textContent));
         if (leave && !bs.some(b => b.classList.contains('card'))) return leave.click();
         const card = bs.find(b => b.classList.contains('card')) || bs.find(b => b.classList.contains('opt') && !bad.test(b.textContent)) || bs.find(b => !bad.test(b.textContent));
@@ -74,7 +72,7 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       const key = st.act * 100 + st.room; if (key !== lastRoom) { lastRoom = key; stuckSince = Date.now(); }
       if (Date.now() - stuckSince > 90e3) { errors.push('STUCK in ' + JSON.stringify(st)); break; }
     }
-    const res = await page.evaluate(() => ({ chars: BOT.chars, stats: { compShots: BOT.comp || 0, skirm: BOT.sk || 'none', packs: BOT.packs || 0, gems: S.gems, owned: Object.keys(S.col).length, runs: S.stats.runs, bosses: S.stats.bosses, kills: S.stats.kills, bestAct: S.stats.bestAct, wins: S.stats.wins, ults: S.stats.ults, obj: S.stats.objectives, revives: S.stats.revives }, simMin: +(BOT.simT / 60).toFixed(1), endedAt: run ? { act: run.act, room: run.room } : 'run over' }));
+    const res = await page.evaluate(() => ({ chars: BOT.chars, stats: { compShots: BOT.comp || 0, pulled: BOT.rar || 'none', eggs: run && run.eggs ? run.eggs.length : 0, packs: BOT.packs || 0, gems: S.gems, owned: Object.keys(S.col).length, runs: S.stats.runs, bosses: S.stats.bosses, kills: S.stats.kills, bestAct: S.stats.bestAct, wins: S.stats.wins, ults: S.stats.ults, obj: S.stats.objectives, revives: S.stats.revives }, simMin: +(BOT.simT / 60).toFixed(1), endedAt: run ? { act: run.act, room: run.room } : 'run over' }));
     results.push({ run: k + 1, ...res, errors: [...new Set(errors)].slice(0, 8) });
     console.log(JSON.stringify(results[results.length - 1]));
     await page.close();

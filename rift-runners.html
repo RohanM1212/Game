@@ -87,6 +87,47 @@ p{line-height:1.5}
 .tile .ti{font-size:30px;line-height:1.1}.tile .tn{font-size:12px;font-weight:700}.tile .ts{font-size:11px;color:var(--gold)}.tile .te{font-size:10px;color:var(--dim)}
 .tile.empty{opacity:.45;border-style:dashed}.tile.sel{box-shadow:0 0 0 3px #ffd24a;transform:translateY(-3px)}.tile.enemy{background:#2a1520}
 .syn{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0}.syn .ico.on{background:#2a3350}
+.sqboard.two{grid-template-columns:repeat(2,120px)}
+.tile.boss{box-shadow:0 0 16px #ff4060;background:#3a1020}.tile .tl{color:#9fb4ff;font-size:10px}
+.tile.r3{box-shadow:0 0 10px #c07cff66}.tile.r4{box-shadow:0 0 14px #ffc23a88;background:linear-gradient(160deg,#3a2a0a,#161a28)}
+.vs{font-size:28px;font-weight:900;color:#ff6070;align-self:center;padding:0 6px}
+.blessrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+.bless{width:118px;padding:6px;border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;text-align:center;opacity:.55;font-size:12px}
+.bless span{font-size:22px}.bless.on{opacity:1;border-color:var(--gold);background:#2a2410}
+.lvchip{border:1px solid var(--line);border-radius:10px;padding:6px 10px;text-align:center;font-size:15px}.lvchip.up{border-color:var(--gold);box-shadow:0 0 12px #ffd24a88}
+.packtease{width:190px;height:190px;border-radius:24px;font-size:96px;margin:18px auto;display:flex;align-items:center;justify-content:center;animation:tease 1s ease-in-out infinite;border:3px solid #556}
+.packtease.t2{border-color:#5cb8ff;box-shadow:0 0 30px #5cb8ff88}
+.packtease.t3{border-color:#c07cff;box-shadow:0 0 50px #c07cff;animation:tease .5s ease-in-out infinite}
+.packtease.t4{border-color:#ffc23a;box-shadow:0 0 70px #ffc23a,0 0 20px #fff inset;animation:tease .3s ease-in-out infinite,glowL .6s infinite alternate;background:linear-gradient(160deg,#5a4212,#1e1406)}
+@keyframes tease{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.06)}}
+.pcard.back.hint{border-color:var(--rc);box-shadow:0 0 26px var(--rc);animation:tease .4s ease-in-out infinite}
+#tbwrap{width:100%;max-width:1000px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tbhead{font-size:20px}.tbturn{display:flex;gap:6px;align-items:center;color:var(--dim);font-size:13px}
+.tq{font-size:20px;border-radius:8px;padding:2px 4px;border:2px solid transparent}.tq.me{background:#1a2a50}.tq.foe{background:#401a24}.tq.now{border-color:var(--gold);transform:scale(1.2)}
+.tbfield{display:flex;gap:14px;align-items:center;justify-content:center;width:100%}
+.tbside{display:grid;grid-template-columns:repeat(2,150px);gap:10px}
+.tbu{position:relative;height:150px;border:2px solid var(--rc,#444);border-radius:14px;background:#141a2c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:4px;cursor:default;transition:transform .15s}
+.tbside.foe .tbu{background:#2a1520}
+.tbu.empty{border-style:dashed;opacity:.25}
+.tbu.r3{box-shadow:0 0 14px #c07cff99}.tbu.r4{box-shadow:0 0 20px #ffc23a;background:linear-gradient(160deg,#3a2a0a,#141a2c)}
+.tbu.boss{transform:scale(1.06);box-shadow:0 0 22px #ff4060}
+.tbu .ui1{font-size:40px;line-height:1.1}.tbu .un{font-size:12px;font-weight:700;text-align:center}.tbu .us{font-size:11px;color:var(--gold)}
+.tbu .hpb{width:90%;height:8px;background:#000a;border-radius:4px;position:relative;overflow:hidden}.tbu .hpb i{position:absolute;left:0;top:0;bottom:0;background:#5ee08a;transition:width .3s}.tbside.foe .hpb i{background:#ff6070}
+.tbu .hpb s{position:absolute;left:0;top:0;height:3px;background:#7fe3ff}
+.tbu .uh{font-size:10px;color:var(--dim)}.tbu .ucd{font-size:10px;color:#b48cff}.tbu .ucd.ready{color:#fff;font-weight:700;text-shadow:0 0 6px #b48cff}.tbu .ust{font-size:12px;min-height:14px}
+.tbu.dead{opacity:.25;filter:grayscale(1)}
+.tbu.acting{outline:3px solid var(--gold);transform:translateY(-6px) scale(1.04)}
+.tbu.tgt{cursor:pointer;outline:3px dashed #ff6070;animation:pulse 1s infinite}.tbu.tgt:hover{transform:scale(1.06)}
+.tbu.hit{animation:tbhit .35s}.tbu.casting{animation:tbcast .6s}
+@keyframes tbhit{25%{transform:translateX(-7px);filter:brightness(2)}60%{transform:translateX(5px)}}
+@keyframes tbcast{50%{transform:scale(1.15);filter:brightness(1.6) drop-shadow(0 0 12px #fff)}}
+.tbu .tk{position:absolute;top:4px;left:4px}.tbu .beat{position:absolute;top:4px;right:4px;font-size:10px;color:#ff8a8a;font-weight:800}
+.tbf{position:absolute;top:30%;font-weight:900;font-size:18px;pointer-events:none;text-shadow:0 2px 3px #000;animation:tbfl 1s ease-out forwards;white-space:nowrap}
+@keyframes tbfl{from{transform:translateY(0) scale(1.3)}to{transform:translateY(-50px);opacity:0}}
+.tbmsg{min-height:22px;text-align:center}.tbact{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px;max-width:760px}.tbact>button{padding-right:34px;min-width:150px}.tbact>.row,.tbact>.keys{flex-basis:100%;justify-content:center;text-align:center}
+.tbsmall button{font-size:13px;padding:6px 10px}
+button.spready{border-color:#b48cff;box-shadow:0 0 14px #b48cff88}
+@media (max-width:700px){.tbside{grid-template-columns:repeat(2,96px)}.tbu{height:120px}.tbu .ui1{font-size:28px}.tbfield{gap:4px}}
 .colgrid{display:grid;grid-template-columns:repeat(auto-fill,104px);gap:8px;justify-content:center;max-width:900px;width:100%;margin:6px auto}
 .tile.locked{opacity:.35;filter:grayscale(1)}
 .card.pack{width:180px;gap:5px;padding:12px 10px}.card.pack button{width:100%}
@@ -300,7 +341,6 @@ const DOOR = {
   event:    { icon: '❓', name: 'Mystery',  tip: 'Something strange. No fight.' },
   treasure: { icon: '💎', name: 'Treasure', tip: 'A relic and gold. No fight.' },
   rest:     { icon: '⛺', name: 'Campfire', tip: 'Rest, train or forage. No fight.' },
-  squad:    { icon: '🛡️', name: 'Skirmish', tip: 'Your squad team fights a tactical auto-battle. Wins give gems.' },
   packs:    { icon: '🎁', name: 'Pack Machine', tip: 'Spend gold on squad packs. No fight.' },
   boss:     { icon: '👹', name: 'BOSS',     tip: 'The guardian of this biome.' },
 };
@@ -336,6 +376,12 @@ const ACHIEVEMENTS = [
   { id: 'heat3',  name: 'Feel the Heat',   desc: 'Win a run on Heat 3+',          reward: 100, test: s => s.maxHeat >= 4 },
   { id: 'heat10', name: 'Inferno Master',  desc: 'Win a run on Heat 10',          reward: 500, test: s => s.stats.heat10 >= 1 },
   { id: 'daily',  name: 'Daily Habit',     desc: 'Finish a Daily Challenge run',  reward: 15,  test: s => s.stats.dailies >= 1 },
+  { id: 'leg',    name: 'LEGENDARY!',      desc: 'Get a Legendary squad member',  reward: 50,  test: s => (s.stats.legendaries || 0) >= 1 },
+  { id: 'col30',  name: 'Pet Collector',   desc: 'Collect 30 different squad members', reward: 80, test: s => Object.keys(s.col || {}).length >= 30 },
+  { id: 'col60',  name: 'Gotta Have Them All', desc: 'Collect every squad member', reward: 300, test: s => Object.keys(s.col || {}).length >= Object.keys(ROSTER).length },
+  { id: 'tow10',  name: 'Tower Climber',   desc: 'Clear Rift Tower floor 10',     reward: 40,  test: s => ((s.tower || {}).best || 0) >= 10 },
+  { id: 'tow30',  name: 'Sky High',        desc: 'Clear Rift Tower floor 30',     reward: 120, test: s => ((s.tower || {}).best || 0) >= 30 },
+  { id: 'tow60',  name: 'Top of the Tower',desc: 'Clear Rift Tower floor 60',     reward: 400, test: s => ((s.tower || {}).best || 0) >= 60 },
   { id: 'chars',  name: 'Full Roster',     desc: 'Unlock every character',        reward: 100, test: s => Object.keys(CHARS).every(k => s.chars[k]) },
 ];
 
@@ -343,7 +389,7 @@ const ACHIEVEMENTS = [
 const SAVE_KEY = 'riftRunnersSave_v1';
 function defaultSave() {
   return { v: 2, shards: 0, meta: {}, chars: { knight: true, ranger: true }, maxHeat: 0, heat: 0, ach: {}, daily: {}, run: null, lastChar: ['knight', 'ranger'], seenHelp: false,
-    gems: 250, col: { rat: { n: 1 }, snail: { n: 1 }, candle: { n: 1 }, duck: { n: 1 }, frog: { n: 1 } }, team: ['rat', 'snail', 'duck', null, 'candle', 'frog'], buddies: ['rat', 'duck'], pity: { e: 0, l: 0 }, freePull: '',
+    gems: 250, col: { rat: { n: 1 }, snail: { n: 1 }, candle: { n: 1 }, duck: { n: 1 }, frog: { n: 1 } }, team: ['snail', 'rat', 'candle', 'frog'], buddies: ['rat', 'duck'], pity: { e: 0, l: 0 }, freePull: '', tower: { best: 0 }, tbAuto: false, tbSpeed: 1,
     opt: { vol: .7, music: true, shake: true },
     stats: { runs: 0, kills: 0, bosses: 0, wins: 0, coopWins: 0, bestAct: 1, elites: 0, gold: 0, playTime: 0, shardsEarned: 0, deaths: 0, evolutions: 0, noHit: 0, dailies: 0, heat10: 0, bestLevel: 0, revives: 0, ults: 0, set4: 0, objectives: 0 } };
 }
@@ -354,7 +400,9 @@ function migrate(s) { // v1 saves (single runner + node map) → v2
   if (s.run && !s.run.players) { const r = s.run; s.shards += Math.round((r.floors || 0) * 3 + (r.kills || 0) / 20 + (r.bosses || 0) * 20 + (r.elites || 0) * 5); s.run = null; } // an old unfinished run can't continue in the new loop — you get its shards
   if (s.run && s.run.squad) delete s.run.squad; // the old per-run squad became the permanent collection
   if (s.run) s.run.wager = 0;
-  if (s.run && s.run.doors) s.run.doors.forEach(d => { if (d.t === 'casino') d.t = 'packs'; });
+  if (s.run && s.run.doors) s.run.doors.forEach(d => { if (d.t === 'casino' || d.t === 'squad') d.t = 'packs'; });
+  if (s.run && s.run.cur && s.run.cur.t === 'squad') s.run.cur = null;
+  if (Array.isArray(s.team) && s.team.length === 6) { const o = s.team; s.team = [o[1] || o[0], o[0] || o[2], o[4] || o[3], o[3] || o[5]].map((x, i, arr) => arr.indexOf(x) === i ? x : null); }
   s.v = 2; return s;
 }
 function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return migrate(merge(defaultSave(), JSON.parse(raw))); } catch (e) {} return defaultSave(); }
@@ -576,6 +624,10 @@ function newRun(chars, heat, daily, opts = {}) {
     players: chars.map(id => { const c = CHARS[id]; return { char: id, weapons: [{ id: c.weapon || pick(Object.keys(WEAPONS)), lvl: 1, evo: false }], passives: {}, hp: 0 }; }) };
   run.rerolls += Math.max(...chars.map(id => CHARS[id].mods.rerolls || 0));
   if (daily) addRelic(pick(Object.keys(RELICS)));
+  if (hasBless(10)) run.gold += 40;
+  if (hasBless(30)) run.bonus.maxHp = (run.bonus.maxHp || 0) + 15;
+  if (hasBless(40)) run.rerolls += 2;
+  if (hasBless(50) && !daily) { const r = randomRelics(1)[0]; if (r) addRelic(r); }
   run.players.forEach((p, i) => { p.hp = calcStats(run, i).maxHp; });
   S.lastChar = chars.concat(S.lastChar).slice(0, 2); S.heat = heat; S.stats.runs++;
   run.doors = makeDoors();
@@ -601,7 +653,7 @@ function makeDoors() {
   if (run.room >= ROOMS_PER_ACT) return [{ t: 'boss', o: 'boss' }];
   const r = run.room, n = (rnd() < .3 + calcStats(run, 0).luck * .5) ? 3 : 2, out = [];
   const pool = () => [{ t: 'fight', w: 22 }, { t: 'level', w: 16 }, { t: 'gold', w: 12 }, { t: 'elite', w: r >= 2 ? 12 : 0 }, { t: 'shop', w: r >= 2 && run.shops < 2 ? 12 : 0 },
-    { t: 'heal', w: 9 }, { t: 'event', w: r >= 1 ? 10 : 0 }, { t: 'squad', w: r >= 1 ? 15 : 0 }, { t: 'packs', w: r >= 1 && !run.casinos ? 7 : 0 }, { t: 'treasure', w: r >= 3 ? 4 : 0 }, { t: 'rest', w: r >= 4 ? 7 : 0 }].filter(o => o.w && !out.some(d => d.t === o.t));
+    { t: 'heal', w: 9 }, { t: 'event', w: r >= 1 ? 10 : 0 }, { t: 'packs', w: r >= 1 && !run.casinos ? 7 : 0 }, { t: 'treasure', w: r >= 3 ? 4 : 0 }, { t: 'rest', w: r >= 4 ? 7 : 0 }].filter(o => o.w && !out.some(d => d.t === o.t));
   if (r === 0) out.push({ t: 'fight' }, { t: 'level' });
   else { if (r === 5 && !run.shops) out.push({ t: 'shop' }); while (out.length < n) out.push({ t: weighted(pool()).t }); }
   out.forEach(d => { if (['fight', 'level', 'gold', 'heal'].includes(d.t)) d.o = r === 0 ? 'survive' : weighted([{ k: 'survive', w: 26 }, { k: 'hunt', w: 18 }, { k: 'defend', w: 16 }, { k: 'capture', w: 16 }, { k: 'collect', w: 16 }]).k; else if (d.t === 'elite') d.o = 'survive'; });
@@ -612,7 +664,6 @@ function enterDoor(d) {
   run.cur = d; run.doors = null;
   if (!['fight', 'level', 'gold', 'heal', 'elite', 'boss'].includes(d.t)) { paused = true; bankHp(); }
   if (d.t === 'shop') { run.shops++; showShop(); }
-  else if (d.t === 'squad') startSkirmish();
   else if (d.t === 'packs') { run.casinos = (run.casinos || 0) + 1; showPackDoor(); }
   else if (d.t === 'event') showEvent();
   else if (d.t === 'treasure') showTreasure();
@@ -675,6 +726,7 @@ function showTitle() {
   items.push(['🌐 Online Co-op <span class="tag">experimental</span>', showOnline]);
   items.push([`📅 Daily Challenge ${d ? `<span class="tag">best: ${d} rooms</span>` : ''}`, () => hasRun ? confirmAbandon(() => showCharSelect({ players: 1, daily: true })) : showCharSelect({ players: 1, daily: true })]);
   items.push([`🃏 Squad &amp; Packs <span class="tag">💎 ${S.gems} · ${Object.keys(col()).length}/${Object.keys(ROSTER).length}</span>${S.freePull !== todayStr() ? ' <span class="tag" style="color:var(--gold)">🎁 free pull!</span>' : ''}`, () => showSquadHub('packs', showTitle)]);
+  items.push([`🗼 Rift Tower <span class="tag">turn-based squad battles · floor ${(S.tower || {}).best || 0}</span>`, () => showTower()]);
   items.push([`💠 Upgrades <span class="tag">${S.shards} shards</span>`, showUpgrades]);
   items.push([`🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span>`, showAchievements]);
   items.push(['📊 Stats, Options &amp; Save Backup', showStats]);
@@ -703,7 +755,7 @@ function showHelp() {
     <li><b>Element sets:</b> weapons have elements. Own 2 (or 4) of one element for a set bonus: ${Object.values(ELEMENTS).map(e => `${e.icon} ${e.name}`).join(' · ')}.</li>
     <li><b>Arenas</b> have pillars (enemy shots can't pass), 🛢️ barrels (shoot them to explode), a ⛲ healing shrine, and a biome hazard (bushes, lava, ice, darkness, storms).</li>
     <li><b>🃏 Squad &amp; Packs:</b> open packs with 💎 gems (you earn them every run) or 🪙 gold (shop and 🎁 doors) to collect 42 members in 5 rarities: <span style="color:#b8c0d0">Common</span>, <span style="color:#5ee08a">Uncommon</span>, <span style="color:#5cb8ff">Rare</span>, <span style="color:#c07cff">Epic</span>, <span style="color:#ffc23a">Legendary</span>. Duplicates give stars (★1–★5).</li>
-    <li><b>🛡️ Skirmish</b> doors: your team (2×3 board, front row gets hit first) auto-battles. Match elements and classes for bonuses, use the element wheel 🔥&gt;🗡️&gt;✨&gt;⚡&gt;❄️&gt;🔥, pick a tactic, and hit 📯 <b>Rally</b> (R) once. Press <b>T</b> between rooms to change your team.</li>
+    <li><b>🗼 Rift Tower</b> (title screen): turn-based squad battles with your team of 4. Pick Attack, Special or Guard for each member, use the element wheel 🔥&gt;🗡️&gt;✨&gt;⚡&gt;❄️&gt;🔥, and climb floors for gems, packs and <b>blessings that make every run stronger</b>. Your members level up as they fight.</li>
     <li><b>🐾 Buddy:</b> each player takes one member into action rooms. It fights beside you and uses a skill every 9 seconds.</li>
     <li><b>Co-op:</b> share gold, XP and relics; each player has their own runner, weapons and level-up picks. If your partner goes down, <b>stand next to them</b> to revive them.</li>
     <li><b>Shards</b> 💠 are earned every run, win or lose. Spend them on permanent upgrades. New runners unlock as you play.</li>
@@ -1018,90 +1070,124 @@ function drawLv() {
 
 
 /* =====================================================================
-   🃏 SQUAD — a permanent collection of squad members.
+   🃏 SQUAD — a permanent collection of squad members (pets).
    Open packs (💎 gems or 🪙 gold) to collect members of 5 rarities, power
-   them up with duplicates (★1–★5), build a 2×3 team with element + class
-   synergies, and fight tactical auto-battles at 🛡️ Skirmish doors.
-   Bring one member as your 🐾 Buddy into action rooms.
+   them up with duplicates (★1–★5) and levels, and fight turn-based battles
+   in the ⚔️ Rift Tower (a side mode). One member comes with you on runs as
+   your 🐾 Buddy.
    ===================================================================== */
 const RAR = [
-  { k: 'C', name: 'Common',    color: '#b8c0d0', w: 60,  mul: 1 },
-  { k: 'U', name: 'Uncommon',  color: '#5ee08a', w: 25,  mul: 1.18 },
-  { k: 'R', name: 'Rare',      color: '#5cb8ff', w: 11,  mul: 1.4 },
-  { k: 'E', name: 'Epic',      color: '#c07cff', w: 3.5, mul: 1.7 },
-  { k: 'L', name: 'Legendary', color: '#ffc23a', w: .5,  mul: 2.1 },
+  { k: 'C', name: 'Common',    color: '#b8c0d0', mul: 1 },
+  { k: 'U', name: 'Uncommon',  color: '#5ee08a', mul: 1.2 },
+  { k: 'R', name: 'Rare',      color: '#5cb8ff', mul: 1.45 },
+  { k: 'E', name: 'Epic',      color: '#c07cff', mul: 1.85 },
+  { k: 'L', name: 'Legendary', color: '#ffc23a', mul: 2.4 },
 ];
 const CLASSES = {
-  guardian: { icon: '🛡️', name: 'Guardian', b2: 'Guardians start with a 25% shield.', b4: 'Guardians start with a 50% shield.' },
-  brawler:  { icon: '👊', name: 'Brawler',  b2: 'Brawlers get +20% HP.', b4: 'Brawlers get +45% HP.' },
-  ranger:   { icon: '🏹', name: 'Ranger',   b2: 'Rangers attack 15% faster.', b4: 'Rangers attack 35% faster.' },
-  mystic:   { icon: '🔮', name: 'Mystic',   b2: 'Everyone\'s specials charge 20% faster.', b4: 'Specials charge 40% faster.' },
-  assassin: { icon: '🗡️', name: 'Assassin', b2: 'Assassins: +20% crit chance.', b4: 'Assassins: +40% crit, crits ×2.5.' },
-  support:  { icon: '💚', name: 'Support',  b2: 'All healing +30%.', b4: 'All healing +60% and slow regen.' },
-  summoner: { icon: '🥚', name: 'Summoner', b2: 'Summons are 40% stronger.', b4: 'Summons are 90% stronger and summon twice.' },
+  guardian: { icon: '🛡️', name: 'Guardian', b2: 'Guardians start with a 30% shield.' },
+  brawler:  { icon: '👊', name: 'Brawler',  b2: 'Brawlers get +25% HP.' },
+  ranger:   { icon: '🏹', name: 'Ranger',   b2: 'Rangers get +25% speed.' },
+  mystic:   { icon: '🔮', name: 'Mystic',   b2: 'Everyone\'s special starts ready.' },
+  assassin: { icon: '🗡️', name: 'Assassin', b2: 'Assassins get +25% crit chance.' },
+  support:  { icon: '💚', name: 'Support',  b2: 'All healing +40%.' },
+  summoner: { icon: '🥚', name: 'Summoner', b2: 'Summons are 60% stronger.' },
 };
 const ESYN = {
-  fire:   { 2: 'Attacks burn.', 4: 'Stronger burn, +20% damage.' },
-  frost:  { 2: 'Hits slow enemy attacks 20%.', 4: 'Slow 40%.' },
-  storm:  { 2: '20% chance attacks chain.', 4: '40% chance, chains twice.' },
-  blade:  { 2: '+15% crit chance.', 4: '+30% crit chance.' },
-  arcane: { 2: 'Everyone starts with a 15% shield.', 4: '30% shield.' },
+  fire:   { 2: 'Attacks burn.', 3: 'Attacks burn harder, +15% damage.' },
+  frost:  { 2: 'Attacks have a 15% chance to freeze.', 3: '30% chance to freeze.' },
+  storm:  { 2: '25% chance attacks chain.', 3: '45% chance, chains twice.' },
+  blade:  { 2: '+15% crit chance.', 3: '+30% crit chance.' },
+  arcane: { 2: 'Everyone starts with a 15% shield.', 3: '30% shield.' },
 };
-// element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (+30% damage, −20% the other way)
+// element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (+40% damage, −25% the other way)
 const BEATS = { fire: 'blade', blade: 'arcane', arcane: 'storm', storm: 'frost', frost: 'fire' };
-// [name, icon, rarity 0-4, element, class, range, hp, atk, attack every (s), special cost, special key, special text]
+// [name, icon, rarity 0-4, element, class, range, hp, atk, speed, special cooldown (turns), special key, special text]
 const ROSTER = {
-  rat:      ['Scrapper Rat',   '🐀', 0, 'blade',  'brawler',  'melee',  95, 9, .8, 60, 'frenzy',  'Frenzy: 3 quick bites.'],
-  frog:     ['Bog Frog',       '🐸', 0, 'frost',  'support',  'ranged', 80, 7, 1.0, 70, 'pull',    'Tongue Pull: yanks a back-row enemy into the front row.'],
-  bees:     ['Bee Swarm',      '🐝', 0, 'storm',  'summoner', 'ranged', 70, 6, .9, 60, 'sting3',  'Buzz: stings 3 random enemies.'],
-  hedgehog: ['Hedgehog',       '🦔', 0, 'blade',  'guardian', 'melee', 130, 6, 1.1, 70, 'spikes',  'Spikes: reflects 40% of melee damage for 4s.'],
-  snail:    ['Shell Snail',    '🐌', 0, 'arcane', 'guardian', 'melee', 150, 5, 1.3, 80, 'hide',    'Hide: shields itself for 45% HP.'],
-  candle:   ['Candle Imp',     '🕯️', 0, 'fire',   'ranger',   'ranged', 70, 9, 1.0, 70, 'fireball','Fireball: a big hit that burns.'],
-  duck:     ['Duck Knight',    '🦆', 0, 'frost',  'brawler',  'melee', 110, 8, 1.0, 70, 'knock',   'Charge: hits hard and knocks the target to the back row.'],
-  shroom:   ['Spore Shroom',   '🍄', 0, 'arcane', 'support',  'ranged', 85, 6, 1.1, 70, 'spores',  'Spores: poisons every enemy in one lane.'],
-  squirrel: ['Acorn Slinger',  '🐿️', 0, 'blade',  'ranger',   'ranged', 75, 8, .9, 60, 'double',  'Double Shot: two hits at once.'],
-  crab:     ['Pinch Crab',     '🦀', 0, 'frost',  'guardian', 'melee', 125, 7, 1.1, 70, 'stun1',   'Pinch: stuns its target for 1.2s.'],
-  fox:      ['Fox Trickster',  '🦊', 1, 'arcane', 'assassin', 'melee',  90, 11, .9, 60, 'blink',   'Blink: teleports to the weakest back-row enemy and strikes.'],
-  wolves:   ['Wolf Pack',      '🐺', 1, 'blade',  'summoner', 'melee', 100, 9, .9, 80, 'pup',     'Howl: summons a wolf pup into an empty slot.'],
-  bat:      ['Vampire Bat',    '🦇', 1, 'arcane', 'assassin', 'melee',  85, 10, .8, 60, 'drain',   'Drain: bites and heals itself.'],
-  tortoise: ['Old Tortoise',   '🐢', 1, 'frost',  'guardian', 'melee', 180, 6, 1.4, 80, 'taunt',   'Taunt: every enemy must attack it for 3s.'],
-  pixie:    ['Pixie',          '🧚', 1, 'storm',  'support',  'ranged', 80, 7, 1.0, 60, 'heal1',   'Spark Heal: heals the most hurt ally.'],
-  scorpion: ['Scorpion',       '🦂', 1, 'fire',   'assassin', 'melee',  95, 10, .9, 60, 'venom',   'Venom: heavy poison on its target.'],
-  owl:      ['Owl Sage',       '🦉', 1, 'arcane', 'mystic',   'ranged', 85, 8, 1.1, 70, 'insight', 'Insight: the next 3 ally attacks are crits.'],
-  viper:    ['Storm Viper',    '🐍', 1, 'storm',  'ranger',   'ranged', 85, 9, 1.0, 70, 'chain4',  'Chain Bolt: lightning jumps through 4 enemies.'],
-  monkey:   ['Banana Monkey',  '🐒', 1, 'storm',  'brawler',  'melee', 110, 9, .9, 70, 'banana',  'Banana Peel: the target slips — stunned 1.5s and loses its charge.'],
-  stag:     ['Frost Stag',     '🦌', 1, 'frost',  'brawler',  'melee', 120, 9, 1.0, 70, 'sweep',   'Antler Sweep: hits the whole enemy front row.'],
-  lion:     ['Lion Captain',   '🦁', 2, 'blade',  'guardian', 'melee', 170, 10, 1.1, 80, 'roar',    'Roar: allies deal +30% damage for 5s.'],
-  witch:    ['Hedge Witch',    '🧙', 2, 'arcane', 'support',  'ranged', 95, 8, 1.2, 80, 'massheal','Mass Heal: heals every ally 18%.'],
-  ninja:    ['Shadow Ninja',   '🥷', 2, 'blade',  'assassin', 'melee', 100, 13, .8, 70, 'execute', 'Execute: finishes an enemy under 30% HP, or hits very hard.'],
-  bear:     ['Ice Bear',       '🐻', 2, 'frost',  'guardian', 'melee', 210, 9, 1.3, 90, 'froze',   'Frozen Hide: big shield, and melee attackers get frozen.'],
-  eagle:    ['Thunderbird',    '🦅', 2, 'storm',  'ranger',   'ranged', 95, 11, 1.0, 80, 'clap',    'Thunderclap: stuns the enemy back row for 1s.'],
-  octo:     ['Octo Mystic',    '🐙', 2, 'arcane', 'mystic',   'ranged', 100, 9, 1.1, 80, 'ink',     'Ink: blinds an enemy row (they miss half their attacks).'],
-  newt:     ['Salamander',     '🦎', 2, 'fire',   'brawler',  'melee', 140, 11, 1.0, 70, 'burst',   'Flame Burst: burns the target and its neighbours.'],
-  robo:     ['Clockwork Knight','🤖', 2, 'storm', 'guardian', 'melee', 190, 9, 1.2, 90, 'overcharge','Overcharge: shields itself and zaps attackers.'],
-  drake:    ['Young Drake',    '🐉', 3, 'fire',   'mystic',   'ranged', 140, 14, 1.2, 100, 'inferno','Inferno: sets the whole enemy team on fire.'],
-  unicorn:  ['Unicorn',        '🦄', 3, 'arcane', 'support',  'ranged', 130, 10, 1.1, 110, 'revive','Rainbow: brings a fallen ally back at 50% HP.'],
-  vlord:    ['Vampire Lord',   '🧛', 3, 'fire',   'assassin', 'melee', 150, 15, .9, 100, 'feast',  'Blood Feast: drains every enemy and heals itself.'],
-  golem:    ['Rune Golem',     '🗿', 3, 'arcane', 'guardian', 'melee', 300, 11, 1.4, 100, 'wall',   'Stone Wall: every ally gets a 30% shield.'],
-  rex:      ['Storm Rex',      '🦖', 3, 'storm',  'brawler',  'melee', 230, 15, 1.1, 100, 'stomp',  'Stomp: stuns the whole enemy front row for 1.5s.'],
-  queen:    ['Frost Queen',    '👸', 3, 'frost',  'mystic',   'ranged', 130, 12, 1.1, 110, 'blizzard','Blizzard: freezes every enemy for 1.5s.'],
-  pumpkin:  ['Pumpkin King',   '🎃', 3, 'fire',   'summoner', 'ranged', 150, 11, 1.1, 100, 'pumpkins','Harvest: summons two pumpkin minions.'],
-  dragon:   ['Ember Dragon',   '🐲', 4, 'fire',   'mystic',   'ranged', 200, 18, 1.1, 110, 'dragonfire','Dragonfire: scorches a whole row. Comes back to life once.'],
-  paladin:  ['Paladin King',   '🤴', 4, 'arcane', 'guardian', 'melee', 360, 14, 1.2, 120, 'aegis',  'Holy Aegis: the whole team is invincible for 2s and heals.'],
-  thor:     ['Thunder God',    '🌩️', 4, 'storm',  'mystic',   'ranged', 190, 17, 1.0, 110, 'judgment','Judgment: 8 lightning bolts rain on the enemy.'],
-  void:     ['Void Walker',    '🌌', 4, 'arcane', 'assassin', 'melee', 200, 20, .8, 100, 'riftswap','Rift Swap: flips the enemy\'s front and back rows, then strikes.'],
-  whale:    ['Sky Whale',      '🐋', 4, 'frost',  'guardian', 'melee', 420, 12, 1.3, 120, 'tidal',  'Tidal Wave: hits every enemy and knocks the front row back.'],
-  ninetail: ['Nine-Tail Fox',  '🦊', 4, 'fire',   'assassin', 'ranged', 190, 16, .9, 100, 'foxfire','Foxfire: 9 homing fireballs.'],
-  luckycat: ['Lucky Cat',      '🐱', 4, 'blade',  'support',  'ranged', 180, 12, 1.0, 90, 'fortune','Fortune: a random blessing — heal, rage, shields or a jackpot hit.'],
+  rat:      ['Scrapper Rat',    '🐀', 0, 'blade',  'brawler',  'melee',   95, 10, 115, 3, 'frenzy',   'Frenzy: bites 3 times.'],
+  frog:     ['Bog Frog',        '🐸', 0, 'frost',  'support',  'ranged',  85,  8,  95, 3, 'pull',     'Tongue Pull: yanks any enemy into the front row and hits it.'],
+  bees:     ['Bee Swarm',       '🐝', 0, 'storm',  'summoner', 'ranged',  70,  7, 120, 3, 'sting3',   'Buzz: stings 3 random enemies.'],
+  hedgehog: ['Hedgehog',        '🦔', 0, 'blade',  'guardian', 'melee',  135,  7,  85, 3, 'spikes',   'Spikes: taunts, and melee attackers take half their damage back.'],
+  snail:    ['Shell Snail',     '🐌', 0, 'arcane', 'guardian', 'melee',  150,  6,  60, 3, 'hide',     'Hide: shields itself for 50% HP.'],
+  candle:   ['Candle Imp',      '🕯️', 0, 'fire',   'ranger',   'ranged',  75, 10, 100, 3, 'fireball', 'Fireball: a big hit that burns.'],
+  duck:     ['Duck Knight',     '🦆', 0, 'frost',  'brawler',  'melee',  115,  9,  95, 3, 'knock',    'Charge: hits hard and knocks the target to the back row.'],
+  shroom:   ['Spore Shroom',    '🍄', 0, 'arcane', 'support',  'ranged',  85,  7,  90, 3, 'spores',   'Spores: poisons every enemy.'],
+  squirrel: ['Acorn Slinger',   '🐿️', 0, 'blade',  'ranger',   'ranged',  75,  9, 120, 3, 'double',   'Double Shot: two quick hits.'],
+  crab:     ['Pinch Crab',      '🦀', 0, 'frost',  'guardian', 'melee',  125,  8,  80, 3, 'stun1',    'Pinch: stuns its target for a turn.'],
+  bunny:    ['Carrot Bunny',    '🐰', 0, 'storm',  'support',  'ranged',  80,  7, 125, 3, 'carrot',   'Carrot Snack: heals the most hurt ally.'],
+  chick:    ['Fire Chick',      '🐥', 0, 'fire',   'brawler',  'melee',   90, 10, 110, 3, 'ember',    'Hot Feathers: hits the front row and burns it.'],
+  mouse:    ['Cheese Thief',    '🐭', 0, 'blade',  'assassin', 'melee',   80, 11, 130, 3, 'steal',    'Swipe: a sneaky hit that delays the target\'s special by 2 turns.'],
+  fox:      ['Fox Trickster',   '🦊', 1, 'arcane', 'assassin', 'melee',   90, 12, 125, 3, 'blink',    'Blink: teleports to any enemy for a big hit.'],
+  wolves:   ['Wolf Pack',       '🐺', 1, 'blade',  'summoner', 'melee',  105, 10, 110, 4, 'pup',      'Howl: calls a wolf pup to fight.'],
+  bat:      ['Vampire Bat',     '🦇', 1, 'arcane', 'assassin', 'melee',   90, 11, 130, 3, 'drain',    'Drain: bites and heals itself.'],
+  tortoise: ['Old Tortoise',    '🐢', 1, 'frost',  'guardian', 'melee',  190,  7,  55, 4, 'taunt',    'Stubborn: taunts every enemy and shields itself.'],
+  pixie:    ['Pixie',           '🧚', 1, 'storm',  'support',  'ranged',  85,  8, 120, 3, 'heal1',    'Spark Heal: a big heal on the most hurt ally.'],
+  scorpion: ['Scorpion',        '🦂', 1, 'fire',   'assassin', 'melee',   95, 11, 110, 3, 'venom',    'Venom: heavy poison.'],
+  owl:      ['Owl Sage',        '🦉', 1, 'arcane', 'mystic',   'ranged',  90,  9,  95, 3, 'insight',  'Insight: every ally\'s next hit is a crit.'],
+  viper:    ['Storm Viper',     '🐍', 1, 'storm',  'ranger',   'ranged',  90, 10, 105, 4, 'chain4',   'Chain Bolt: lightning jumps through every enemy.'],
+  stag:     ['Frost Stag',      '🦌', 1, 'frost',  'brawler',  'melee',  125, 10, 100, 3, 'sweep',    'Antler Sweep: hits the whole front row.'],
+  monkey:   ['Banana Monkey',   '🐒', 1, 'storm',  'brawler',  'melee',  110, 10, 115, 3, 'banana',   'Banana Peel: the target slips — stunned, and its special is delayed.'],
+  penguin:  ['Penguin Slider',  '🐧', 1, 'frost',  'ranger',   'ranged',  95,  9, 105, 3, 'slide',    'Belly Slide: hits every enemy and slows them.'],
+  koala:    ['Sleepy Koala',    '🐨', 1, 'arcane', 'guardian', 'melee',  170,  8,  65, 4, 'nap',      'Power Nap: heals 40% and taunts.'],
+  parrot:   ['Parrot Pirate',   '🦜', 1, 'storm',  'assassin', 'ranged',  90, 11, 125, 3, 'squawk',   'Squawk!: blinds the enemy front row (they miss half their hits).'],
+  lion:     ['Lion Captain',    '🦁', 2, 'blade',  'guardian', 'melee',  175, 11, 100, 4, 'roar',     'Roar: every ally deals +40% damage for 2 turns.'],
+  witch:    ['Hedge Witch',     '🧙', 2, 'arcane', 'support',  'ranged', 100,  9,  95, 3, 'massheal', 'Mass Heal: heals every ally.'],
+  ninja:    ['Shadow Ninja',    '🥷', 2, 'blade',  'assassin', 'melee',  105, 14, 140, 3, 'execute',  'Execute: finishes any enemy under 35% HP, or hits very hard.'],
+  bear:     ['Ice Bear',        '🐻', 2, 'frost',  'guardian', 'melee',  215, 10,  70, 4, 'froze',    'Frozen Hide: big shield, and melee attackers get frozen.'],
+  eagle:    ['Thunderbird',     '🦅', 2, 'storm',  'ranger',   'ranged', 100, 12, 125, 4, 'clap',     'Thunderclap: stuns the enemy back row.'],
+  octo:     ['Octo Mystic',     '🐙', 2, 'arcane', 'mystic',   'ranged', 105, 10, 100, 3, 'ink',      'Ink: blinds an enemy row for 2 turns.'],
+  newt:     ['Salamander',      '🦎', 2, 'fire',   'brawler',  'melee',  145, 12, 105, 3, 'burst',    'Flame Burst: burns the target and the one next to it.'],
+  robo:     ['Clockwork Knight','🤖', 2, 'storm',  'guardian', 'melee',  195, 10,  80, 4, 'overcharge','Overcharge: shields itself and zaps melee attackers.'],
+  shark:    ['Reef Shark',      '🦈', 2, 'frost',  'assassin', 'melee',  115, 14, 120, 3, 'bloodfin', 'Blood in the Water: huge hit, double damage on hurt enemies.'],
+  mammoth:  ['Woolly Mammoth',  '🦣', 2, 'frost',  'brawler',  'melee',  200, 12,  75, 4, 'trample',  'Trample: hits the front row and stuns one of them.'],
+  peacock:  ['Peacock Mage',    '🦚', 2, 'arcane', 'mystic',   'ranged', 100, 11, 110, 4, 'dazzle',   'Dazzle: every enemy is blinded and weakened.'],
+  tiger:    ['Storm Tiger',     '🐯', 2, 'storm',  'brawler',  'melee',  150, 13, 120, 3, 'pounce',   'Pounce: a big hit that bounces to another enemy.'],
+  drake:    ['Young Drake',     '🐉', 3, 'fire',   'mystic',   'ranged', 145, 15, 105, 4, 'inferno',  'Inferno: sets the whole enemy team on fire.'],
+  unicorn:  ['Unicorn',         '🦄', 3, 'arcane', 'support',  'ranged', 140, 11, 110, 4, 'revive',   'Rainbow: brings a fallen ally back at 50% HP.'],
+  vlord:    ['Vampire Lord',    '🧛', 3, 'fire',   'assassin', 'melee',  160, 16, 125, 4, 'feast',    'Blood Feast: drains every enemy and heals itself.'],
+  golem:    ['Rune Golem',      '🗿', 3, 'arcane', 'guardian', 'melee',  310, 12,  60, 4, 'wall',     'Stone Wall: every ally gets a big shield.'],
+  rex:      ['Storm Rex',       '🦖', 3, 'storm',  'brawler',  'melee',  240, 16,  95, 4, 'stomp',    'Stomp: stuns the whole enemy front row.'],
+  queen:    ['Frost Queen',     '👸', 3, 'frost',  'mystic',   'ranged', 135, 13, 105, 5, 'blizzard', 'Blizzard: freezes every enemy for a turn.'],
+  pumpkin:  ['Pumpkin King',    '🎃', 3, 'fire',   'summoner', 'ranged', 155, 12,  90, 4, 'pumpkins', 'Harvest: summons two pumpkin minions.'],
+  dove:     ['Spirit Dove',     '🕊️', 3, 'arcane', 'support',  'ranged', 135, 11, 120, 4, 'sanctuary','Sanctuary: heals every ally and removes bad effects.'],
+  squid:    ['Deep Kraken',     '🦑', 3, 'frost',  'brawler',  'melee',  250, 14,  85, 4, 'tentacles','Tentacles: 5 slams on random enemies that weaken them.'],
+  samurai:  ['Oni Samurai',     '👺', 3, 'blade',  'assassin', 'melee',  165, 17, 130, 4, 'iaido',    'Iaido: slashes every enemy; hurt enemies take a crit.'],
+  genie:    ['Lamp Genie',      '🧞', 3, 'storm',  'mystic',   'ranged', 140, 13, 115, 4, 'wish',     'Three Wishes: every ally gets rage and their specials recharge.'],
+  dragon:   ['Ember Dragon',    '🐲', 4, 'fire',   'mystic',   'ranged', 210, 19, 110, 4, 'dragonfire','Dragonfire: scorches a whole row with fire.'],
+  paladin:  ['Paladin King',    '🤴', 4, 'arcane', 'guardian', 'melee',  370, 15,  85, 5, 'aegis',    'Holy Aegis: the whole team can\'t be hurt for a turn, and heals.'],
+  thor:     ['Thunder God',     '🌩️', 4, 'storm',  'mystic',   'ranged', 200, 18, 120, 4, 'judgment', 'Judgment: 8 lightning bolts rain on the enemy.'],
+  void:     ['Void Walker',     '🌌', 4, 'arcane', 'assassin', 'melee',  210, 21, 140, 4, 'riftswap', 'Rift Swap: flips the enemy\'s rows, then slashes the new front.'],
+  whale:    ['Sky Whale',       '🐋', 4, 'frost',  'guardian', 'melee',  430, 13,  70, 5, 'tidal',    'Tidal Wave: hits every enemy and washes the front row back.'],
+  ninetail: ['Nine-Tail Fox',   '🦊', 4, 'fire',   'assassin', 'ranged', 195, 18, 135, 4, 'foxfire',  'Foxfire: 9 homing fireballs.'],
+  luckycat: ['Lucky Cat',       '🐱', 4, 'blade',  'support',  'ranged', 190, 14, 115, 4, 'fortune',  'Fortune: a random blessing — heal, rage, shields or a JACKPOT hit.'],
+  sun:      ['Sun Phoenix',     '🌞', 4, 'fire',   'support',  'ranged', 200, 16, 115, 5, 'sunrise',  'Sunrise: revives EVERY fallen ally and sets the enemy on fire.'],
+  chrono:   ['Chrono Sage',     '⏳', 4, 'arcane', 'mystic',   'ranged', 190, 16, 100, 5, 'timewarp', 'Rewind: every ally\'s special is ready and they act again right now.'],
+  kong:     ['Storm Kong',      '🦍', 4, 'storm',  'brawler',  'melee',  380, 20,  95, 4, 'kongsmash','Kong Smash: crushes and stuns the enemy front row.'],
+  reaper:   ['Shadow Reaper',   '💀', 4, 'blade',  'assassin', 'melee',  200, 22, 135, 4, 'reap',     'Reap: every enemy under 35% HP dies; the rest get slashed.'],
 };
-const SUMMONS = { pup: ['Wolf Pup', '🐶', 'blade', 'brawler', 'melee', 60, 7, .8], pumpkinling: ['Pumpkinling', '🎃', 'fire', 'brawler', 'melee', 55, 7, .9] };
-const UD = id => { const r = ROSTER[id]; return { id, name: r[0], icon: r[1], rar: r[2], el: r[3], cls: r[4], range: r[5], hp: r[6], atk: r[7], cd: r[8], mana: r[9], ab: r[10], txt: r[11] }; };
+const LPASS = { // legendary passives
+  dragon: 'Comes back to life once at 50% HP.', paladin: 'Allies take 15% less damage.', thor: 'Every attack chains to another enemy.',
+  void: '30% chance to dodge attacks.', whale: 'Heals 8% HP every turn.', ninetail: 'Every hit burns.', luckycat: 'The whole team gets +20% crit chance.',
+  sun: 'Heals every ally 6% at the start of each round.', chrono: 'Always acts first, and its special starts ready.', kong: 'Double damage to stunned enemies.',
+  reaper: 'Every kill instantly readies its special.',
+};
+const SUMMONS = { pup: ['Wolf Pup', '🐶', 'blade', 'brawler', 'melee', 60, 8, 110], pumpkinling: ['Pumpkinling', '🎃', 'fire', 'brawler', 'melee', 70, 9, 90] };
+const UD = id => { const r = ROSTER[id]; return { id, name: r[0], icon: r[1], rar: r[2], el: r[3], cls: r[4], range: r[5], hp: r[6], atk: r[7], spd: r[8], cdT: r[9], ab: r[10], txt: r[11] }; };
 const STAR_COPIES = [0, 1, 2, 4, 8, 16]; // total copies needed for each star
 const starOf = n => n >= 16 ? 5 : n >= 8 ? 4 : n >= 4 ? 3 : n >= 2 ? 2 : 1;
 const starMul = s => 1 + .25 * (s - 1);
-function unitPower(id, star) { const d = UD(id), m = RAR[d.rar].mul * starMul(star); return { hp: d.hp * m, atk: d.atk * m }; }
 function col() { return S.col = S.col || {}; }
 const ownStar = id => col()[id] ? starOf(col()[id].n) : 0;
+const lvOf = id => (col()[id] && col()[id].lv) || 1;
+const lvCap = id => 10 + 5 * Math.max(1, ownStar(id));
+const lvMul = lv => 1 + .04 * (lv - 1);
+const sqXpNeed = lv => 15 + lv * 10;
+function unitPower(id, star, lv) { const d = UD(id), m = RAR[d.rar].mul * starMul(star) * lvMul(lv || 1); return { hp: d.hp * m, atk: d.atk * m }; }
+function giveXp(id, amt) { // returns levels gained
+  const c = col()[id]; if (!c) return 0; c.lv = c.lv || 1; c.xp = (c.xp || 0) + amt; let n = 0;
+  while (c.lv < lvCap(id) && c.xp >= sqXpNeed(c.lv)) { c.xp -= sqXpNeed(c.lv); c.lv++; n++; }
+  if (c.lv >= lvCap(id)) c.xp = Math.min(c.xp, sqXpNeed(c.lv));
+  return n;
+}
 
 /* ----- packs & pulls ----- */
 const PACKS = {
@@ -1112,6 +1198,8 @@ const PACKS = {
   storm:  { name: 'Storm Pack',  icon: '⚡', n: 3, gems: 150, gold: 0, el: 'storm',  rates: [55, 27, 13, 4, 1], desc: '3 storm members.' },
   blade:  { name: 'Blade Pack',  icon: '🗡️', n: 3, gems: 150, gold: 0, el: 'blade',  rates: [55, 27, 13, 4, 1], desc: '3 blade members.' },
   arcane: { name: 'Arcane Pack', icon: '✨', n: 3, gems: 150, gold: 0, el: 'arcane', rates: [55, 27, 13, 4, 1], desc: '3 arcane members.' },
+  egg:    { name: 'Rift Egg',    icon: '🥚', n: 1, gems: 0,   gold: 0, rates: [35, 35, 20, 8, 2], desc: 'Found in a run.', hidden: true },
+  goldegg:{ name: 'Golden Egg',  icon: '🥇', n: 1, gems: 0,   gold: 0, rates: [0, 30, 40, 22, 8], desc: 'Dropped by a boss.', hidden: true },
 };
 function pullOne(pack, forceMin = 0) {
   const pity = S.pity = S.pity || { e: 0, l: 0 };
@@ -1126,40 +1214,50 @@ function pullOne(pack, forceMin = 0) {
   const id = ids[Math.floor(Math.random() * ids.length)];
   const c = col(), before = c[id] ? c[id].n : 0;
   let gems = 0;
-  if (before >= 16) { gems = [5, 10, 20, 40, 100][r]; S.gems += gems; } else c[id] = { n: before + 1 };
+  if (before >= 16) { gems = [5, 10, 20, 40, 100][r]; S.gems += gems; } else { c[id] = c[id] || { n: 0, lv: 1, xp: 0 }; c[id].n++; }
   S.stats.pulls = (S.stats.pulls || 0) + 1; if (r === 4) S.stats.legendaries = (S.stats.legendaries || 0) + 1;
   return { id, r, isNew: before === 0, starUp: before > 0 && starOf(before + 1) > starOf(before), star: starOf(Math.min(16, before + 1)), gems };
 }
-function openPack(key, pay, back) {
+function openPack(key, pay, back, forceMin) {
   const pack = PACKS[key];
   if (pay === 'gems') { if (S.gems < pack.gems) return; S.gems -= pack.gems; }
   else if (pay === 'gold') { if (!run || run.gold < pack.gold) return; run.gold -= pack.gold; }
   else if (pay === 'free') { S.freePull = todayStr(); }
   const res = [];
-  for (let k = 0; k < (pay === 'free' ? 1 : pack.n); k++) res.push(pullOne(pack, pack.guarantee && k === pack.n - 1 && !res.some(x => x.r >= pack.guarantee) ? pack.guarantee : 0));
+  for (let k = 0; k < (pay === 'free' ? 1 : pack.n); k++) res.push(pullOne(pack, (k === 0 && forceMin) || (pack.guarantee && k === pack.n - 1 && !res.some(x => x.r >= pack.guarantee) ? pack.guarantee : 0)));
   save(); checkAch();
   revealPulls(res, pack, back);
 }
 let RV = null;
 function revealPulls(res, pack, back) {
-  RV = { res, i: 0, pack, back };
+  RV = { res, i: 0, pack, back, tease: true };
   sfx('door'); drawReveal();
 }
 function drawReveal() {
+  if (RV.tease) { // the pack glows with its best rarity before it opens
+    const best = Math.max(...RV.res.map(x => x.r));
+    screen(`<h2>${RV.pack.icon} ${RV.pack.name}</h2><div class="sub">${RV.res.length > 1 ? RV.res.length + ' members inside' : 'Something is inside...'}</div>
+      <button class="packtease t${best}" data-a="0"><span>${RV.pack.icon}</span></button>
+      <div class="sub">${best >= 3 ? '<b style="color:' + RAR[best].color + '">...it\'s glowing!</b>' : 'Click or press Space to open.'}</div>`,
+      [() => { RV.tease = false; sfx(best >= 3 ? 'boss' : 'boom'); drawReveal(); }], 'menu', k => { if (k === ' ' || k === 'enter') { RV.tease = false; drawReveal(); return true; } });
+    if (best >= 3) sfx('alarm');
+    return;
+  }
   const { res, i } = RV, cur = res[i - 1];
   const cards = res.map((x, k) => { const d = UD(x.id), R = RAR[x.r];
-    if (k >= i) return `<div class="pcard back" style="--rc:#444"><div class="ci">${k === i ? '❔' : '🎴'}</div></div>`;
+    if (k >= i) return `<div class="pcard back ${k === i && x.r >= 3 ? 'hint' : ''}" style="--rc:${k === i && x.r >= 3 ? R.color : '#444'}"><div class="ci">${k === i ? '❔' : '🎴'}</div></div>`;
     return `<div class="pcard r${x.r} ${k === i - 1 ? 'fresh' : ''}" style="--rc:${R.color}"><div class="rar">${R.name.toUpperCase()}</div><div class="ci">${d.icon}</div><div class="ct">${d.name}</div>
       <div class="cs">${ELEMENTS[d.el].icon} ${CLASSES[d.cls].icon} ${CLASSES[d.cls].name}</div>
       <div class="tag2">${x.gems ? `+${x.gems} 💎 (maxed)` : x.isNew ? '✨ NEW!' : x.starUp ? `★ up! ${'★'.repeat(x.star)}` : `copy ${col()[x.id].n}/${STAR_COPIES[Math.min(5, x.star + 1)]}`}</div></div>`; }).join('');
   const done = i >= res.length;
   const big = cur && cur.r >= 3;
+  const close = () => { const b = RV.back; RV = null; b(); };
   screen(`<h2>${RV.pack.icon} ${RV.pack.name}</h2>
     ${cur && cur.r === 4 ? `<div class="legend-banner">✨ LEGENDARY! ✨</div>` : cur && cur.r === 3 ? `<div class="legend-banner epic">💜 EPIC! 💜</div>` : '<div style="height:44px"></div>'}
     <div class="pullrow ${big ? 'shake' : ''}">${cards}</div>
-    ${cur ? `<div class="sub">${UD(cur.id).txt}</div>` : '<div class="sub">Click or press Space to flip a card.</div>'}
+    ${cur ? `<div class="sub">${UD(cur.id).txt}${cur.r === 4 ? `<br><b style="color:var(--gold)">👑 ${LPASS[cur.id]}</b>` : ''}</div>` : '<div class="sub">Click or press Space to flip a card.</div>'}
     <div class="row" style="margin-top:10px">${done ? `<button class="opt big" data-a="1" data-n="1">Continue<kbd>1</kbd></button>` : `<button class="opt big" data-a="0">🎴 Flip (Space)</button><button data-a="2">⏭ Reveal all</button>`}</div>`,
-    [flipNext, () => { const b = RV.back; RV = null; b(); }, () => { while (RV.i < RV.res.length) flipNext(true); drawReveal(); }], 'menu', k => { if (k === ' ' || k === 'enter') { done ? (() => { const b = RV.back; RV = null; b(); })() : flipNext(); return true; } });
+    [flipNext, close, () => { while (RV.i < RV.res.length) flipNext(true); drawReveal(); }], 'menu', k => { if (k === ' ' || k === 'enter') { done ? close() : flipNext(); return true; } });
   if (cur && !cur._fx) { cur._fx = true; pullFx(cur.r); }
 }
 function flipNext(silent) {
@@ -1169,207 +1267,453 @@ function flipNext(silent) {
 }
 function pullFx(r) {
   if (r === 0) sfx('click');
-  else if (r === 1) tone && AU.ctx && tone(880, .12, 'triangle', .08);
+  else if (r === 1) sfx('gem');
   else if (r === 2) sfx('gold');
-  else if (r === 3) sfx('level');
-  else { sfx('ult'); setTimeout(() => sfx('win'), 350); }
+  else if (r === 3) { sfx('level'); setTimeout(() => sfx('gold'), 200); }
+  else { sfx('ult'); setTimeout(() => sfx('win'), 350); setTimeout(() => sfx('level'), 900); }
   if (r >= 3) { const f = document.createElement('div'); f.className = 'flash ' + (r === 4 ? 'gold' : 'purple'); document.body.appendChild(f); setTimeout(() => f.remove(), 900);
-    if (r === 4) for (let k = 0; k < 40; k++) { const s = document.createElement('div'); s.className = 'spark'; s.textContent = rpick(['✨', '⭐', '💛', '🌟']); s.style.left = (30 + Math.random() * 40) + 'vw'; s.style.top = (35 + Math.random() * 20) + 'vh'; s.style.setProperty('--dx', (Math.random() - .5) * 90 + 'vw'); s.style.setProperty('--dy', (Math.random() - .7) * 80 + 'vh'); document.body.appendChild(s); setTimeout(() => s.remove(), 1600); } }
+    const n = r === 4 ? 60 : 18;
+    for (let k = 0; k < n; k++) { const s = document.createElement('div'); s.className = 'spark'; s.textContent = rpick(r === 4 ? ['✨', '⭐', '💛', '🌟', '👑'] : ['💜', '✨', '🔮']); s.style.left = (30 + Math.random() * 40) + 'vw'; s.style.top = (35 + Math.random() * 20) + 'vh'; s.style.setProperty('--dx', (Math.random() - .5) * 90 + 'vw'); s.style.setProperty('--dy', (Math.random() - .7) * 80 + 'vh'); document.body.appendChild(s); setTimeout(() => s.remove(), 1600); } }
 }
 
-/* ----- team (formation) ----- */
-function team() { if (!Array.isArray(S.team) || S.team.length !== 6) S.team = [null, null, null, null, null, null]; S.team = S.team.map(id => id && col()[id] ? id : null); return S.team; }
+/* ----- team (4 slots: 0,1 front · 2,3 back) ----- */
+function team() {
+  if (!Array.isArray(S.team) || S.team.length !== 4) { const old = (Array.isArray(S.team) ? S.team : []).filter(Boolean); S.team = [old[0] || null, old[1] || null, old[2] || null, old[3] || null]; }
+  S.team = S.team.map(id => id && col()[id] ? id : null); return S.team;
+}
 const teamUnits = () => team().filter(Boolean);
-function synergy(list) { // distinct members count
+function synergy(list) {
   const e = { fire: 0, frost: 0, storm: 0, blade: 0, arcane: 0 }, c = {}; const seen = new Set();
-  for (const id of list) { if (!id || seen.has(id)) continue; seen.add(id); const d = SUMMONS[id] ? null : UD(id); if (!d) continue; e[d.el]++; c[d.cls] = (c[d.cls] || 0) + 1; }
+  for (const id of list) { if (!id || seen.has(id) || !ROSTER[id]) continue; seen.add(id); const d = UD(id); e[d.el]++; c[d.cls] = (c[d.cls] || 0) + 1; }
   return { e, c };
 }
-const lv24 = n => n >= 4 ? 4 : n >= 2 ? 2 : 0;
+const eLv = n => n >= 3 ? 3 : n >= 2 ? 2 : 0;
 function synHTML2(list) {
   const { e, c } = synergy(list);
-  const E = Object.keys(ESYN).map(el => { const L = lv24(e[el]); return `<span class="ico ${L ? 'on' : ''}" title="${esc(ELEMENTS[el].name + ': (2) ' + ESYN[el][2] + ' (4) ' + ESYN[el][4])}" style="${L ? 'border-color:' + ELEMENTS[el].color : ''}">${ELEMENTS[el].icon} ${e[el]}${L ? ` <b>${L === 4 ? 'II' : 'I'}</b>` : ''}</span>`; }).join('');
-  const C = Object.keys(CLASSES).map(k => { const n = c[k] || 0, L = lv24(n); return `<span class="ico ${L ? 'on' : ''}" title="${esc(CLASSES[k].name + ': (2) ' + CLASSES[k].b2 + ' (4) ' + CLASSES[k].b4)}">${CLASSES[k].icon} ${n}${L ? ` <b>${L === 4 ? 'II' : 'I'}</b>` : ''}</span>`; }).join('');
-  return `<div class="syn">${E}</div><div class="syn">${C}</div><div class="keys">Element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (+30% damage)</div>`;
+  const E = Object.keys(ESYN).map(el => { const L = eLv(e[el]); return `<span class="ico ${L ? 'on' : ''}" title="${esc(ELEMENTS[el].name + ': (2) ' + ESYN[el][2] + ' (3) ' + ESYN[el][3])}" style="${L ? 'border-color:' + ELEMENTS[el].color : ''}">${ELEMENTS[el].icon} ${e[el]}${L ? ` <b>${L === 3 ? 'II' : 'I'}</b>` : ''}</span>`; }).join('');
+  const C = Object.keys(CLASSES).map(k => { const n = c[k] || 0; return `<span class="ico ${n >= 2 ? 'on' : ''}" title="${esc(CLASSES[k].name + ': (2) ' + CLASSES[k].b2)}">${CLASSES[k].icon} ${n}${n >= 2 ? ' <b>✓</b>' : ''}</span>`; }).join('');
+  const act = [...Object.keys(ESYN).filter(el => eLv(e[el])).map(el => `${ELEMENTS[el].icon} ${ESYN[el][eLv(e[el])]}`), ...Object.keys(CLASSES).filter(k => (c[k] || 0) >= 2).map(k => `${CLASSES[k].icon} ${CLASSES[k].b2}`)];
+  return `<div class="syn">${E}</div><div class="syn">${C}</div><div class="keys">${act.length ? '<b>Active:</b> ' + act.join(' · ') : 'Put 2 of the same element or class together for a bonus.'}<br>Element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (+40% damage)</div>`;
 }
 
-/* ----- tactical auto-battle ----- */
-const TACTICS = {
-  attack: { icon: '⚔️', name: 'All-Out Attack', desc: '+20% damage, −15% HP.' },
-  hold:   { icon: '🛡️', name: 'Hold the Line',  desc: 'Your front row starts with a 40% shield.' },
-  focus:  { icon: '🎯', name: 'Focus Fire',     desc: 'Everyone attacks the enemy with the lowest HP.' },
-  ambush: { icon: '🌀', name: 'Ambush',         desc: 'Everyone starts with half a special charged.' },
-  wind:   { icon: '💚', name: 'Second Wind',    desc: 'When your first member falls, heal everyone 25%.' },
-};
-function fighter(id, star, side, slot, mul, syn) {
+/* =====================================================================
+   ⚔️ TURN-BASED BATTLE ENGINE
+   ===================================================================== */
+const FX_KEYS = ['blind', 'taunt', 'weak', 'rage', 'slow', 'reflect', 'inv', 'frostHide'];
+function tbUnit(id, star, lv, side, slot, mul, syn, extra = {}) {
   const s = SUMMONS[id];
-  const d = s ? { id, name: s[0], icon: s[1], rar: 0, el: s[2], cls: s[3], range: s[4], hp: s[5], atk: s[6], cd: s[7], mana: 999, ab: null, txt: '' } : UD(id);
-  const m = (s ? 1 : RAR[d.rar].mul * starMul(star)) * mul;
-  const f = { id, d, star, side, slot, hp: d.hp * m, maxHp: d.hp * m, atk: d.atk * m, cd: d.cd, t: .25 + slot * .07 + side * .03, mana: 0, shield: 0, stun: 0, slowT: 0, slowA: 0, burn: 0, burnD: 0, poison: 0, poisonD: 0, blind: 0, taunt: 0, reflect: 0, frostHide: 0, crits: 0, rage: 0, inv: 0, alive: true, reborn: false, fx: 0, summon: !!s };
+  const d = s ? { id, name: s[0], icon: s[1], rar: 0, el: s[2], cls: s[3], range: s[4], hp: s[5], atk: s[6], spd: s[7], cdT: 99, ab: null, txt: '' } : UD(id);
+  const m = (s ? 1 : RAR[d.rar].mul * starMul(star) * lvMul(lv)) * mul;
+  const u = { id, d, star, lv, side, slot, hp: d.hp * m, maxHp: d.hp * m, atk: d.atk * m, spd: d.spd * (.95 + Math.random() * .1), cd: 1, shield: 0, stun: 0, burn: 0, burnD: 0, poison: 0, poisonD: 0, crit: 0, guard: 0, alive: true, reborn: false, summon: !!s, boss: !!extra.boss, fx: {} };
+  for (const k of FX_KEYS) u.fx[k] = 0;
+  if (u.boss) { u.hp = u.maxHp = u.maxHp * 1.7; u.atk *= 1.1; }
   const C = syn.c, E = syn.e;
-  if (d.cls === 'brawler') { const L = lv24(C.brawler || 0); f.maxHp *= L === 4 ? 1.45 : L ? 1.2 : 1; f.hp = f.maxHp; }
-  if (d.cls === 'guardian') { const L = lv24(C.guardian || 0); f.shield += f.maxHp * (L === 4 ? .5 : L ? .25 : 0); }
-  if (d.cls === 'ranger') { const L = lv24(C.ranger || 0); f.cd *= L === 4 ? .65 : L ? .85 : 1; }
-  const A = lv24(E.arcane); f.shield += f.maxHp * (A === 4 ? .3 : A ? .15 : 0);
-  return f;
+  if (d.cls === 'brawler' && (C.brawler || 0) >= 2) { u.maxHp *= 1.25; u.hp = u.maxHp; }
+  if (d.cls === 'guardian' && (C.guardian || 0) >= 2) u.shield += u.maxHp * .3;
+  if (d.cls === 'ranger' && (C.ranger || 0) >= 2) u.spd *= 1.25;
+  if ((C.mystic || 0) >= 2) u.cd = 0;
+  const A = eLv(E.arcane); u.shield += u.maxHp * (A === 3 ? .3 : A ? .15 : 0);
+  if (id === 'chrono') { u.cd = 0; u.spd = 999; }
+  return u;
 }
-function makeSide(ids, stars, side, mul, tactic) {
-  const syn = synergy(ids);
-  const f = []; ids.forEach((id, slot) => { if (id) f.push(fighter(id, stars[slot], side, slot, mul, syn)); });
-  f.forEach(x => { x.syn = syn; if (tactic === 'attack') { x.atk *= 1.2; x.maxHp *= .85; x.hp = x.maxHp; } if (tactic === 'hold' && x.slot < 3) x.shield += x.maxHp * .4; if (tactic === 'ambush') x.mana = x.d.mana * .5; });
-  return f;
+function tbSide(ids, stars, lvs, side, mul, bossSlot) {
+  const syn = synergy(ids), out = [];
+  ids.forEach((id, slot) => { if (id) { const u = tbUnit(id, stars[slot], lvs[slot], side, slot, mul, syn, { boss: slot === bossSlot }); u.syn = syn; out.push(u); } });
+  return out;
 }
-function genEnemyTeam() {
-  const a = run.act, n = clamp(3 + Math.floor((a - 1) * 1.1 + run.room / 4), 3, 6);
-  const rates = [[70, 25, 5, 0, 0], [45, 32, 18, 5, 0], [28, 32, 26, 12, 2], [18, 28, 30, 18, 6], [10, 22, 32, 24, 12]][Math.min(4, a - 1)];
-  const ids = [], stars = [];
-  for (let k = 0; k < n; k++) { const r = weighted(rates.map((w, i) => ({ r: i, w }))).r; const pool = Object.keys(ROSTER).filter(q => ROSTER[q][2] === r); ids.push(pick(pool)); stars.push(clamp(1 + Math.floor(rnd() * (a * .8 + run.room / 6)), 1, 5)); }
-  const order = [1, 0, 2, 4, 3, 5], board = [null, null, null, null, null, null], st = [1, 1, 1, 1, 1, 1];
-  const sorted = ids.map((id, k) => ({ id, s: stars[k] })).sort((x, y) => (UD(y.id).range === 'melee') - (UD(x.id).range === 'melee') || (UD(y.id).cls === 'guardian') - (UD(x.id).cls === 'guardian'));
-  sorted.forEach((x, k) => { board[order[k]] = x.id; st[order[k]] = x.s; });
-  return { ids: board, stars: st, mul: .9 + .1 * (a - 1) + .02 * run.room + .1 * run.heat };
-}
-function newBattle(enemy, tactic) {
-  const my = team(), myStars = my.map(id => id ? ownStar(id) : 1);
-  const B = { t: 0, done: null, anims: [], texts: [], tactic, rally: false, windUsed: false, log: [] };
-  B.f = makeSide(my, myStars, 0, 1, tactic).concat(makeSide(enemy.ids, enemy.stars, 1, enemy.mul, null));
+function tbNew(my, foe) {
+  const B = { round: 0, queue: [], ev: [], hits: [], log: [], done: null, auto: false, speed: 1, mode: 'wait', cur: null };
+  B.u = tbSide(my.ids, my.stars, my.lvs, 0, 1).concat(tbSide(foe.ids, foe.stars, foe.lvs, 1, foe.mul, foe.bossSlot));
   return B;
 }
-const foesOf = (B, x) => B.f.filter(y => y.alive && y.side !== x.side);
-const friendsOf = (B, x) => B.f.filter(y => y.alive && y.side === x.side);
-function laneTarget(B, x, list) { const col = x.slot % 3; return list.slice().sort((a, b) => Math.abs(a.slot % 3 - col) - Math.abs(b.slot % 3 - col) || a.slot - b.slot)[0]; }
-function pickT(B, x) {
-  const foes = foesOf(B, x); if (!foes.length) return null;
-  const taunt = foes.find(y => y.taunt > 0); if (taunt) return taunt;
-  if (x.side === 0 && B.tactic === 'focus') return foes.slice().sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
-  const front = foes.filter(y => y.slot < 3), back = foes.filter(y => y.slot >= 3);
-  if (x.d.cls === 'assassin') return back.length ? back.slice().sort((a, b) => a.hp - b.hp)[0] : laneTarget(B, x, front);
-  if (x.d.range === 'ranged') return front.length && Math.random() < .65 ? laneTarget(B, x, front) : foes[Math.floor(Math.random() * foes.length)];
-  return front.length ? laneTarget(B, x, front) : laneTarget(B, x, back);
+const tbFoes = (B, u) => B.u.filter(x => x.alive && x.side !== u.side);
+const tbFriends = (B, u) => B.u.filter(x => x.alive && x.side === u.side);
+const tbHas = (B, side, id) => B.u.some(x => x.alive && x.side === side && x.id === id);
+function tbValid(B, u, ignoreRows) {
+  let f = tbFoes(B, u); if (!f.length) return [];
+  const t = f.filter(x => x.fx.taunt > 0); if (t.length) return t;
+  if (!ignoreRows && u.d.range === 'melee' && u.d.cls !== 'assassin') { const fr = f.filter(x => x.slot < 2); if (fr.length) return fr; }
+  return f;
 }
-function healF(B, from, to, amt) {
+const tbRow = (B, side, front) => B.u.filter(x => x.alive && x.side === side && (x.slot < 2) === front);
+function tbText(B, u, s, c) { B.ev.push({ u, s, c }); }
+function tbHeal(B, from, to, amt) {
   if (!to || !to.alive) return;
-  const L = lv24(from.syn.c.support || 0); amt *= L === 4 ? 1.6 : L ? 1.3 : 1;
-  to.hp = Math.min(to.maxHp, to.hp + amt); B.texts.push({ f: to, s: '+' + Math.round(amt), c: '#5ee08a', t: .7 });
+  if ((from.syn.c.support || 0) >= 2) amt *= 1.4;
+  const h = Math.min(to.maxHp - to.hp, amt); to.hp += h; if (h > .5) tbText(B, to, '+' + Math.round(h), '#5ee08a');
 }
-function dmgF(B, a, t, dmg, color, kind) {
+function tbDmg(B, a, t, mult, kind = 'hit', o = {}) {
   if (!t || !t.alive) return 0;
-  if (a.blind > 0 && kind !== 'ab' && Math.random() < .5) { B.texts.push({ f: t, s: 'miss', c: '#aaa', t: .5 }); return 0; }
-  if (BEATS[a.d.el] === t.d.el) dmg *= 1.3; else if (BEATS[t.d.el] === a.d.el) dmg *= .8;
-  if (a.rage > 0) dmg *= 1.3;
-  if (a.side === 0 && B.f.some(y => y.side === 0 && y.alive && y.d.ab === 'fortune' && y.lucky)) dmg *= 1.1;
+  if (t.fx.inv > 0) { tbText(B, t, 'immune', '#ffe680'); return 0; }
+  if (kind !== 'dot' && t.id === 'void' && Math.random() < .3) { tbText(B, t, 'dodge!', '#c9a8ff'); return 0; }
+  if (kind === 'hit' && a.fx.blind > 0 && Math.random() < .5) { tbText(B, t, 'miss', '#aaa'); return 0; }
+  let dmg = a.atk * mult;
+  if (BEATS[a.d.el] === t.d.el) dmg *= 1.4; else if (BEATS[t.d.el] === a.d.el) dmg *= .75;
+  if (a.fx.rage > 0) dmg *= 1.4;
+  if (a.fx.weak > 0) dmg *= .7;
+  if (a.id === 'kong' && t.stun > 0) dmg *= 2;
   const E = a.syn.e, C = a.syn.c;
-  let cc = .05 + (lv24(E.blade) === 4 ? .3 : lv24(E.blade) ? .15 : 0) + (a.d.cls === 'assassin' ? (lv24(C.assassin || 0) === 4 ? .4 : lv24(C.assassin || 0) ? .2 : 0) : 0), cm = a.d.cls === 'assassin' && lv24(C.assassin || 0) === 4 ? 2.5 : 2;
-  let crit = false; if (a.crits > 0 && kind !== 'dot') { a.crits--; crit = true; } else if (kind !== 'dot' && Math.random() < cc) crit = true;
-  if (crit) dmg *= cm;
-  if (lv24(E.fire) && kind !== 'dot') { t.burn = 3; t.burnD = Math.max(t.burnD, a.atk * (lv24(E.fire) === 4 ? .3 : .15)); if (lv24(E.fire) === 4) dmg *= 1.2; }
-  if (lv24(E.frost) && kind !== 'dot') { t.slowT = 2; t.slowA = lv24(E.frost) === 4 ? .4 : .2; }
-  if (t.inv > 0) { B.texts.push({ f: t, s: 'immune', c: '#ffe680', t: .5 }); return 0; }
-  if (t.d.cls === 'guardian') dmg *= .85;
+  let crit = false;
+  if (kind !== 'dot') {
+    const cc = .08 + (eLv(E.blade) === 3 ? .3 : eLv(E.blade) ? .15 : 0) + (a.d.cls === 'assassin' && (C.assassin || 0) >= 2 ? .25 : 0) + (tbHas(B, a.side, 'luckycat') ? .2 : 0) + (a.id === 'reaper' ? .25 : 0);
+    if (o.crit || a.crit > 0 || Math.random() < cc) { crit = true; if (!o.crit && a.crit > 0) a.crit--; dmg *= 1.8; }
+    if (eLv(E.fire) === 3) dmg *= 1.15;
+  }
+  if (t.guard) dmg *= .5;
+  if (tbHas(B, t.side, 'paladin')) dmg *= .85;
   const sh = Math.min(t.shield, dmg); t.shield -= sh; dmg -= sh;
-  t.hp -= dmg; t.fx = .15; t.mana = Math.min(t.d.mana, t.mana + 4);
-  if (kind === 'hit' && a.d.range === 'melee') { if (t.reflect > 0) { a.hp -= dmg * .4; a.fx = .15; } if (t.frostHide > 0) a.stun = Math.max(a.stun, .8); }
-  if (Math.round(dmg) <= 0 && sh > 0) { if (kind !== 'dot') B.texts.push({ f: t, s: 'blocked', c: '#7fe3ff', t: .5 }); }
-  else if (kind !== 'dot' || dmg >= 1) B.texts.push({ f: t, s: Math.round(dmg) + (crit ? '!' : ''), c: crit ? '#ffd24a' : kind === 'dot' ? '#ff9a50' : '#fff', t: .6 });
-  if (color) B.anims.push({ a, t, c: color, life: .25 });
-  if (t.hp <= 0) killF(B, t);
-  if (a.hp <= 0 && a.alive) killF(B, a);
+  t.hp -= dmg;
+  if (dmg < .5 && sh > 0) tbText(B, t, 'blocked', '#7fe3ff'); else tbText(B, t, Math.round(dmg) + (crit ? '!' : ''), crit ? '#ffd24a' : kind === 'dot' ? '#ff9a50' : BEATS[a.d.el] === t.d.el ? '#ff8a8a' : '#fff');
+  if (kind !== 'dot') {
+    B.hits.push({ a, t, c: ELEMENTS[a.d.el].color });
+    if (eLv(E.fire) || a.id === 'ninetail') { t.burn = Math.max(t.burn, 2); t.burnD = Math.max(t.burnD, a.atk * (eLv(E.fire) === 3 || a.id === 'ninetail' ? .3 : .18)); }
+    if (a.d.range === 'melee') { if (t.fx.reflect > 0) { a.hp -= dmg * .5; tbText(B, a, '-' + Math.round(dmg * .5), '#dfe8ff'); } if (t.fx.frostHide > 0) { a.stun = Math.max(a.stun, 1); tbText(B, a, 'frozen!', '#9fe8ff'); } }
+  }
+  if (kind === 'hit') {
+    const fr = eLv(E.frost); if (fr && t.hp > 0 && Math.random() < (fr === 3 ? .3 : .15)) { t.stun = Math.max(t.stun, 1); tbText(B, t, 'frozen!', '#9fe8ff'); }
+    const st = eLv(E.storm); let chains = st && Math.random() < (st === 3 ? .45 : .25) ? (st === 3 ? 2 : 1) : 0; if (a.id === 'thor') chains = Math.max(chains, 1);
+    let last = t; while (chains-- > 0) { const c = tbFoes(B, a).find(y => y !== last); if (!c) break; tbDmg(B, a, c, .5, 'chain'); last = c; }
+  }
+  if (t.hp <= 0) tbKill(B, t, a);
+  if (a.hp <= 0 && a.alive) tbKill(B, a, t);
   return dmg;
 }
-function killF(B, t) {
-  if (t.d.ab === 'dragonfire' && !t.reborn) { t.reborn = true; t.hp = t.maxHp * .5; t.burn = 0; t.poison = 0; B.texts.push({ f: t, s: 'REBORN!', c: '#ff8a3c', t: 1.2 }); return; }
-  t.alive = false; t.hp = 0;
-  if (t.side === 0 && B.tactic === 'wind' && !B.windUsed) { B.windUsed = true; friendsOf(B, t).forEach(y => healF(B, y, y, y.maxHp * .25)); B.log.push('💚 Second Wind!'); }
+function tbKill(B, t, by) {
+  if (t.id === 'dragon' && !t.reborn) { t.reborn = true; t.hp = t.maxHp * .5; t.burn = 0; t.poison = 0; tbText(B, t, '🔥 REBORN!', '#ff8a3c'); return; }
+  t.alive = false; t.hp = 0; t.stun = 0;
+  B.log.push(`💥 ${t.d.icon} ${t.d.name} fainted`);
+  if (by && by.id === 'reaper' && by.alive) { by.cd = 0; tbText(B, by, 'soul harvested', '#c9a8ff'); }
 }
-function emptySlot(B, side) { for (const s of [0, 1, 2, 3, 4, 5]) if (!B.f.some(y => y.alive && y.side === side && y.slot === s)) return s; return -1; }
-function summon(B, x, id) {
-  const L = lv24(x.syn.c.summoner || 0), n = L === 4 ? 2 : 1;
-  for (let k = 0; k < n; k++) { const s = emptySlot(B, x.side); if (s < 0) return; const f = fighter(id, 1, x.side, s, (1 + .1 * (x.star - 1)) * (L === 4 ? 1.9 : L ? 1.4 : 1), x.syn); f.syn = x.syn; f.atk *= RAR[x.d.rar].mul; f.maxHp *= RAR[x.d.rar].mul; f.hp = f.maxHp; B.f.push(f); B.texts.push({ f, s: 'summoned!', c: '#8fe08a', t: .8 }); }
+function tbEmpty(B, side) { for (const s of [0, 1, 2, 3]) if (!B.u.some(y => y.alive && y.side === side && y.slot === s)) return s; return -1; }
+function tbSummon(B, x, id) {
+  const s = tbEmpty(B, x.side); if (s < 0) { tbFriends(B, x).forEach(y => y.fx.rage = Math.max(y.fx.rage, 1)); tbText(B, x, 'no room — rage!', '#ffd24a'); return; }
+  B.u = B.u.filter(y => !(y.side === x.side && y.slot === s && !y.alive));
+  const boost = ((x.syn.c.summoner || 0) >= 2 ? 1.6 : 1) * RAR[x.d.rar].mul * starMul(x.star) * lvMul(x.lv);
+  const f = tbUnit(id, 1, 1, x.side, s, boost, x.syn); f.syn = x.syn; f.cd = 99; B.u.push(f); tbText(B, f, 'summoned!', '#8fe08a');
+  B.queue.push(f);
 }
-function moveRow(B, t, toBack) { const want = toBack ? t.slot % 3 + 3 : t.slot % 3; if (want === t.slot) return; const other = B.f.find(y => y.alive && y.side === t.side && y.slot === want); if (other) other.slot = t.slot; t.slot = want; }
+function tbMoveRow(B, t, toBack) { const want = toBack ? t.slot % 2 + 2 : t.slot % 2; if (want === t.slot) return; const other = B.u.find(y => y.alive && y.side === t.side && y.slot === want); if (other) other.slot = t.slot; t.slot = want; }
+const tbHurtAlly = (B, u) => tbFriends(B, u).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
+const tbRand = l => l[Math.floor(Math.random() * l.length)];
+const tbRowTargets = (B, u, front) => { const r = tbRow(B, 1 - u.side, front); return r.length ? r : tbRow(B, 1 - u.side, !front); };
+// specials: t = 'enemy' needs a target (rows ignored), 'none' = no target, heal = only worth using when someone is hurt
 const AB = {
-  frenzy(B, x) { for (let k = 0; k < 3; k++) dmgF(B, x, pickT(B, x), x.atk * .8, '#fff', 'ab'); },
-  pull(B, x) { const back = foesOf(B, x).filter(y => y.slot >= 3); const t = back.sort((a, b) => a.maxHp - b.maxHp)[0] || pickT(B, x); if (t) { moveRow(B, t, false); dmgF(B, x, t, x.atk * 1.2, '#5ee08a', 'ab'); B.texts.push({ f: t, s: 'pulled!', c: '#8fe', t: .8 }); } },
-  sting3(B, x) { const fs = foesOf(B, x); for (let k = 0; k < 3 && fs.length; k++) dmgF(B, x, fs[Math.floor(Math.random() * fs.length)], x.atk * .9, '#fff27a', 'ab'); },
-  spikes(B, x) { x.reflect = 4; B.texts.push({ f: x, s: 'spikes!', c: '#dfe8ff', t: .8 }); },
-  hide(B, x) { x.shield += x.maxHp * .45; B.texts.push({ f: x, s: 'shield', c: '#7fe3ff', t: .8 }); },
-  fireball(B, x) { const t = pickT(B, x); dmgF(B, x, t, x.atk * 2.6, '#ff8a3c', 'ab'); if (t) { t.burn = 3; t.burnD = Math.max(t.burnD, x.atk * .3); } },
-  knock(B, x) { const t = pickT(B, x); if (t) { dmgF(B, x, t, x.atk * 2, '#9fe8ff', 'ab'); if (t.alive) { moveRow(B, t, true); B.texts.push({ f: t, s: 'knocked back!', c: '#9fe8ff', t: .8 }); } } },
-  spores(B, x) { const lane = (pickT(B, x) || {}).slot % 3; foesOf(B, x).filter(y => y.slot % 3 === lane).forEach(y => { y.poison = 5; y.poisonD = x.atk * .45; B.anims.push({ a: x, t: y, c: '#b07cff', life: .3 }); }); },
-  double(B, x) { const t = pickT(B, x); dmgF(B, x, t, x.atk * 1.1, '#dfe8ff', 'ab'); dmgF(B, x, t && t.alive ? t : pickT(B, x), x.atk * 1.1, '#dfe8ff', 'ab'); },
-  stun1(B, x) { const t = pickT(B, x); if (t) { dmgF(B, x, t, x.atk * 1.2, '#9fe8ff', 'ab'); t.stun = Math.max(t.stun, 1.2); B.texts.push({ f: t, s: 'stunned', c: '#ffe680', t: .8 }); } },
-  blink(B, x) { const back = foesOf(B, x).filter(y => y.slot >= 3).sort((a, b) => a.hp - b.hp)[0] || pickT(B, x); dmgF(B, x, back, x.atk * 2.4, '#c9a8ff', 'ab'); },
-  pup(B, x) { summon(B, x, 'pup'); },
-  drain(B, x) { const d = dmgF(B, x, pickT(B, x), x.atk * 1.8, '#ff5c8a', 'ab'); healF(B, x, x, d * .8); },
-  taunt(B, x) { x.taunt = 3; x.shield += x.maxHp * .15; B.texts.push({ f: x, s: 'TAUNT!', c: '#ffb84a', t: 1 }); },
-  heal1(B, x) { const h = friendsOf(B, x).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0]; healF(B, x, h, x.atk * 3.5); if (h) B.anims.push({ a: x, t: h, c: '#5ee08a', life: .3 }); },
-  venom(B, x) { const t = pickT(B, x); if (t) { dmgF(B, x, t, x.atk, '#8fe08a', 'ab'); t.poison = 6; t.poisonD = x.atk * .9; } },
-  insight(B, x) { friendsOf(B, x).forEach(y => y.crits = Math.max(y.crits, 1)); x.crits = 3; B.texts.push({ f: x, s: 'insight!', c: '#c9a8ff', t: .8 }); },
-  chain4(B, x) { let t = pickT(B, x), hitS = new Set(); for (let k = 0; k < 5 && t; k++) { dmgF(B, x, t, x.atk * (k ? .8 : 1.3), '#fff27a', 'ab'); hitS.add(t); t = foesOf(B, x).find(y => !hitS.has(y)); } },
-  banana(B, x) { const t = pickT(B, x); if (t) { dmgF(B, x, t, x.atk * 1.3, '#ffe066', 'ab'); t.stun = Math.max(t.stun, 1.5); t.mana = 0; B.texts.push({ f: t, s: '🍌 slipped!', c: '#ffe066', t: .9 }); } },
-  sweep(B, x) { foesOf(B, x).filter(y => y.slot < 3).forEach(y => dmgF(B, x, y, x.atk * 1.3, '#9fe8ff', 'ab')); },
-  roar(B, x) { friendsOf(B, x).forEach(y => y.rage = 5); B.texts.push({ f: x, s: 'ROAR!', c: '#ffd24a', t: 1 }); },
-  massheal(B, x) { friendsOf(B, x).forEach(y => healF(B, x, y, y.maxHp * .18)); },
-  execute(B, x) { const low = foesOf(B, x).find(y => y.hp / y.maxHp < .3); if (low && !low.d.ab?.startsWith('dragon')) { low.hp = 0; killF(B, low); B.texts.push({ f: low, s: 'EXECUTED', c: '#ff6070', t: 1 }); B.anims.push({ a: x, t: low, c: '#ff6070', life: .3 }); } else dmgF(B, x, pickT(B, x), x.atk * 2.8, '#ff6070', 'ab'); },
-  froze(B, x) { x.shield += x.maxHp * .35; x.frostHide = 4; B.texts.push({ f: x, s: 'frozen hide', c: '#9fe8ff', t: .8 }); },
-  clap(B, x) { foesOf(B, x).filter(y => y.slot >= 3).forEach(y => { y.stun = Math.max(y.stun, 1); dmgF(B, x, y, x.atk * .9, '#fff27a', 'ab'); }); },
-  ink(B, x) { const t = pickT(B, x); if (!t) return; const row = t.slot < 3; foesOf(B, x).filter(y => (y.slot < 3) === row).forEach(y => { y.blind = 3; B.anims.push({ a: x, t: y, c: '#555', life: .3 }); }); },
-  burst(B, x) { const t = pickT(B, x); if (!t) return; foesOf(B, x).filter(y => y === t || (Math.floor(y.slot / 3) === Math.floor(t.slot / 3) && Math.abs(y.slot % 3 - t.slot % 3) === 1)).forEach(y => { dmgF(B, x, y, x.atk * 1.4, '#ff8a3c', 'ab'); y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .3); }); },
-  overcharge(B, x) { x.shield += x.maxHp * .3; x.reflect = 4; B.texts.push({ f: x, s: 'overcharge!', c: '#fff27a', t: .8 }); },
-  inferno(B, x) { foesOf(B, x).forEach(y => { y.burn = 4; y.burnD = Math.max(y.burnD, x.atk * .45); B.anims.push({ a: x, t: y, c: '#ff8a3c', life: .3 }); }); },
-  revive(B, x) { const dead = B.f.filter(y => !y.alive && y.side === x.side && !y.summon && !y.revived)[0]; if (dead) { dead.alive = true; dead.revived = true; dead.hp = dead.maxHp * .5; dead.stun = 0; B.texts.push({ f: dead, s: 'REVIVED!', c: '#ffc2f0', t: 1.2 }); if (B.f.some(y => y.alive && y.side === dead.side && y !== dead && y.slot === dead.slot)) dead.slot = emptySlot(B, dead.side) >= 0 ? emptySlot(B, dead.side) : dead.slot; } else friendsOf(B, x).forEach(y => healF(B, x, y, y.maxHp * .12)); },
-  feast(B, x) { let t = 0; foesOf(B, x).forEach(y => t += dmgF(B, x, y, x.atk * .8, '#ff5c8a', 'ab')); healF(B, x, x, t * .6); },
-  wall(B, x) { friendsOf(B, x).forEach(y => { y.shield += y.maxHp * .3; }); B.texts.push({ f: x, s: 'STONE WALL', c: '#7fe3ff', t: 1 }); },
-  stomp(B, x) { foesOf(B, x).filter(y => y.slot < 3).forEach(y => { dmgF(B, x, y, x.atk * 1.1, '#fff27a', 'ab'); y.stun = Math.max(y.stun, 1.5); }); },
-  blizzard(B, x) { foesOf(B, x).forEach(y => { y.stun = Math.max(y.stun, 1.5); dmgF(B, x, y, x.atk * .6, '#9fe8ff', 'ab'); }); },
-  pumpkins(B, x) { summon(B, x, 'pumpkinling'); summon(B, x, 'pumpkinling'); },
-  dragonfire(B, x) { const t = pickT(B, x); if (!t) return; const row = t.slot < 3; foesOf(B, x).filter(y => (y.slot < 3) === row).forEach(y => { dmgF(B, x, y, x.atk * 2.2, '#ff6030', 'ab'); y.burn = 4; y.burnD = Math.max(y.burnD, x.atk * .4); }); },
-  aegis(B, x) { friendsOf(B, x).forEach(y => { y.inv = 2; healF(B, x, y, y.maxHp * .15); }); B.texts.push({ f: x, s: 'HOLY AEGIS', c: '#ffe680', t: 1.2 }); },
-  judgment(B, x) { for (let k = 0; k < 8; k++) { const fs = foesOf(B, x); if (!fs.length) break; dmgF(B, x, fs[Math.floor(Math.random() * fs.length)], x.atk * .9, '#fff27a', 'ab'); } },
-  riftswap(B, x) { foesOf(B, x).forEach(y => { y.slot = y.slot < 3 ? y.slot + 3 : y.slot - 3; }); B.texts.push({ f: x, s: 'RIFT SWAP!', c: '#c9a8ff', t: 1.2 }); dmgF(B, x, pickT(B, x), x.atk * 2, '#c9a8ff', 'ab'); },
-  tidal(B, x) { foesOf(B, x).forEach(y => dmgF(B, x, y, x.atk * 1.2, '#5cb8ff', 'ab')); foesOf(B, x).filter(y => y.slot < 3).forEach(y => moveRow(B, y, true)); },
-  foxfire(B, x) { for (let k = 0; k < 9; k++) { const fs = foesOf(B, x); if (!fs.length) break; dmgF(B, x, fs.sort((a, b) => a.hp - b.hp)[0], x.atk * .55, '#ff8a3c', 'ab'); } },
-  fortune(B, x) { const r = Math.random(); x.lucky = true;
-    if (r < .25) { friendsOf(B, x).forEach(y => healF(B, x, y, y.maxHp * .2)); B.texts.push({ f: x, s: '🍀 heal!', c: '#5ee08a', t: 1 }); }
-    else if (r < .5) { friendsOf(B, x).forEach(y => y.rage = 5); B.texts.push({ f: x, s: '🍀 rage!', c: '#ffd24a', t: 1 }); }
-    else if (r < .75) { friendsOf(B, x).forEach(y => y.shield += y.maxHp * .25); B.texts.push({ f: x, s: '🍀 shields!', c: '#7fe3ff', t: 1 }); }
-    else { dmgF(B, x, pickT(B, x), x.atk * 6, '#ffd24a', 'ab'); B.texts.push({ f: x, s: '🍀 JACKPOT!', c: '#ffd24a', t: 1.2 }); } },
+  frenzy:   { t: 'enemy', fn(B, x, t) { for (let k = 0; k < 3; k++) tbDmg(B, x, t.alive ? t : tbRand(tbValid(B, x)), .65, 'ab'); } },
+  pull:     { t: 'enemy', fn(B, x, t) { tbMoveRow(B, t, false); tbText(B, t, 'pulled!', '#8fe'); tbDmg(B, x, t, 1.4, 'ab'); } },
+  sting3:   { t: 'none', fn(B, x) { for (let k = 0; k < 3; k++) { const f = tbFoes(B, x); if (f.length) tbDmg(B, x, tbRand(f), .85, 'ab'); } } },
+  spikes:   { t: 'none', fn(B, x) { x.fx.taunt = 2; x.fx.reflect = 2; tbText(B, x, 'SPIKES!', '#dfe8ff'); } },
+  hide:     { t: 'none', fn(B, x) { x.shield += x.maxHp * .5; tbText(B, x, 'shield', '#7fe3ff'); } },
+  fireball: { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.2, 'ab'); t.burn = 2; t.burnD = Math.max(t.burnD, x.atk * .35); } },
+  knock:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.9, 'ab'); if (t.alive) { tbMoveRow(B, t, true); tbText(B, t, 'knocked back!', '#9fe8ff'); } } },
+  spores:   { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.poison = 3; y.poisonD = Math.max(y.poisonD, x.atk * .4); tbDmg(B, x, y, .3, 'ab'); }); } },
+  double:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.1, 'ab'); tbDmg(B, x, t.alive ? t : tbRand(tbValid(B, x, true)), 1.1, 'ab'); } },
+  stun1:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); if (t.alive) { t.stun = Math.max(t.stun, 1); tbText(B, t, 'stunned', '#ffe680'); } } },
+  carrot:   { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, tbHurtAlly(B, x), x.atk * 4); } },
+  ember:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 1.1, 'ab'); y.burn = 2; y.burnD = Math.max(y.burnD, x.atk * .3); }); } },
+  steal:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.6, 'ab'); if (t.alive) { t.cd += 2; tbText(B, t, 'special delayed', '#c9a8ff'); } } },
+  blink:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.5, 'ab'); } },
+  pup:      { t: 'none', fn(B, x) { tbSummon(B, x, 'pup'); } },
+  drain:    { t: 'enemy', fn(B, x, t) { const d = tbDmg(B, x, t, 1.8, 'ab'); tbHeal(B, x, x, d * .8); } },
+  taunt:    { t: 'none', fn(B, x) { x.fx.taunt = 2; x.shield += x.maxHp * .25; tbText(B, x, 'TAUNT!', '#ffb84a'); } },
+  heal1:    { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, tbHurtAlly(B, x), x.atk * 5.5); } },
+  venom:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1, 'ab'); if (t.alive) { t.poison = 3; t.poisonD = Math.max(t.poisonD, x.atk * .8); tbText(B, t, 'poisoned', '#8fe08a'); } } },
+  insight:  { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => y.crit = Math.max(y.crit, 1)); x.crit = 2; tbText(B, x, 'INSIGHT', '#c9a8ff'); } },
+  chain4:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); tbFoes(B, x).filter(y => y !== t).forEach(y => tbDmg(B, x, y, .8, 'ab')); } },
+  sweep:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => tbDmg(B, x, y, 1.35, 'ab')); } },
+  banana:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); if (t.alive) { t.stun = Math.max(t.stun, 1); t.cd += 1; tbText(B, t, '🍌 slipped!', '#ffe066'); } } },
+  slide:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .85, 'ab'); y.fx.slow = 2; }); } },
+  nap:      { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, x, x.maxHp * .4); x.fx.taunt = 2; tbText(B, x, 'zzz... TAUNT', '#ffb84a'); } },
+  squawk:   { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { y.fx.blind = 2; tbDmg(B, x, y, .7, 'ab'); tbText(B, y, 'blinded', '#aaa'); }); } },
+  roar:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => y.fx.rage = Math.max(y.fx.rage, 2)); tbText(B, x, 'ROAR!', '#ffd24a'); } },
+  massheal: { t: 'none', heal: true, fn(B, x) { tbFriends(B, x).forEach(y => tbHeal(B, x, y, x.atk * 2.6)); } },
+  execute:  { t: 'enemy', fn(B, x, t) { if (t.hp / t.maxHp < .35 && !t.boss) { t.hp = 0; tbText(B, t, 'EXECUTED', '#ff6070'); B.hits.push({ a: x, t, c: '#ff6070' }); tbKill(B, t, x); } else tbDmg(B, x, t, 2.6, 'ab'); } },
+  froze:    { t: 'none', fn(B, x) { x.shield += x.maxHp * .4; x.fx.frostHide = 2; x.fx.taunt = 1; tbText(B, x, 'frozen hide', '#9fe8ff'); } },
+  clap:     { t: 'none', fn(B, x) { tbRowTargets(B, x, false).forEach(y => { tbDmg(B, x, y, 1, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); } },
+  ink:      { t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { y.fx.blind = 2; tbDmg(B, x, y, .6, 'ab'); tbText(B, y, 'inked', '#888'); }); } },
+  burst:    { t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { tbDmg(B, x, y, 1.5, 'ab'); y.burn = 2; y.burnD = Math.max(y.burnD, x.atk * .35); }); } },
+  overcharge:{ t: 'none', fn(B, x) { x.shield += x.maxHp * .35; x.fx.reflect = 2; x.fx.taunt = 1; tbText(B, x, 'overcharge!', '#fff27a'); } },
+  bloodfin: { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, t.hp / t.maxHp < .5 ? 4.4 : 2.2, 'ab'); } },
+  trample:  { t: 'none', fn(B, x) { const r = tbRowTargets(B, x, true); r.forEach(y => tbDmg(B, x, y, 1.4, 'ab')); const s = tbRand(r.filter(y => y.alive)); if (s) { s.stun = 1; tbText(B, s, 'trampled', '#ffe680'); } } },
+  dazzle:   { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.fx.blind = Math.max(y.fx.blind, 1); y.fx.weak = 2; tbText(B, y, 'dazzled', '#c9a8ff'); }); } },
+  pounce:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.1, 'ab'); const o = tbFoes(B, x).find(y => y !== t); if (o) tbDmg(B, x, o, 1.1, 'ab'); } },
+  inferno:  { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .9, 'ab'); y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .5); }); } },
+  revive:   { t: 'none', fn(B, x) { const dead = B.u.find(y => !y.alive && y.side === x.side && !y.summon && !y.revived && !B.u.some(z => z.alive && z.side === y.side && z.slot === y.slot)); if (dead) { dead.alive = true; dead.revived = true; dead.hp = dead.maxHp * .5; dead.burn = dead.poison = 0; tbText(B, dead, '🌈 REVIVED!', '#ffc2f0'); B.queue.push(dead); } else tbFriends(B, x).forEach(y => tbHeal(B, x, y, x.atk * 2)); } },
+  feast:    { t: 'none', fn(B, x) { let t = 0; tbFoes(B, x).forEach(y => t += tbDmg(B, x, y, 1, 'ab')); tbHeal(B, x, x, t * .6); } },
+  wall:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.shield += y.maxHp * .35; }); x.fx.taunt = 1; tbText(B, x, 'STONE WALL', '#7fe3ff'); } },
+  stomp:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 1.3, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); } },
+  blizzard: { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .8, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); tbText(B, x, 'BLIZZARD', '#9fe8ff'); } },
+  pumpkins: { t: 'none', fn(B, x) { tbSummon(B, x, 'pumpkinling'); tbSummon(B, x, 'pumpkinling'); } },
+  sanctuary:{ t: 'none', heal: true, fn(B, x) { tbFriends(B, x).forEach(y => { tbHeal(B, x, y, x.atk * 3); y.burn = y.poison = y.stun = 0; y.fx.weak = y.fx.blind = 0; }); tbText(B, x, 'SANCTUARY', '#fff'); } },
+  tentacles:{ t: 'none', fn(B, x) { for (let k = 0; k < 5; k++) { const f = tbFoes(B, x); if (!f.length) break; const y = tbRand(f); tbDmg(B, x, y, .75, 'ab'); y.fx.weak = 2; } } },
+  iaido:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => tbDmg(B, x, y, 1.5, 'ab', { crit: y.hp / y.maxHp < .5 })); } },
+  wish:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.fx.rage = Math.max(y.fx.rage, 2); if (y !== x) y.cd = Math.max(0, y.cd - 2); }); tbText(B, x, '✨ WISH GRANTED', '#fff27a'); } },
+  dragonfire:{ t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { tbDmg(B, x, y, 2.4, 'ab'); y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .45); }); tbText(B, x, 'DRAGONFIRE', '#ff6030'); } },
+  aegis:    { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.fx.inv = 1; tbHeal(B, x, y, y.maxHp * .2); }); tbText(B, x, 'HOLY AEGIS', '#ffe680'); } },
+  judgment: { t: 'none', fn(B, x) { for (let k = 0; k < 8; k++) { const f = tbFoes(B, x); if (!f.length) break; tbDmg(B, x, tbRand(f), .85, 'ab'); } tbText(B, x, 'JUDGMENT', '#fff27a'); } },
+  riftswap: { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.slot = y.slot < 2 ? y.slot + 2 : y.slot - 2; }); tbText(B, x, 'RIFT SWAP!', '#c9a8ff'); tbRowTargets(B, x, true).forEach(y => tbDmg(B, x, y, 1.9, 'ab')); } },
+  tidal:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => tbDmg(B, x, y, 1.4, 'ab')); tbRow(B, 1 - x.side, true).forEach(y => tbMoveRow(B, y, true)); tbText(B, x, 'TIDAL WAVE', '#5cb8ff'); } },
+  foxfire:  { t: 'none', fn(B, x) { for (let k = 0; k < 9; k++) { const f = tbFoes(B, x); if (!f.length) break; tbDmg(B, x, f.sort((a, b) => a.hp - b.hp)[0], .6, 'ab'); } } },
+  fortune:  { t: 'none', fn(B, x) { const r = Math.random();
+    if (r < .25) { tbFriends(B, x).forEach(y => tbHeal(B, x, y, y.maxHp * .3)); tbText(B, x, '🍀 heal!', '#5ee08a'); }
+    else if (r < .5) { tbFriends(B, x).forEach(y => y.fx.rage = 3); tbText(B, x, '🍀 rage!', '#ffd24a'); }
+    else if (r < .75) { tbFriends(B, x).forEach(y => y.shield += y.maxHp * .35); tbText(B, x, '🍀 shields!', '#7fe3ff'); }
+    else { const f = tbFoes(B, x); if (f.length) tbDmg(B, x, tbRand(f), 7, 'ab'); tbText(B, x, '🎰 JACKPOT!', '#ffd24a'); } } },
+  sunrise:  { t: 'none', fn(B, x) { B.u.filter(y => !y.alive && y.side === x.side && !y.summon && !B.u.some(z => z.alive && z.side === y.side && z.slot === y.slot)).forEach(y => { y.alive = true; y.hp = y.maxHp * .4; y.burn = y.poison = 0; tbText(B, y, '🌞 REVIVED!', '#ffd24a'); B.queue.push(y); }); tbFoes(B, x).forEach(y => { y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .5); }); tbText(B, x, 'SUNRISE', '#ffd24a'); } },
+  timewarp: { t: 'none', fn(B, x) { const al = tbFriends(B, x).filter(y => y !== x); al.forEach(y => { y.cd = 0; y.stun = 0; }); B.queue = al.concat(B.queue.filter(y => !al.includes(y))); tbText(B, x, '⏳ REWIND', '#c9a8ff'); } },
+  kongsmash:{ t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 2.6, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); tbText(B, x, 'KONG SMASH', '#fff27a'); } },
+  reap:     { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { if (y.hp / y.maxHp < .35 && !y.boss) { y.hp = 0; tbText(B, y, 'REAPED', '#c9a8ff'); tbKill(B, y, x); } else tbDmg(B, x, y, 1.6, 'ab'); }); } },
 };
-function battleTick(B, dt) {
-  if (B.done) return;
-  B.t += dt;
-  const mys = side => { const f0 = B.f.find(y => y.side === side); const L = f0 ? lv24(f0.syn.c.mystic || 0) : 0; return L === 4 ? 1.4 : L ? 1.2 : 1; };
-  for (const x of B.f) if (x.alive) {
-    for (const k of ['stun', 'slowT', 'blind', 'taunt', 'reflect', 'frostHide', 'rage', 'inv', 'fx']) if (x[k] > 0) x[k] -= dt;
-    if (x.burn > 0) { x.burn -= dt; x.hp -= x.burnD * dt; if (x.hp <= 0) killF(B, x); }
-    if (x.poison > 0) { x.poison -= dt; x.hp -= x.poisonD * dt; if (x.hp <= 0) killF(B, x); }
-    if (lv24(x.syn.c.support || 0) === 4) x.hp = Math.min(x.maxHp, x.hp + x.maxHp * .008 * dt);
-    if (!x.alive || x.stun > 0) continue;
-    x.t -= dt * (x.slowT > 0 ? 1 - x.slowA : 1);
-    if (x.t > 0) continue;
-    x.t = x.cd;
-    if (x.d.ab && x.mana >= x.d.mana) { x.mana = 0; AB[x.d.ab](B, x); B.log.push(`${x.d.icon} ${x.d.name}: ${x.d.txt.split(':')[0]}`); continue; }
-    const t = pickT(B, x); if (!t) break;
-    dmgF(B, x, t, x.atk, ELEMENTS[x.d.el].color, 'hit');
-    x.mana = Math.min(x.d.mana, x.mana + 12 * mys(x.side));
-    const st = lv24(x.syn.e.storm); if (st && Math.random() < (st === 4 ? .4 : .2)) { let n = st === 4 ? 2 : 1, last = t; while (n-- > 0) { const c = foesOf(B, x).find(y => y !== last); if (!c) break; dmgF(B, x, c, x.atk * .5, '#fff27a', 'dot'); last = c; } }
+function tbNeedHeal(B, x) { return tbFriends(B, x).some(y => y.hp / y.maxHp < .65) || (x.d.ab === 'nap' && x.hp / x.maxHp < .7); }
+function tbAI(B, u) { // picks {act, t}
+  const ab = u.d.ab && AB[u.d.ab];
+  if (ab && u.cd <= 0 && (!ab.heal || tbNeedHeal(B, u)) && !(u.d.ab === 'revive' && !B.u.some(y => !y.alive && y.side === u.side && !y.summon) && !tbNeedHeal(B, u))) {
+    if (ab.t === 'enemy') { const f = tbFoes(B, u); return { act: 'sp', t: f.slice().sort((a, b) => tbScore(u, b) - tbScore(u, a))[0] }; }
+    return { act: 'sp' };
   }
-  for (const a of B.anims) a.life -= dt; B.anims = B.anims.filter(a => a.life > 0);
-  for (const t of B.texts) t.t -= dt; B.texts = B.texts.filter(t => t.t > 0);
-  const alive = s => B.f.some(x => x.alive && x.side === s);
-  if (!alive(1)) B.done = 'win'; else if (!alive(0)) B.done = 'lose';
-  else if (B.t > 60) { const pct = s => B.f.filter(x => x.side === s && !x.summon).reduce((a, x) => a + Math.max(0, x.hp) / x.maxHp, 0); B.done = pct(0) >= pct(1) ? 'win' : 'lose'; }
+  const v = tbValid(B, u); if (!v.length) return { act: 'guard' };
+  return { act: 'atk', t: v.slice().sort((a, b) => tbScore(u, b) - tbScore(u, a))[0] };
 }
-function useRally(B) { if (!B || B.rally || B.done) return; B.rally = true; sfx('revive'); B.f.filter(y => y.alive && y.side === 0).forEach(y => { healF(B, y, y, y.maxHp * .25); y.mana = Math.min(y.d.mana, y.mana + y.d.mana * .3); y.stun = 0; y.poison = 0; y.burn = 0; }); B.log.push('📯 Rally!'); }
-function simulateTeam(enemy, tactic) { const B = newBattle(enemy, tactic); while (!B.done) battleTick(B, .05); return B.done; }
+function tbScore(u, t) { return (BEATS[u.d.el] === t.d.el ? .5 : BEATS[t.d.el] === u.d.el ? -.3 : 0) + (1 - t.hp / t.maxHp) + (t.hp < u.atk * 1.2 ? 1 : 0) + Math.random() * .15; }
+function tbStartRound(B) {
+  B.round++;
+  for (const x of B.u) if (x.alive && x.id === 'sun') tbFriends(B, x).forEach(y => tbHeal(B, x, y, y.maxHp * .06));
+  B.queue = B.u.filter(x => x.alive).sort((a, b) => b.spd * (b.fx.slow > 0 ? .5 : 1) - a.spd * (a.fx.slow > 0 ? .5 : 1));
+}
+// start a unit's turn: damage over time, stun. Returns true if it can act.
+function tbBeginTurn(B, u) {
+  u.guard = 0;
+  if (u.id === 'whale') tbHeal(B, u, u, u.maxHp * .08);
+  if (u.burn > 0) { u.burn--; u.hp -= u.burnD; tbText(B, u, '🔥' + Math.round(u.burnD), '#ff9a50'); if (u.hp <= 0) tbKill(B, u); }
+  if (u.alive && u.poison > 0) { u.poison--; u.hp -= u.poisonD; tbText(B, u, '☠️' + Math.round(u.poisonD), '#8fe08a'); if (u.hp <= 0) tbKill(B, u); }
+  if (!u.alive) return false;
+  if (u.stun > 0) { u.stun--; tbText(B, u, '💫 skips turn', '#ffe680'); tbEndTurn(B, u, false); return false; }
+  return true;
+}
+function tbEndTurn(B, u, usedSp) {
+  for (const k of FX_KEYS) if (u.fx[k] > 0) u.fx[k]--;
+  if (!usedSp) u.cd = Math.max(0, u.cd - 1);
+  tbCheck(B);
+}
+function tbDo(B, u, act, t) {
+  B.hits = [];
+  if (!tbFoes(B, u).length) { tbCheck(B); return; }
+  let used = false;
+  if (act === 'sp' && u.d.ab && u.cd <= 0) {
+    const ab = AB[u.d.ab]; if (ab.t === 'enemy' && (!t || !t.alive)) t = tbRand(tbFoes(B, u));
+    ab.fn(B, u, t); u.cd = u.d.cdT; used = true;
+    B.log.push(`${u.d.icon} ${u.d.name} used ${u.d.txt.split(':')[0]}!`); B.flash = u;
+  } else if (act === 'guard') { u.guard = 1; u.cd = Math.max(0, u.cd - 1); tbText(B, u, '🛡️ guard', '#7fe3ff'); B.log.push(`${u.d.icon} ${u.d.name} guards.`); }
+  else { if (!t || !t.alive || !tbValid(B, u).includes(t)) t = tbValid(B, u)[0]; if (t) { tbDmg(B, u, t, 1, 'hit'); B.log.push(`${u.d.icon} ${u.d.name} attacks ${t.d.icon}`); } }
+  tbEndTurn(B, u, used);
+}
+function tbCheck(B) {
+  if (B.done) return;
+  const alive = s => B.u.some(x => x.alive && x.side === s);
+  if (!alive(1)) B.done = 'win'; else if (!alive(0)) B.done = 'lose'; else if (B.round > 30) B.done = 'lose';
+}
+// next unit that should act (starting new rounds as needed)
+function tbNextActor(B) {
+  for (let guard = 0; guard < 200 && !B.done; guard++) {
+    if (!B.queue.length) tbStartRound(B);
+    const u = B.queue.shift();
+    if (!u || !u.alive) continue;
+    return u;
+  }
+  return null;
+}
+function tbSimulate(my, foe) { // headless, both sides on auto
+  const B = tbNew(my, foe);
+  for (let n = 0; n < 600 && !B.done; n++) { const u = tbNextActor(B); if (!u) break; if (!tbBeginTurn(B, u)) { tbCheck(B); continue; } const a = tbAI(B, u); tbDo(B, u, a.act, a.t); B.ev = []; }
+  return B;
+}
+const myTeamSpec = () => { const t = team(); return { ids: t, stars: t.map(id => id ? ownStar(id) : 1), lvs: t.map(id => id ? lvOf(id) : 1) }; };
+
+/* =====================================================================
+   🗼 RIFT TOWER — the side mode
+   ===================================================================== */
+const TOWER_TOP = 60;
+const BLESS = [
+  { f: 10, icon: '🪙', txt: 'Runs start with +40 gold' },
+  { f: 20, icon: '🐾', txt: 'Buddies are 30% stronger' },
+  { f: 30, icon: '❤️', txt: '+15 max HP in runs' },
+  { f: 40, icon: '🎲', txt: '+2 rerolls every run' },
+  { f: 50, icon: '🏺', txt: 'Start every run with a random relic' },
+  { f: 60, icon: '👑', txt: 'Your buddy uses its skill twice as often' },
+];
+const hasBless = f => ((S.tower || {}).best || 0) >= f;
+function towerRng(f) { let s = hashStr('rift-tower-' + f); return () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), s | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function towerFloor(f) {
+  const R = towerRng(f), boss = f % 10 === 0;
+  const n = f <= 2 ? 2 : f <= 5 ? 3 : 4;
+  const rates = f <= 5 ? [80, 20, 0, 0, 0] : f <= 10 ? [65, 30, 5, 0, 0] : f <= 20 ? [30, 40, 25, 5, 0] : f <= 30 ? [15, 35, 35, 13, 2] : f <= 40 ? [5, 25, 40, 25, 5] : f <= 50 ? [0, 15, 40, 35, 10] : [0, 5, 35, 40, 20];
+  const pickR = () => { let r = R() * 100; for (let i = 0; i < 5; i++) { r -= rates[i]; if (r < 0) return i; } return 4; };
+  const all = Object.keys(ROSTER), ids = [], stars = [], lvs = [];
+  for (let k = 0; k < n; k++) { const r = pickR(); const pool = all.filter(q => ROSTER[q][2] === r); ids.push(pool[Math.floor(R() * pool.length)]); stars.push(clamp(1 + Math.floor(f / 25 + R() * .8), 1, 3)); lvs.push(clamp(1 + Math.floor(f * .35 + R() * 2), 1, 25)); }
+  let bossSlot = -1;
+  if (boss) { const r = f >= 30 ? 4 : 3, pool = all.filter(q => ROSTER[q][2] === r && q !== 'whale'); ids[0] = pool[Math.floor(R() * pool.length)]; }
+  // place melee in front, ranged in back
+  const order = ids.map((id, k) => ({ id, s: stars[k], l: lvs[k], m: UD(id).range === 'melee' ? 1 : 0, b: boss && k === 0 })).sort((a, b) => b.m - a.m || b.b - a.b);
+  const out = { ids: [null, null, null, null], stars: [1, 1, 1, 1], lvs: [1, 1, 1, 1] }, free = [0, 1, 2, 3];
+  order.forEach(o => { const s = (o.m ? [0, 1, 2, 3] : [2, 3, 0, 1]).find(x => free.includes(x)); free.splice(free.indexOf(s), 1); out.ids[s] = o.id; out.stars[s] = o.s; out.lvs[s] = o.l; if (o.b) bossSlot = s; });
+  return Object.assign(out, { mul: .75 + .013 * Math.min(f, 35) - .006 * Math.max(0, f - 35), bossSlot, boss });
+}
+function towerReward(f) {
+  const r = { gems: 15 + f * 3, xp: 12 + f * 2, pack: null, force: 0, mystery: false };
+  if (f % 10 === 0) r.pack = 'rift'; else if (f % 5 === 0) r.pack = 'basic';
+  if (f === 12 || f === 33) { r.pack = 'basic'; r.force = 3; r.mystery = true; }
+  if (f === 25 || f === 50 || f === 60) { r.pack = 'rift'; r.force = 4; r.mystery = true; }
+  return r;
+}
+let TW = { sel: null };
+function showTower(sel) {
+  S.tower = S.tower || { best: 0 };
+  const best = S.tower.best, next = Math.min(best + 1, 999);
+  TW.sel = clamp(sel || TW.sel || next, 1, next);
+  const f = TW.sel, fl = towerFloor(f), rw = towerReward(f), first = f > best;
+  const acts = [], A = fn => { acts.push(fn); return acts.length - 1; };
+  const foeTiles = [0, 2, 1, 3].map(i => unitTile(fl.ids[i], { a: A(() => {}), enemy: true, star: fl.stars[i], lv: fl.lvs[i], boss: i === fl.bossSlot, label: '' })).join('');
+  const t = team(), myTiles = [2, 0, 3, 1].map(i => unitTile(t[i], { a: A(() => { showSquadHub('team', () => showTower()); }), label: i < 2 ? 'front' : 'back' })).join('');
+  const ps = unitsPower(myTeamSpec()), pe = unitsPower(fl);
+  const bl = BLESS.map(b => `<div class="bless ${best >= b.f ? 'on' : ''}" title="Clear floor ${b.f}"><span>${best >= b.f ? b.icon : '🔒'}</span><small>F${b.f}</small><small>${b.txt}</small></div>`).join('');
+  screen(`<h2>🗼 Rift Tower <span class="tag">best: floor ${best}</span></h2>
+    <div class="sub">Turn-based squad battles. Clear floors for 💎 gems, packs and <b>blessings that make your runs stronger</b>. Your team also levels up.</div>
+    <div class="blessrow">${bl}</div>
+    <div class="row" style="align-items:center;margin-top:8px"><button data-a="${A(() => showTower(f - 1))}" ${f <= 1 ? 'disabled' : ''}>◀</button>
+      <h3 style="margin:0 12px">${fl.boss ? '👹 BOSS ' : ''}Floor ${f}${first ? '' : ' <span class="tag">cleared</span>'}</h3>
+      <button data-a="${A(() => showTower(f + 1))}" ${f >= next ? 'disabled' : ''}>▶</button></div>
+    <div class="row" style="align-items:flex-start;gap:28px">
+      <div><h3>Your team <span class="keys">power ${ps}</span></h3><div class="sqboard two">${myTiles}</div><div class="keys">back ◀ ▶ front · click to edit</div></div>
+      <div class="vs">VS</div>
+      <div><h3>Enemy <span class="keys">power ${pe}</span></h3><div class="sqboard two">${foeTiles}</div><div class="keys">front ◀ ▶ back</div></div>
+    </div>
+    <div class="sub">${first ? `First clear: <b>💎 ${rw.gems}</b>${rw.mystery ? ' + <b style="color:var(--gold)">🎁 ??? mystery reward</b>' : rw.pack ? ` + ${PACKS[rw.pack].icon} <b>free ${PACKS[rw.pack].name}</b>` : ''} · team XP +${rw.xp}` : `Replay: 💎 5 · team XP +${Math.round(rw.xp * .6)}`}</div>
+    <div class="col" style="margin-top:8px"><button class="opt big" data-a="${A(() => startTowerBattle(f))}" data-n="1" ${teamUnits().length ? '' : 'disabled'}>⚔️ Fight!<kbd>1</kbd></button>
+    <button data-a="${A(() => showSquadHub('team', () => showTower()))}" data-n="2">🛡️ Edit team<kbd>2</kbd></button>
+    <button data-a="${A(() => { showSquadHub('packs', () => showTower()); })}" data-n="3">🎁 Packs (💎 ${S.gems})<kbd>3</kbd></button>
+    <button data-a="${A(showTitle)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { showTitle(); return true; } if (k === 'arrowleft' && f > 1) { showTower(f - 1); return true; } if (k === 'arrowright' && f < next) { showTower(f + 1); return true; } });
+}
+function unitsPower(spec) { let p = 0; spec.ids.forEach((id, i) => { if (!id) return; const q = unitPower(id, spec.stars[i], spec.lvs[i]); p += q.hp / 10 + q.atk * (spec.bossSlot === i ? 1.9 : 1); }); return Math.round(p * (spec.mul || 1)); }
+
+/* ----- battle screen ----- */
+let TB = null;
+function startTowerBattle(f) {
+  const fl = towerFloor(f);
+  TB = tbNew(myTeamSpec(), fl); TB.floor = f; TB.auto = !!S.tbAuto; TB.speed = S.tbSpeed || 1; TB.mode = 'wait';
+  TB.startIds = teamUnits();
+  screen(`<div id="tbwrap"><div class="tbhead"><b>⚔️ ${fl.boss ? '👹 BOSS — ' : ''}Floor ${f}</b> <span id="tbround"></span></div>
+    <div id="tbturn" class="tbturn"></div>
+    <div class="tbfield"><div class="tbside me" id="tbme"></div><div class="vs">VS</div><div class="tbside foe" id="tbfoe"></div></div>
+    <div id="tbmsg" class="tbmsg"></div><div id="tbact" class="tbact"></div></div>`, [], 'menu', tbKey);
+  $('#tbwrap').onclick = e => { const c = e.target.closest('[data-u]'), b = e.target.closest('[data-tb]'); if (b && !b.disabled) { audioOn(); sfx('click'); tbButton(b.dataset.tb); } else if (c) tbClickUnit(+c.dataset.u); };
+  tbStep();
+}
+function tbKey(k) {
+  const B = TB; if (!B) return false;
+  if (k === 'escape') { if (B.mode === 'target') { B.mode = 'choose'; tbRender(); } return true; }
+  if (k === ' ') { tbButton('auto'); return true; }
+  if (B.mode === 'choose') { if (k === 'a' || k === '1') tbButton('atk'); else if (k === 's' || k === '2') tbButton('sp'); else if (k === 'g' || k === '3') tbButton('guard'); return true; }
+  if (B.mode === 'target' && /^[1-4]$/.test(k)) { const l = tbTargetsFor(B, B.cur, B.pending); if (l[+k - 1]) tbClickUnit(B.u.indexOf(l[+k - 1])); return true; }
+  if (B.mode === 'over' && (k === 'enter')) return false;
+  return true;
+}
+function tbTargetsFor(B, u, act) { if (!u) return []; if (act === 'sp') return AB[u.d.ab].t === 'enemy' ? tbFoes(B, u).sort((a, b) => a.slot - b.slot) : []; return tbValid(B, u).sort((a, b) => a.slot - b.slot); }
+function tbButton(b) {
+  const B = TB; if (!B || B.done) return;
+  if (b === 'auto') { B.auto = !B.auto; S.tbAuto = B.auto; if (B.auto && (B.mode === 'choose' || B.mode === 'target')) { const u = B.cur, a = tbAI(B, u); B.mode = 'busy'; tbDo(B, u, a.act, a.t); tbAfter(); } else tbRender(); return; }
+  if (b === 'speed') { B.speed = B.speed >= 3 ? 1 : B.speed + 1; S.tbSpeed = B.speed; tbRender(); return; }
+  if (b === 'flee') { B.done = 'lose'; B.fled = true; tbFinish(); return; }
+  if (B.mode !== 'choose' && B.mode !== 'target') return;
+  const u = B.cur;
+  if (b === 'guard') { B.mode = 'busy'; tbDo(B, u, 'guard'); tbAfter(); return; }
+  if (b === 'sp' && (u.cd > 0 || !u.d.ab)) return;
+  if (b === 'sp' && AB[u.d.ab].t !== 'enemy') { B.mode = 'busy'; tbDo(B, u, 'sp'); tbAfter(); return; }
+  const l = tbTargetsFor(B, u, b); if (l.length === 1) { B.mode = 'busy'; tbDo(B, u, b, l[0]); tbAfter(); return; }
+  B.mode = 'target'; B.pending = b; tbRender();
+}
+function tbClickUnit(i) {
+  const B = TB; if (!B || B.mode !== 'target') return;
+  const t = B.u[i], l = tbTargetsFor(B, B.cur, B.pending); if (!l.includes(t)) return;
+  B.mode = 'busy'; tbDo(B, B.cur, B.pending, t); tbAfter();
+}
+function tbAfter() { const B = TB; tbRender(); sfx(B.flash ? 'ult' : B.hits.length ? 'hit' : 'click'); const my = B; setTimeout(() => { if (TB === my) tbStep(); }, (B.flash ? 900 : 620) / B.speed); B.flash = null; }
+function tbStep() {
+  const B = TB; if (!B) return;
+  if (B.done) { tbFinish(); return; }
+  const u = tbNextActor(B); if (!u) { tbCheck(B); tbFinish(); return; }
+  B.cur = u; B.hits = [];
+  if (!tbBeginTurn(B, u)) { tbCheck(B); tbRender(); const my = B; setTimeout(() => { if (TB === my) tbStep(); }, 520 / B.speed); return; }
+  if (u.side === 0 && !B.auto) { B.mode = 'choose'; tbRender(); return; }
+  B.mode = 'busy'; tbRender();
+  const my = B; setTimeout(() => { if (TB !== my) return; const a = tbAI(B, u); tbDo(B, u, a.act, a.t); tbAfter(); }, 380 / B.speed);
+}
+function tbCard(B, x, i, targets) {
+  const R = RAR[x.d.rar], st = [x.stun > 0 && '💫', x.burn > 0 && '🔥', x.poison > 0 && '☠️', x.fx.blind > 0 && '🌫️', x.fx.taunt > 0 && '😤', x.fx.rage > 0 && '💢', x.fx.weak > 0 && '🥀', x.fx.slow > 0 && '🐌', x.fx.reflect > 0 && '🌵', x.fx.inv > 0 && '✨', x.fx.frostHide > 0 && '🧊', x.guard && '🛡️', x.crit > 0 && '🎯'].filter(Boolean).join('');
+  const ti = targets.indexOf(x), hit = B.hits.some(h => h.t === x), acting = B.cur === x;
+  const beat = B.cur && B.cur.side === 0 && x.side === 1 && BEATS[B.cur.d.el] === x.d.el;
+  return `<div class="tbu r${x.d.rar} ${x.alive ? '' : 'dead'} ${acting ? 'acting' : ''} ${hit ? 'hit' : ''} ${ti >= 0 ? 'tgt' : ''} ${x.boss ? 'boss' : ''} ${B.flash === x ? 'casting' : ''}" data-u="${i}" style="--rc:${R.color}" title="${esc(x.d.name + (x.d.txt ? ' — ' + x.d.txt : '') + (LPASS[x.id] ? ' 👑 ' + LPASS[x.id] : ''))}">
+    ${ti >= 0 ? `<kbd class="tk">${ti + 1}</kbd>` : ''}${beat ? '<span class="beat">+40%</span>' : ''}
+    <div class="ui1">${x.d.icon}</div><div class="un">${x.boss ? '👹 ' : ''}${x.d.name}</div>
+    <div class="us">${x.summon ? '' : '★'.repeat(x.star) + ' Lv' + x.lv} ${ELEMENTS[x.d.el].icon}${CLASSES[x.d.cls].icon}</div>
+    <div class="hpb"><i style="width:${Math.max(0, x.hp / x.maxHp * 100)}%"></i>${x.shield > 1 ? `<s style="width:${Math.min(100, x.shield / x.maxHp * 100)}%"></s>` : ''}</div>
+    <div class="uh">${Math.ceil(Math.max(0, x.hp))}/${Math.ceil(x.maxHp)}</div>
+    ${x.d.ab && x.alive ? `<div class="ucd ${x.cd <= 0 ? 'ready' : ''}">${x.cd <= 0 ? '✨ READY' : '✨ in ' + x.cd}</div>` : ''}
+    <div class="ust">${x.alive ? st : '💀'}</div></div>`;
+}
+function tbRender() {
+  const B = TB; if (!B || !$('#tbwrap')) return;
+  const targets = B.mode === 'target' ? tbTargetsFor(B, B.cur, B.pending) : [];
+  const side = (s, order) => order.map(slot => { const x = B.u.find(y => y.side === s && y.slot === slot && y.alive) || B.u.find(y => y.side === s && y.slot === slot); return x ? tbCard(B, x, B.u.indexOf(x), targets) : '<div class="tbu empty"></div>'; }).join('');
+  $('#tbme').innerHTML = side(0, [2, 0, 3, 1]);
+  $('#tbfoe').innerHTML = side(1, [0, 2, 1, 3]);
+  $('#tbround').textContent = `Round ${B.round}`;
+  const q = [B.cur, ...B.queue].filter(x => x && x.alive).slice(0, 8);
+  $('#tbturn').innerHTML = 'Next: ' + q.map((x, k) => `<span class="tq ${x.side ? 'foe' : 'me'} ${k === 0 ? 'now' : ''}">${x.d.icon}</span>`).join('');
+  const u = B.cur, msg = $('#tbmsg'), act = $('#tbact');
+  if (B.mode === 'choose' || B.mode === 'target') {
+    msg.innerHTML = B.mode === 'target' ? `Pick a target for <b>${u.d.icon} ${u.d.name}</b> — click it or press its number (Esc = back)` : `<b>${u.d.icon} ${u.d.name}</b>'s turn! ${u.d.range === 'melee' && u.d.cls !== 'assassin' ? '<span class="keys">(melee: must hit the front row first)</span>' : ''}`;
+    act.innerHTML = `<button class="opt" data-tb="atk">⚔️ Attack <kbd>A</kbd></button>
+      <button class="opt ${u.cd <= 0 && u.d.ab ? 'spready' : ''}" data-tb="sp" ${u.cd > 0 || !u.d.ab ? 'disabled' : ''} title="${esc(u.d.txt)}">✨ ${u.d.ab ? esc(u.d.txt.split(':')[0]) : 'Special'} ${u.cd > 0 ? `(${u.cd})` : ''}<kbd>S</kbd></button>
+      <button data-tb="guard">🛡️ Guard <kbd>G</kbd><br><small>half damage, special charges faster</small></button>`;
+  } else {
+    msg.innerHTML = B.log.slice(-2).join(' · ') || '...';
+    act.innerHTML = '';
+  }
+  act.innerHTML += `<div class="row tbsmall"><button data-tb="auto" class="${B.auto ? 'on' : ''}">🤖 Auto: ${B.auto ? "ON" : "off"} (Space)</button><button data-tb="speed">⏩ ${B.speed}×</button><button data-tb="flee">🏳️ Retreat</button></div>`;
+  if (u && (B.mode === 'choose' || B.mode === 'target') && u.d.ab) act.innerHTML += `<div class="keys">✨ ${esc(u.d.txt)}${LPASS[u.id] ? ` · 👑 ${LPASS[u.id]}` : ''}</div>`;
+  // floating numbers
+  for (const e of B.ev) { const el = document.querySelector(`#tbwrap [data-u="${B.u.indexOf(e.u)}"]`); if (!el) continue; const f = document.createElement('div'); f.className = 'tbf'; f.textContent = e.s; f.style.color = e.c; f.style.left = (30 + Math.random() * 40) + '%'; el.appendChild(f); }
+  B.ev = [];
+}
+function tbFinish() {
+  const B = TB; if (!B || B.mode === 'over') return; B.mode = 'over';
+  const won = B.done === 'win', f = B.floor, rw = towerReward(f), first = won && f > (S.tower.best || 0);
+  sfx(won ? 'win' : 'lose');
+  const flawless = won && B.u.filter(x => x.side === 0 && !x.summon).every(x => x.alive);
+  let gems = 0, xp = Math.round(rw.xp * (won ? (first ? 1 : .6) : .3)), newBless = null;
+  if (won) { gems = first ? rw.gems : 5; if (flawless && first) gems = Math.round(gems * 1.5); S.gems += gems; S.stats.towerWins = (S.stats.towerWins || 0) + 1; }
+  if (first) { S.tower.best = f; newBless = BLESS.find(b => b.f === f); }
+  const lvl = B.startIds.map(id => { const before = lvOf(id), n = giveXp(id, xp); return { id, before, n }; });
+  save(); checkAch();
+  const lvHTML = lvl.map(o => `<div class="lvchip ${o.n ? 'up' : ''}">${UD(o.id).icon} Lv ${lvOf(o.id)}${o.n ? ' ⬆️' : ''}<br><small>${col()[o.id].lv >= lvCap(o.id) ? 'MAX (more ★ raises it)' : `${Math.floor(col()[o.id].xp)}/${sqXpNeed(lvOf(o.id))} xp`}</small></div>`).join('');
+  const goPack = first && rw.pack;
+  TB = null;
+  screen(`<h1 style="font-size:44px">${won ? (flawless ? '🌟 FLAWLESS VICTORY!' : '🏆 Victory!') : B.fled ? '🏳️ Retreated' : '💔 Defeat'}</h1>
+    <div class="sub">${won ? `Floor ${f} ${first ? 'cleared for the first time!' : 'cleared again.'} +${gems} 💎${flawless && first ? ' (flawless bonus ×1.5)' : ''}` : 'Try another team: tanks in front, use the element wheel, and save specials for the right moment.'}</div>
+    ${newBless ? `<div class="panel" style="border-color:var(--gold)"><h2 style="margin:0">${newBless.icon} New blessing unlocked!</h2><div class="sub">${newBless.txt}</div></div>` : ''}
+    <h3>Team XP +${xp}</h3><div class="row">${lvHTML}</div>
+    <div class="col" style="margin-top:12px">${goPack ? `<button class="opt big" data-a="0" data-n="1">${rw.mystery ? '🎁 Open your mystery reward!' : `${PACKS[rw.pack].icon} Open your free ${PACKS[rw.pack].name}!`}<kbd>1</kbd></button>` : `<button class="opt big" data-a="1" data-n="1">${won ? '⚔️ Next floor' : '🔁 Try again'}<kbd>1</kbd></button>`}
+    <button data-a="2" data-n="2">🗼 Tower<kbd>2</kbd></button></div>`,
+    [() => openPack(rw.pack, 'reward', () => showTower(f + 1), rw.force), () => startTowerBattle(won ? Math.min(f + 1, S.tower.best + 1) : f), () => showTower(won ? f + 1 : f)]);
+  inputLock = performance.now() + 500;
+}
 
 /* ----- screens: packs, collection, team ----- */
 let SQV = { tab: 'packs', sel: null, back: null, filter: 'all' };
 const unitTile = (id, opts = {}) => {
-  if (!id) return `<button class="tile empty ${opts.sel ? 'sel' : ''}" data-a="${opts.a}"><span class="small">${opts.label || 'empty'}</span></button>`;
-  const d = UD(id), owned = col()[id], R = RAR[d.rar], st = owned ? starOf(owned.n) : 0;
-  return `<button class="tile ${opts.sel ? 'sel' : ''} ${owned ? '' : 'locked'} ${opts.enemy ? 'enemy' : ''}" data-a="${opts.a}" title="${esc(d.name + ' — ' + d.txt)}" style="border-color:${R.color}">
-    <span class="ti">${owned || opts.enemy ? d.icon : '❔'}</span><span class="tn">${owned || opts.enemy ? d.name : '???'}</span><span class="ts">${opts.enemy ? '★'.repeat(opts.star || 1) : st ? '★'.repeat(st) : ''}</span><span class="te" style="color:${R.color}">${R.name}${owned || opts.enemy ? ' · ' + ELEMENTS[d.el].icon + CLASSES[d.cls].icon : ''}</span></button>`;
+  if (!id) return `<button class="tile empty ${opts.sel ? 'sel' : ''}" data-a="${opts.a}"><span class="small">${opts.label === undefined ? 'empty' : opts.label}</span></button>`;
+  const d = UD(id), owned = col()[id], R = RAR[d.rar], st = opts.enemy ? opts.star || 1 : owned ? starOf(owned.n) : 0, lv = opts.enemy ? opts.lv : owned ? lvOf(id) : 0, show = owned || opts.enemy;
+  return `<button class="tile r${d.rar} ${opts.sel ? 'sel' : ''} ${owned || opts.enemy ? '' : 'locked'} ${opts.enemy ? 'enemy' : ''} ${opts.boss ? 'boss' : ''}" data-a="${opts.a}" title="${esc(show ? d.name + ' — ' + d.txt + (LPASS[id] ? ' 👑 ' + LPASS[id] : '') : '???')}" style="border-color:${R.color}">
+    <span class="ti">${show ? d.icon : '❔'}</span><span class="tn">${opts.boss ? '👹 ' : ''}${show ? d.name : '???'}</span><span class="ts">${st ? '★'.repeat(st) : ''}${lv ? ` <span class="tl">Lv${lv}</span>` : ''}</span><span class="te" style="color:${R.color}">${R.name}${show ? ' · ' + ELEMENTS[d.el].icon + CLASSES[d.cls].icon : ''}</span></button>`;
 };
 function showSquadHub(tab, back) { SQV = { tab: tab || SQV.tab || 'packs', sel: null, back: back || SQV.back, filter: SQV.filter || 'all' }; drawSquadHub(); }
 function drawSquadHub() {
@@ -1380,32 +1724,33 @@ function drawSquadHub() {
   if (SQV.tab === 'packs') {
     const free = S.freePull !== todayStr();
     body = `<div class="sub">💎 <b>${S.gems}</b> gems${inRun ? ` · 🪙 <b>${run.gold}</b> gold` : ''} · Epic guaranteed in <b>${10 - ((S.pity || {}).e || 0)}</b> pulls · Legendary guaranteed in <b>${60 - ((S.pity || {}).l || 0)}</b></div>
-      <div class="row">${Object.entries(PACKS).map(([k, p]) => `<div class="card pack" style="min-height:0"><div class="ci">${p.icon}</div><div class="ct">${p.name}</div><div class="cd">${p.desc}<br><small>${p.rates.map((w, i) => `<span style="color:${RAR[i].color}">${RAR[i].k} ${w}%</span>`).join(' ')}</small></div>
+      <div class="row">${Object.entries(PACKS).filter(([, p]) => !p.hidden).map(([k, p]) => `<div class="card pack" style="min-height:0"><div class="ci">${p.icon}</div><div class="ct">${p.name}</div><div class="cd">${p.desc}<br><small>${p.rates.map((w, i) => `<span style="color:${RAR[i].color}">${RAR[i].k} ${w}%</span>`).join(' ')}</small></div>
         <button class="opt" data-a="${A(() => openPack(k, 'gems', drawSquadHub))}" ${S.gems < p.gems ? 'disabled' : ''}>💎 ${p.gems}</button>
         ${inRun && p.gold ? `<button data-a="${A(() => openPack(k, 'gold', drawSquadHub))}" ${run.gold < p.gold ? 'disabled' : ''}>🪙 ${p.gold} gold</button>` : ''}
         ${k === 'basic' && free ? `<button class="opt" data-a="${A(() => openPack('basic', 'free', drawSquadHub))}">🎁 Daily free pull!</button>` : ''}</div>`).join('')}</div>
-      <div class="keys">Earn 💎 gems every run (more for going deeper and winning Skirmishes) and from achievements. Duplicates power members up: 2 copies ★2, 4 ★3, 8 ★4, 16 ★5.</div>`;
+      <div class="keys">Earn 💎 gems from runs and the 🗼 Rift Tower. Duplicates power members up: 2 copies ★2, 4 ★3, 8 ★4, 16 ★5 (each ★ also raises the level cap).</div>`;
   } else if (SQV.tab === 'collection') {
     const ids = Object.keys(ROSTER).filter(id => SQV.filter === 'all' || String(ROSTER[id][2]) === SQV.filter).sort((a, b) => ROSTER[b][2] - ROSTER[a][2] || (col()[b] ? 1 : 0) - (col()[a] ? 1 : 0));
-    const f = ['all', '4', '3', '2', '1', '0'].map(k => `<button data-a="${A(() => { SQV.filter = k; drawSquadHub(); })}" class="${SQV.filter === k ? 'on' : ''}" style="${k !== 'all' ? 'color:' + RAR[+k].color : ''}">${k === 'all' ? 'All' : RAR[+k].name}</button>`).join('');
-    body = `<div class="sub">Collected <b>${owned}/${total}</b></div><div class="tabs">${f}</div><div class="colgrid">${ids.map(id => unitTile(id, { a: A(() => { SQV.sel = id; drawSquadHub(); }), sel: SQV.sel === id })).join('')}</div>${unitInfo(SQV.sel, A)}`;
+    const f = ['all', '4', '3', '2', '1', '0'].map(k => `<button data-a="${A(() => { SQV.filter = k; drawSquadHub(); })}" class="${SQV.filter === k ? 'on' : ''}" style="${k !== 'all' ? 'color:' + RAR[+k].color : ''}">${k === 'all' ? 'All' : RAR[+k].name} ${k === 'all' ? '' : Object.keys(col()).filter(id => ROSTER[id][2] === +k).length + '/' + Object.keys(ROSTER).filter(id => ROSTER[id][2] === +k).length}</button>`).join('');
+    body = `<div class="sub">Collected <b>${owned}/${total}</b></div><div class="tabs">${f}</div><div class="colgrid">${ids.map(id => unitTile(id, { a: A(() => { SQV.sel = id; drawSquadHub(); }), sel: SQV.sel === id })).join('')}</div>${unitInfo(SQV.sel)}`;
   } else {
     const t = team();
-    const slots = [3, 4, 5, 0, 1, 2].map(i => unitTile(t[i], { a: A(() => teamSlot(i)), sel: SQV.sel === 'slot' + i, label: i < 3 ? 'front' : 'back' }));
-    const mine = Object.keys(col()).sort((a, b) => ROSTER[b][2] - ROSTER[a][2]);
-    body = `${synHTML2(t)}<h3>Your team <span class="keys">(back row on top · front row below takes the hits)</span></h3><div class="sqboard">${slots.join('')}</div>
-      <div class="keys">${SQV.sel && !String(SQV.sel).startsWith('slot') ? `Now click a slot to place <b>${UD(SQV.sel).icon} ${UD(SQV.sel).name}</b>.` : 'Click a member below, then a slot. Click a placed member, then another slot to swap, or then the same slot to remove it.'}</div>
-      <h3>🐾 Buddies <span class="keys">(fight beside you in action rooms)</span></h3><div class="row">${[0, 1].map(p => { const b = (S.buddies || [])[p]; return `<button data-a="${A(() => { if (SQV.sel && !String(SQV.sel).startsWith('slot')) { S.buddies = S.buddies || [null, null]; S.buddies[p] = SQV.sel; SQV.sel = null; save(); drawSquadHub(); } })}">${p ? 'P2' : 'P1'} buddy: ${b ? UD(b).icon + ' ' + UD(b).name + ' ' + '★'.repeat(ownStar(b)) : '— none —'}</button>`; }).join('')}</div>
+    const slots = [2, 0, 3, 1].map(i => unitTile(t[i], { a: A(() => teamSlot(i)), sel: SQV.sel === 'slot' + i, label: i < 2 ? 'front' : 'back' }));
+    const mine = Object.keys(col()).sort((a, b) => ROSTER[b][2] - ROSTER[a][2] || ownStar(b) - ownStar(a) || lvOf(b) - lvOf(a));
+    body = `${synHTML2(t)}<h3>Tower team <span class="keys">(back ◀ ▶ front · the front takes the hits and melee can only reach the front)</span></h3><div class="sqboard two">${slots.join('')}</div>
+      <div class="keys">${SQV.sel && !String(SQV.sel).startsWith('slot') ? `Now click a slot to place <b>${UD(SQV.sel).icon} ${UD(SQV.sel).name}</b>, or a buddy button.` : 'Click a member below, then a slot or a buddy button. Click a placed member, then another slot to swap, or the same slot to remove it.'}</div>
+      <h3>🐾 Buddies <span class="keys">(fight beside you in runs — rarer buddies are MUCH stronger)</span></h3><div class="row">${[0, 1].map(p => { const b = (S.buddies || [])[p]; return `<button data-a="${A(() => { if (SQV.sel && !String(SQV.sel).startsWith('slot')) { S.buddies = S.buddies || [null, null]; S.buddies[p] = SQV.sel; SQV.sel = null; save(); drawSquadHub(); } })}" ${b ? `style="border-color:${RAR[UD(b).rar].color}"` : ''}>${p ? 'P2' : 'P1'} buddy: ${b ? UD(b).icon + ' ' + UD(b).name + ' ' + '★'.repeat(ownStar(b)) + ' Lv' + lvOf(b) : '— none —'}</button>`; }).join('')}</div>
+      ${SQV.sel && !String(SQV.sel).startsWith('slot') ? unitInfo(SQV.sel) : ''}
       <h3>Your members</h3><div class="colgrid">${mine.map(id => unitTile(id, { a: A(() => { SQV.sel = SQV.sel === id ? null : id; drawSquadHub(); }), sel: SQV.sel === id })).join('') || '<div class="sub">Open packs to get members!</div>'}</div>`;
   }
-  screen(`<h2>🃏 Squad &amp; Packs</h2><div class="tabs">${tabs}</div>${body}
+  screen(`<h2>🃏 Squad &amp; Packs</h2><div class="tabs">${tabs}${!inRun ? `<button data-a="${A(() => showTower())}">🗼 Rift Tower</button>` : ''}</div>${body}
     <div class="col" style="margin-top:12px"><button data-a="${A(closeSquadHub)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { closeSquadHub(); return true; } });
 }
-function unitInfo(id, A) {
+function unitInfo(id) {
   if (!id) return '<div class="keys">Click a member to see what it does.</div>';
-  const d = UD(id), o = col()[id], st = o ? starOf(o.n) : 1, p = unitPower(id, st), R = RAR[d.rar];
+  const d = UD(id), o = col()[id], st = o ? starOf(o.n) : 1, lv = o ? lvOf(id) : 1, p = unitPower(id, st, lv), R = RAR[d.rar];
   return `<div class="panel small" style="max-width:760px;border-color:${R.color}"><b style="font-size:17px">${d.icon} ${o ? d.name : '???'}</b> <span style="color:${R.color}">${R.name}</span> · ${ELEMENTS[d.el].icon} ${ELEMENTS[d.el].name} · ${CLASSES[d.cls].icon} ${CLASSES[d.cls].name} · ${d.range}
-    ${o ? `<br>${'★'.repeat(st)}${'☆'.repeat(5 - st)} — copies ${o.n}${st < 5 ? ` (next ★ at ${STAR_COPIES[st + 1]})` : ' (max)'} · ❤️ ${Math.round(p.hp)} ⚔️ ${Math.round(p.atk)} every ${d.cd}s<br>✨ <b>${d.txt}</b> <span class="keys">(charges as it fights)</span>` : '<br>Not collected yet — open packs to find it!'}</div>`;
+    ${o ? `<br>${'★'.repeat(st)}${'☆'.repeat(5 - st)} — copies ${o.n}${st < 5 ? ` (next ★ at ${STAR_COPIES[st + 1]})` : ' (max)'} · Lv ${lv}/${lvCap(id)} · ❤️ ${Math.round(p.hp)} ⚔️ ${Math.round(p.atk)} 💨 ${d.spd}<br>✨ <b>${d.txt}</b> <span class="keys">(every ${d.cdT} turns)</span>${LPASS[id] ? `<br><b style="color:var(--gold)">👑 ${LPASS[id]}</b>` : ''}<br>🐾 As a buddy: ${buddyDesc(id)}` : '<br>Not collected yet — open packs to find it!'}</div>`;
 }
 function teamSlot(i) {
   const t = team();
@@ -1415,85 +1760,6 @@ function teamSlot(i) {
   save(); drawSquadHub();
 }
 function closeSquadHub() { const b = SQV.back; SQV.back = null; if (b) b(); else showTitle(); }
-
-/* ----- skirmish flow in a run ----- */
-let SK = null;
-function startSkirmish() {
-  if (!teamUnits().length) { const mine = Object.keys(col()).sort((a, b) => ROSTER[b][2] - ROSTER[a][2]); const t = team(); mine.slice(0, 5).forEach((id, k) => t[[1, 0, 2, 4, 3][k]] = id); save(); }
-  SK = { enemy: genEnemyTeam(), tactic: SK && SK.tactic || 'hold', speed: 1, B: null };
-  drawSkirmishPrep();
-}
-function drawSkirmishPrep() {
-  const acts = [], A = f => { acts.push(f); return acts.length - 1; }, e = SK.enemy;
-  const enemyT = [3, 4, 5, 0, 1, 2].map(i => unitTile(e.ids[i], { a: A(() => {}), enemy: true, star: e.stars[i] }));
-  const t = team(), my = [3, 4, 5, 0, 1, 2].map(i => unitTile(t[i], { a: A(() => { SQV.back = drawSkirmishPrep; SQV.tab = 'team'; drawSquadHub(); }), label: i < 3 ? 'front' : 'back' }));
-  const es = synergy(e.ids);
-  screen(`<h2>🛡️ Skirmish</h2>
-    <div class="row" style="align-items:flex-start;gap:24px">
-      <div><h3>Your team</h3>${synHTML2(t)}<div class="sqboard">${my.join('')}</div><div class="keys">Click your board to change the team.</div></div>
-      <div><h3>👹 Enemy team</h3><div class="syn">${Object.keys(es.e).filter(k => es.e[k]).map(k => `<span class="ico">${ELEMENTS[k].icon} ${es.e[k]}</span>`).join('')}</div><div class="sqboard">${enemyT.join('')}</div><div class="keys">Their front row is the bottom row.</div></div>
-    </div>
-    <h3>Pick a tactic</h3><div class="row">${Object.entries(TACTICS).map(([k, tc]) => `<button data-a="${A(() => { SK.tactic = k; drawSkirmishPrep(); })}" class="${SK.tactic === k ? 'on' : ''}" style="${SK.tactic === k ? 'border-color:var(--gold)' : ''}">${tc.icon} <b>${tc.name}</b><br><small>${tc.desc}</small></button>`).join('')}</div>
-    <div class="col" style="margin-top:12px"><button class="opt big" data-a="${A(beginSkirmish)}" ${teamUnits().length ? '' : 'disabled'}>⚔️ Fight!</button></div>`, acts, 'menu');
-}
-function beginSkirmish() {
-  SK.B = newBattle(SK.enemy, SK.tactic); SK.mode = 'fighting';
-  screen(`<h2>⚔️ Skirmish <span class="tag">${TACTICS[SK.tactic].icon} ${TACTICS[SK.tactic].name}</span></h2>
-    <canvas id="bcv" width="820" height="440" style="position:static;max-width:100%;background:#0e1220;border-radius:12px;border:1px solid var(--line)"></canvas>
-    <div class="row" style="margin-top:8px"><button class="opt" data-a="0" id="rallyBtn">📯 Rally! (R) — heal 25%, charge specials, cleanse · once</button><button data-a="1">▶ 1×</button><button data-a="2">⏩ 2×</button><button data-a="3">⏩⏩ 4×</button><button data-a="4">⏭ Skip</button></div><div class="keys" id="blog"></div>`,
-    [() => { useRally(SK.B); const b = $('#rallyBtn'); if (b) b.disabled = true; }, () => SK.speed = 1, () => SK.speed = 2, () => SK.speed = 4, () => { while (!SK.B.done) battleTick(SK.B, .05); }], 'menu', k => { if (k === 'r') { useRally(SK.B); const b = $('#rallyBtn'); if (b) b.disabled = true; return true; } });
-  SK.last = performance.now();
-  const tick = now => {
-    if (!SK || SK.mode !== 'fighting') return;
-    const B = SK.B, dt = Math.min(.05, (now - SK.last) / 1000) * SK.speed; SK.last = now;
-    for (let k = 0; k < SK.speed; k++) battleTick(B, dt / SK.speed);
-    drawBattle2(B); const lg = $('#blog'); if (lg) lg.textContent = B.log.slice(-3).join(' · ');
-    if (B.done) { SK.mode = 'over'; setTimeout(() => skirmishOver(B.done), 800); return; }
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
-function bPos(x) { const col = x.slot % 3, row = Math.floor(x.slot / 3); return x.side === 0 ? { x: 310 - row * 115, y: 90 + col * 125 } : { x: 510 + row * 115, y: 90 + col * 125 }; }
-function drawBattle2(B) {
-  const c = $('#bcv'); if (!c) return; const g = c.getContext('2d');
-  g.clearRect(0, 0, c.width, c.height); g.textAlign = 'center';
-  g.fillStyle = '#ffffff10'; g.fillRect(409, 30, 2, 400);
-  g.font = 'bold 13px system-ui'; g.fillStyle = '#9fb4ff'; g.fillText('YOUR TEAM', 200, 22); g.fillStyle = '#ff9aa8'; g.fillText('ENEMY', 620, 22);
-  for (const a of B.anims) { const p = bPos(a.a), q = bPos(a.t), k = 1 - a.life / .25; g.strokeStyle = a.c; g.lineWidth = 3; g.globalAlpha = Math.min(1, a.life * 4); g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x + (q.x - p.x) * Math.min(1, k * 1.6), p.y + (q.y - p.y) * Math.min(1, k * 1.6)); g.stroke(); g.globalAlpha = 1; }
-  for (const x of B.f) { const p = bPos(x), R = RAR[x.d.rar];
-    g.globalAlpha = x.alive ? 1 : .15;
-    g.fillStyle = x.side ? '#3a1a22' : '#1a2440'; g.strokeStyle = x.stun > 0 ? '#ffe680' : x.inv > 0 ? '#fff' : R.color; g.lineWidth = x.d.rar >= 3 ? 4 : 2;
-    g.beginPath(); g.arc(p.x + (x.fx > 0 ? (x.side ? 4 : -4) : 0), p.y, 32, 0, 6.283); g.fill(); g.stroke();
-    if (x.d.rar === 4 && x.alive) { g.strokeStyle = `hsla(${(B.t * 120) % 360},90%,65%,.7)`; g.lineWidth = 2; g.beginPath(); g.arc(p.x, p.y, 37, 0, 6.283); g.stroke(); }
-    g.font = '30px system-ui'; g.fillStyle = '#fff'; g.fillText(x.d.icon, p.x, p.y + 10);
-    g.font = '11px system-ui'; g.fillStyle = '#ffd24a'; g.fillText('★'.repeat(x.star), p.x, p.y - 36);
-    g.fillStyle = '#000a'; g.fillRect(p.x - 32, p.y + 38, 64, 6); g.fillStyle = x.side ? '#ff6070' : '#5ee08a'; g.fillRect(p.x - 32, p.y + 38, 64 * Math.max(0, x.hp / x.maxHp), 6);
-    if (x.shield > 0) { g.fillStyle = '#7fe3ff'; g.fillRect(p.x - 32, p.y + 45, 64 * Math.min(1, x.shield / x.maxHp), 3); }
-    if (x.d.ab) { g.fillStyle = '#0008'; g.fillRect(p.x - 32, p.y + 49, 64, 3); g.fillStyle = x.mana >= x.d.mana ? '#fff' : '#b48cff'; g.fillRect(p.x - 32, p.y + 49, 64 * Math.min(1, x.mana / x.d.mana), 3); }
-    const st = [x.stun > 0 && '💫', x.burn > 0 && '🔥', x.poison > 0 && '☠️', x.blind > 0 && '🌫️', x.taunt > 0 && '😤', x.rage > 0 && '💢', x.reflect > 0 && '🌵', x.inv > 0 && '✨'].filter(Boolean).join('');
-    if (st && x.alive) { g.font = '12px system-ui'; g.fillText(st, p.x, p.y - 48); }
-    g.globalAlpha = 1; }
-  for (const t of B.texts) { const p = bPos(t.f); g.globalAlpha = Math.min(1, t.t * 3); g.font = 'bold 14px system-ui'; g.fillStyle = t.c; g.fillText(t.s, p.x, p.y - 58 - (1 - t.t) * 22); g.globalAlpha = 1; }
-  g.font = '12px system-ui'; g.fillStyle = '#fff8'; g.fillText(`${B.t.toFixed(1)}s${B.rally ? ' · 📯 used' : ''}`, 410, 432);
-}
-function skirmishOver(res) {
-  const won = res === 'win'; sfx(won ? 'win' : 'lose');
-  SK.mode = null;
-  if (won) {
-    const g = Math.round((18 + 10 * run.act) * calcStats(run, 0).goldMul), gems = 8 + 5 * run.act;
-    run.gold += g; S.stats.gold += g; S.gems += gems; S.stats.skirmishes = (S.stats.skirmishes || 0) + 1; save();
-    const bonus = Math.random() < .25 ? pullOne(PACKS.basic) : null;
-    screen(`<h2>🏆 Your team won!</h2><div class="sub">+${g} 🪙 gold · +${gems} 💎 gems${bonus ? ' · 🎁 a member dropped!' : ''}</div>
-      ${bonus ? `<div class="row"><div class="pcard r${bonus.r} fresh" style="--rc:${RAR[bonus.r].color}"><div class="rar">${RAR[bonus.r].name.toUpperCase()}</div><div class="ci">${UD(bonus.id).icon}</div><div class="ct">${UD(bonus.id).name}</div><div class="tag2">${bonus.isNew ? '✨ NEW!' : bonus.starUp ? '★ up!' : '+1 copy'}</div></div></div>` : ''}
-      <div class="col"><button class="opt big" data-a="0" data-n="1">Continue<kbd>1</kbd></button></div>`, [() => roomDone(`🛡️ Skirmish won! +${g} gold, +${gems} gems`)]);
-    if (bonus) pullFx(bonus.r);
-  } else {
-    hurtAll(.15);
-    screen(`<h2>💔 Your team lost.</h2><div class="sub">Everyone loses 15% HP. Try a different tactic, use the element wheel (🔥 > 🗡️ > ✨ > ⚡ > ❄️ > 🔥), move tanks to the front, or open packs to power up.</div>
-      <div class="col"><button class="opt big" data-a="0" data-n="1">Continue<kbd>1</kbd></button></div>`, [() => roomDone('🛡️ Skirmish lost.')]);
-  }
-  inputLock = performance.now() + 400;
-}
 function showPackDoor() { // 🎁 door in a run: buy packs with gold (or gems)
   const acts = [], A = f => { acts.push(f); return acts.length - 1; };
   screen(`<h2>🎁 Pack Machine</h2><div class="sub">🪙 ${run.gold} gold · 💎 ${S.gems} gems — members go into your collection forever.</div>
@@ -1505,10 +1771,20 @@ function showPackDoor() { // 🎁 door in a run: buy packs with gold (or gems)
     <div class="col" style="margin-top:12px"><button data-a="${A(() => roomDone('🎁 You leave the pack machine.'))}">Leave →</button></div>`, acts, 'menu', k => { if (k === 'escape') { roomDone(); return true; } });
 }
 
-/* ----- 🐾 buddies in action rooms ----- */
-const BUDDY_SKILL = { guardian: 'shields you', brawler: 'shockwave', ranger: 'volley', mystic: 'nova', assassin: 'strike', support: 'heals you', summoner: 'minions' };
+/* =====================================================================
+   🐾 BUDDIES in action rooms. Rarity matters a lot: Epics use a stronger,
+   faster skill, and every Legendary has its own signature power.
+   ===================================================================== */
+const BUDDY_SKILL = { guardian: 'shields you', brawler: 'a shockwave', ranger: 'an arrow volley', mystic: 'a magic nova', assassin: 'a huge strike on the toughest enemy', support: 'heals you', summoner: 'lightning totems' };
+const LEG_BUDDY = {
+  dragon: 'breathes a wall of fire', paladin: 'makes you invincible and heals you', thor: 'calls down a lightning storm', void: 'opens a black hole that sucks enemies in',
+  whale: 'crashes a tidal wave through everything', ninetail: 'fires 18 foxfire orbs', luckycat: 'showers you with gold and hits a jackpot', sun: 'heals everyone and burns the ground',
+  chrono: 'freezes time for every enemy', kong: 'slams the ground and stuns everything nearby', reaper: 'reaps every weak enemy on screen',
+};
+function buddyDesc(id) { const d = UD(id); return LEG_BUDDY[id] ? `<b style="color:var(--gold)">👑 ${LEG_BUDDY[id]}</b> every 7s` : `${BUDDY_SKILL[d.cls]} every ${d.rar === 3 ? '7s (Epic: ×1.6 power)' : '9s'}`; }
+const buddyCd = c => (c.d.rar === 4 ? 7 : c.d.rar === 3 ? 7 : 9) * (hasBless(60) ? .5 : 1);
 function makeCompanions() {
-  G.comps = PL.map((pl, k) => { const id = (S.buddies || [])[k]; if (!id || !col()[id]) return null; const d = UD(id), st = ownStar(id); return { id, d, star: st, own: pl.i, x: pl.x + 30, y: pl.y + 20, t: .5, skT: 6, ang: k * Math.PI, pow: RAR[d.rar].mul * starMul(st) }; }).filter(Boolean);
+  G.comps = PL.map((pl, k) => { const id = (S.buddies || [])[k]; if (!id || !col()[id]) return null; const d = UD(id), st = ownStar(id), lv = lvOf(id); return { id, d, star: st, lv, own: pl.i, x: pl.x + 30, y: pl.y + 20, t: .5, skT: 5, ang: k * Math.PI, pow: Math.pow(RAR[d.rar].mul, 1.5) * starMul(st) * lvMul(lv) * (hasBless(20) ? 1.3 : 1) }; }).filter(Boolean);
 }
 function updateCompanions(dt) {
   if (!G.comps || G.phase !== 'fight') return;
@@ -1519,23 +1795,47 @@ function updateCompanions(dt) {
     P = pl; ST = pl.st;
     const m = c.pow * (1 + .3 * (run.act - 1)), col2 = ELEMENTS[c.d.el].color;
     c.t -= dt;
-    if (c.t <= 0) { c.t = c.d.cd * 1.2; const t = nearest(c.x, c.y, c.d.range === 'ranged' ? 460 : 240); if (t) shoot(c.x, c.y, Math.atan2(t.y - c.y, t.x - c.x), 480, 5, c.d.atk * m, 1, 1.2, col2, { el: c.d.el, chill: c.d.el === 'frost' }); }
+    if (c.t <= 0) { c.t = c.d.rar >= 3 ? .7 : 1.1; const t = nearest(c.x, c.y, c.d.range === 'ranged' ? 460 : 260); if (t) shoot(c.x, c.y, Math.atan2(t.y - c.y, t.x - c.x), 480, c.d.rar >= 3 ? 7 : 5, c.d.atk * m * .6, c.d.rar >= 3 ? 2 : 1, 1.2, col2, { el: c.d.el, chill: c.d.el === 'frost' }); }
     c.skT -= dt;
-    if (c.skT <= 0) { // the buddy's special, action-game version
-      c.skT = 9; const cls = c.d.cls, big = c.d.atk * m;
-      if (cls === 'guardian') { pl.aegisBuddy = true; pl.invul = Math.max(pl.invul, 1.2); G.rings.push({ x: pl.x, y: pl.y, r: 6, max: 50, t: .4, color: '#7fe3ff' }); }
-      else if (cls === 'support') { const h = alivePL().sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0]; if (h) { h.hp = Math.min(h.st.maxHp, h.hp + h.st.maxHp * .08 * c.pow); G.rings.push({ x: h.x, y: h.y, r: 6, max: 40, t: .4, color: '#5ee08a' }); } }
-      else if (cls === 'brawler' || cls === 'mystic') { G.rings.push({ x: c.x, y: c.y, r: 6, max: cls === 'mystic' ? 200 : 130, t: .4, color: col2, fill: true }); for (const e of G.enemies) if (!e.dead && dist(e, c) < (cls === 'mystic' ? 200 : 130) + e.r) damageEnemy(e, big * 2.5, (e.x - c.x) * 2, (e.y - c.y) * 2, c.d.el); }
-      else if (cls === 'ranger') { for (let k = 0; k < 8; k++) shoot(c.x, c.y, k / 8 * 6.283, 500, 6, big * 1.5, 2, 1.2, col2, { el: c.d.el }); }
-      else if (cls === 'assassin') { const t = G.boss || nearest(c.x, c.y, 500); if (t) { G.bolts.push({ x1: c.x, y1: c.y, x2: t.x, y2: t.y, t: .2 }); damageEnemy(t, big * 6, 0, 0, c.d.el); } }
-      else if (cls === 'summoner') { for (let k = 0; k < 3; k++) { const a = Math.random() * 6.283; G.areas.push({ kind: 'totem', x: c.x + Math.cos(a) * 60, y: c.y + Math.sin(a) * 60, t: 5, r: 120, dmg: big, zap: 0, rate: .5, own: pl.i }); } }
+    if (c.skT <= 0) {
+      c.skT = buddyCd(c); const big = c.d.atk * m * (c.d.rar === 3 ? 1.6 : 1);
+      if (LEG_BUDDY[c.id]) { legBuddy(c, pl, big); continue; }
+      const cls = c.d.cls;
+      if (cls === 'guardian') { pl.invul = Math.max(pl.invul, c.d.rar === 3 ? 2 : 1.2); G.rings.push({ x: pl.x, y: pl.y, r: 6, max: 50, t: .4, color: '#7fe3ff' }); }
+      else if (cls === 'support') { const h = alivePL().sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0]; if (h) { h.hp = Math.min(h.st.maxHp, h.hp + h.st.maxHp * .05 * c.pow); G.rings.push({ x: h.x, y: h.y, r: 6, max: 40, t: .4, color: '#5ee08a' }); } }
+      else if (cls === 'brawler' || cls === 'mystic') { const R = (cls === 'mystic' ? 200 : 130) * (c.d.rar === 3 ? 1.3 : 1); G.rings.push({ x: c.x, y: c.y, r: 6, max: R, t: .4, color: col2, fill: true }); for (const e of G.enemies) if (!e.dead && dist(e, c) < R + e.r) damageEnemy(e, big * 2.5, (e.x - c.x) * 2, (e.y - c.y) * 2, c.d.el); }
+      else if (cls === 'ranger') { const n = c.d.rar === 3 ? 14 : 8; for (let k = 0; k < n; k++) shoot(c.x, c.y, k / n * 6.283, 500, 6, big * 1.5, 2, 1.2, col2, { el: c.d.el }); }
+      else if (cls === 'assassin') { const t = G.boss || G.enemies.filter(e => !e.dead && dist(e, c) < 500).sort((a, b) => b.hp - a.hp)[0]; if (t) { G.bolts.push({ x1: c.x, y1: c.y, x2: t.x, y2: t.y, t: .2 }); damageEnemy(t, big * 6, 0, 0, c.d.el); } }
+      else if (cls === 'summoner') { for (let k = 0; k < (c.d.rar === 3 ? 5 : 3); k++) { const a = Math.random() * 6.283; G.areas.push({ kind: 'totem', x: c.x + Math.cos(a) * 60, y: c.y + Math.sin(a) * 60, t: 5, r: 120, dmg: big, zap: 0, rate: .5, own: pl.i }); } }
     }
+  }
+}
+function legBuddy(c, pl, big) {
+  const say = s => G.texts.push({ x: c.x, y: c.y - 24, t: 1.1, s, c: '#ffd24a', big: true });
+  const near = (r, fn) => { for (const e of G.enemies) if (!e.dead && dist(e, c) < r + e.r) fn(e); };
+  G.shake = Math.max(G.shake, 5);
+  switch (c.id) {
+    case 'dragon': { say('🐲 DRAGONFIRE!'); const t = nearest(c.x, c.y, 600), a0 = t ? Math.atan2(t.y - c.y, t.x - c.x) : c.ang; for (let k = 0; k < 15; k++) shoot(c.x, c.y, a0 + (k - 7) * .07, 420 + k * 6, 10, big * 2.2, 5, 1.1, '#ff6030', { el: 'fire' }); for (let k = 1; k <= 4; k++) G.areas.push({ kind: 'fire', x: c.x + Math.cos(a0) * k * 70, y: c.y + Math.sin(a0) * k * 70, t: 3, r: 40, dmg: big * .6, own: pl.i }); break; }
+    case 'paladin': say('🤴 HOLY AEGIS!'); for (const p of alivePL()) { p.invul = Math.max(p.invul, 3); p.hp = Math.min(p.st.maxHp, p.hp + p.st.maxHp * .15); G.rings.push({ x: p.x, y: p.y, r: 6, max: 90, t: .6, color: '#ffe680', fill: true }); } break;
+    case 'thor': { say('🌩️ JUDGMENT!'); const l = G.enemies.filter(e => !e.dead && dist(e, c) < 600).sort(() => Math.random() - .5).slice(0, 10); for (const e of l) { G.bolts.push({ x1: e.x + (Math.random() - .5) * 60, y1: e.y - 500, x2: e.x, y2: e.y, t: .25 }); damageEnemy(e, big * 4, 0, 0, 'storm'); } sfx('zap'); break; }
+    case 'void': { say('🌌 BLACK HOLE!'); const t = nearest(c.x, c.y, 500) || c; const bx = t.x, by = t.y; G.rings.push({ x: bx, y: by, r: 260, max: 6, t: .8, color: '#8a4cff', fill: true }); for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - bx, e.y - by) < 280) { if (!e.boss) { e.x += (bx - e.x) * .7; e.y += (by - e.y) * .7; } damageEnemy(e, big * 3, 0, 0, 'arcane'); } break; }
+    case 'whale': say('🐋 TIDAL WAVE!'); G.rings.push({ x: c.x, y: c.y, r: 10, max: 340, t: .7, color: '#5cb8ff', fill: true }); near(340, e => { damageEnemy(e, big * 2.5, (e.x - c.x) * 6, (e.y - c.y) * 6, 'frost'); e.slowT = 3; e.slowAmt = e.boss ? .3 : .6; }); break;
+    case 'ninetail': say('🦊 FOXFIRE!'); for (let k = 0; k < 18; k++) shoot(c.x, c.y, k / 18 * 6.283, 380, 8, big * 1.8, 3, 1.6, '#ff8a3c', { el: 'fire' }); break;
+    case 'luckycat': { say('🎰 JACKPOT!'); for (let k = 0; k < 8; k++) G.pick.push({ x: c.x + (Math.random() - .5) * 80, y: c.y + (Math.random() - .5) * 80, v: Math.round(2 * G.goldScale), gold: true, mag: false }); const t = G.boss || nearest(c.x, c.y, 500); if (t) { G.bolts.push({ x1: c.x, y1: c.y, x2: t.x, y2: t.y, t: .3 }); damageEnemy(t, big * 8, 0, 0, 'blade'); } sfx('gold'); break; }
+    case 'sun': say('🌞 SUNRISE!'); for (const p of alivePL()) p.hp = Math.min(p.st.maxHp, p.hp + p.st.maxHp * .12); for (let k = 0; k < 6; k++) { const a = k / 6 * 6.283; G.areas.push({ kind: 'fire', x: pl.x + Math.cos(a) * 90, y: pl.y + Math.sin(a) * 90, t: 4, r: 45, dmg: big * .7, own: pl.i }); } G.rings.push({ x: pl.x, y: pl.y, r: 6, max: 120, t: .6, color: '#ffd24a', fill: true }); break;
+    case 'chrono': say('⏳ TIME STOP!'); for (const e of G.enemies) if (!e.dead && onScreen(e)) { e.slowT = 3.5; e.slowAmt = e.boss ? .5 : 1; } G.rings.push({ x: c.x, y: c.y, r: 10, max: 700, t: .8, color: '#c9a8ff' }); break;
+    case 'kong': say('🦍 KONG SMASH!'); G.shake = 14; G.rings.push({ x: c.x, y: c.y, r: 10, max: 240, t: .5, color: '#fff27a', fill: true }); near(240, e => { damageEnemy(e, big * 4, (e.x - c.x) * 3, (e.y - c.y) * 3, 'storm'); e.slowT = 1.8; e.slowAmt = e.boss ? .4 : 1; }); break;
+    case 'reaper': say('💀 REAP!'); for (const e of G.enemies) if (!e.dead && onScreen(e)) { if (!e.boss && !e.elite && e.hp < e.maxHp * .4) { G.bolts.push({ x1: c.x, y1: c.y, x2: e.x, y2: e.y, t: .15 }); damageEnemy(e, e.hp + 1, 0, 0, 'blade'); } } { const t = G.boss || G.enemies.find(e => !e.dead && e.elite); if (t) damageEnemy(t, big * 6, 0, 0, 'blade'); } break;
   }
 }
 function drawCompanions() {
   if (!G.comps) return;
-  for (const c of G.comps) { const R = RAR[c.d.rar]; cx.fillStyle = '#0b0d14cc'; cx.strokeStyle = R.color; cx.lineWidth = c.d.rar >= 3 ? 3 : 2; cx.beginPath(); cx.arc(c.x, c.y, 14, 0, 6.283); cx.fill(); cx.stroke(); cx.font = '16px system-ui'; cx.textAlign = 'center'; cx.fillStyle = '#fff'; cx.fillText(c.d.icon, c.x, c.y + 6);
-    bar(c.x - 12, c.y + 17, 24, 3, 1 - c.skT / 9, '#b48cff'); }
+  for (const c of G.comps) { const R = RAR[c.d.rar], rad = c.d.rar === 4 ? 18 : c.d.rar === 3 ? 16 : 14;
+    if (c.d.rar === 4) { cx.strokeStyle = `hsla(${(G.now * 140) % 360},90%,65%,.8)`; cx.lineWidth = 3; cx.beginPath(); cx.arc(c.x, c.y, rad + 5, 0, 6.283); cx.stroke(); cx.shadowColor = '#ffc23a'; cx.shadowBlur = 16; }
+    else if (c.d.rar === 3) { cx.shadowColor = '#c07cff'; cx.shadowBlur = 12; }
+    cx.fillStyle = '#0b0d14cc'; cx.strokeStyle = R.color; cx.lineWidth = c.d.rar >= 3 ? 3 : 2; cx.beginPath(); cx.arc(c.x, c.y, rad, 0, 6.283); cx.fill(); cx.stroke(); cx.shadowBlur = 0;
+    cx.font = (c.d.rar >= 3 ? 20 : 16) + 'px system-ui'; cx.textAlign = 'center'; cx.fillStyle = '#fff'; cx.fillText(c.d.icon, c.x, c.y + 6);
+    bar(c.x - 12, c.y + rad + 3, 24, 3, 1 - c.skT / buddyCd(c), c.d.rar === 4 ? '#ffc23a' : '#b48cff'); }
 }
 
 /* ================= ROOMS ================= */
@@ -1663,6 +1963,7 @@ function spawnTick(dt) {
     for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; makeEnemy(type, clamp(c.x + Math.cos(a) * 430, 20, WORLD - 20), clamp(c.y + Math.sin(a) * 430, 20, WORLD - 20)); }
     G.banner = { text: '⚠️ SWARM!', t: 1.2 };
   }
+  if (!G.gobDone && G.type !== 'boss' && run.room > 0) { if (G.gobAt === undefined) G.gobAt = Math.random() < .2 ? 8 + Math.random() * 25 : 1e9; if (G.time >= G.gobAt) { G.gobDone = true; const [x, y] = spawnPos(); const e = makeEnemy('runner', x, y); e.goblin = true; e.hp = e.maxHp = (60 + 45 * run.act) * G.hpMul; e.xp = 0; e.dmg = 0; e.r = 14; e.gobT = 12; G.banner = { text: '🤑 A GOLD GOBLIN! Catch it before it escapes!', t: 2 }; sfx('alarm'); } }
   while (G.eliteT.length && G.time >= G.eliteT[0]) { G.eliteT.shift(); makeElite(rpick(['brute', 'grunt', 'shooter', 'splitter', 'charger'])); G.banner = { text: '💀 An elite appears!', t: 1.4 }; }
   if (G.beastT) while (G.beastT.length && G.time >= G.beastT[0]) { G.beastT.shift(); const [x, y] = spawnPos(); const e = makeElite(rpick(['brute', 'charger', 'summoner', 'healer']), x, y); e.beast = true; e.hp = e.maxHp = e.maxHp * .8; G.banner = { text: '🎯 A Rift Beast appears!', t: 1.3 }; }
 }
@@ -1702,6 +2003,9 @@ function killEnemy(e, silent) {
   if (e.xp > 0) { if (G.pick.length < 300) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false }); else { const g = G.pick.find(p => !p.gold && !p.mag); if (g) g.v += e.xp * G.xpScale; } }
   const gc = e.elite ? 1 : .12 * (1 + ST.luck);
   if (Math.random() < gc) G.pick.push({ x: e.x + 6, y: e.y + 4, v: Math.round((e.elite ? 20 : ri(1, 3)) * G.goldScale), gold: true, mag: false });
+  if (e.goblin) { for (let k = 0; k < 14; k++) G.pick.push({ x: e.x + (Math.random() - .5) * 70, y: e.y + (Math.random() - .5) * 70, v: Math.round(3 * G.goldScale), gold: true, mag: false }); S.gems += 10; G.texts.push({ x: e.x, y: e.y - 30, t: 1.6, s: '💰 GOBLIN LOOT! +10 💎', c: '#ffd24a', big: true }); sfx('gold'); if (Math.random() < .35) G.pick.push({ x: e.x, y: e.y, egg: 'egg', v: 0, mag: false }); }
+  if (e.elite && !e.boss && Math.random() < (e.beast ? .1 : .15)) G.pick.push({ x: e.x, y: e.y, egg: 'egg', v: 0, mag: false });
+  if (e.boss && Math.random() < .5) G.pick.push({ x: e.x, y: e.y, egg: 'goldegg', v: 0, mag: false });
   if (ST.killHeal) P.hp = Math.min(ST.maxHp, P.hp + ST.killHeal);
   if (has('fang') && Math.random() < .08) P.hp = Math.min(ST.maxHp, P.hp + 2);
   if (e.type === 'splitter' && !e.boss) for (let i = 0; i < 2; i++) makeEnemy('mini', e.x + (i ? 8 : -8), e.y);
@@ -1969,7 +2273,7 @@ function update(dt) {
     const t = nearestPL(p.x, p.y) || PL[0], dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy) || 1;
     if (!p.mag && d < t.st.magnet) p.mag = true;
     if (p.mag) { p.sp = (p.sp || 150) + 900 * dt; p.x += dx / d * p.sp * dt; p.y += dy / d * p.sp * dt; }
-    if (d < t.r + 8) { p.got = true; if (p.gold) { const g = Math.max(1, Math.round(p.v * t.st.goldMul)); run.gold += g; S.stats.gold += g; sfx('gold', 60); } else { addXp(p.v * t.st.xpMul); sfx('gem', 30); } }
+    if (d < t.r + 8) { p.got = true; if (p.egg) { (run.eggs = run.eggs || []).push(p.egg); toast(p.egg === 'goldegg' ? '🌟 A GOLDEN EGG! It hatches when the run ends.' : '🥚 You found a Rift Egg! It hatches when the run ends.', '#ffd24a'); sfx('level'); } else if (p.gold) { const g = Math.max(1, Math.round(p.v * t.st.goldMul)); run.gold += g; S.stats.gold += g; sfx('gold', 60); } else { addXp(p.v * t.st.xpMul); sfx('gem', 30); } }
   }
   G.pick = G.pick.filter(p => !p.got);
   if (paused) return; // a level-up just opened: finish this frame after the player picks
@@ -1994,6 +2298,7 @@ function updateEnemies(dt) {
     if (e.flash > 0) e.flash -= dt;
     const tgt = e.tgtCrystal && G.crystal && G.crystal.hp > 0 ? G.crystal : nearestPL(e.x, e.y);
     if (!tgt) continue;
+    if (e.goblin) { e.gobT -= dt; const a = Math.atan2(e.y - tgt.y, e.x - tgt.x) + Math.sin(G.now * 2 + e.wob) * .7, gs = 165 * (e.slowT > 0 ? 1 - e.slowAmt * .6 : 1); e.x = clamp(e.x + Math.cos(a) * gs * dt, 30, WORLD - 30); e.y = clamp(e.y + Math.sin(a) * gs * dt, 30, WORLD - 30); if (e.gobT <= 0) { e.dead = true; burst(e.x, e.y, '#ffd24a', 20); G.banner = { text: '💨 The goblin escaped with its gold!', t: 1.4 }; } continue; }
     const sp = e.spd * (e.slowT > 0 ? 1 - e.slowAmt : 1) * chill * (inHaz(e, 'bush') ? .6 : 1);
     const dx = tgt.x - e.x, dy = tgt.y - e.y, d = Math.hypot(dx, dy) || 1;
     if (e.boss) bossAI(e, dt, sp, dx, dy, d, tgt);
@@ -2202,9 +2507,13 @@ function endRun(how, then) {
   if (!r.online || NET.role === 'host') S.run = null;
   run = null;
   const newChars = checkUnlocks();
+  const bxp = Math.round(r.floors * 3 + r.kills / 30), buds = [...new Set((S.buddies || []).slice(0, r.players.length).filter(id => id && col()[id]))];
+  const budUp = buds.map(id => ({ id, n: giveXp(id, bxp) }));
+  const hatched = (r.eggs || []).map(k => pullOne(PACKS[k] || PACKS.egg));
   save();
   if (typeof netSend === 'function' && r.online) netSend({ t: 'end' });
   if (then) { then(); return; }
+  const summary = () => {
   const title = how === 'win' ? '🏆 Run Complete!' : how === 'dead' ? '💀 You Fell' : '🏳️ Run Ended';
   screen(`<h1 style="font-size:48px">${title}</h1>
     <div class="panel" style="max-width:520px"><div class="grid" style="width:100%;grid-template-columns:1fr 1fr">
@@ -2214,11 +2523,15 @@ function endRun(how, then) {
       <div>Level: <b>${r.level}</b></div><div>Relics: <b>${r.relics.length}</b></div>
     </div>
     <h2 style="margin-top:14px;color:#7fe3ff">+${shards} 💠 shards · <span style="color:#ff9af0">+${gems} 💎 gems</span></h2>
+    ${budUp.length ? `<p style="text-align:center">🐾 ${budUp.map(o => `${UD(o.id).icon} ${UD(o.id).name} +${bxp} xp${o.n ? ` <b style="color:var(--gold)">⬆️ Lv ${lvOf(o.id)}!</b>` : ''}`).join(' · ')}</p>` : ''}
     ${newChars.length ? `<p style="text-align:center;color:var(--gold)">🔓 New runner: ${newChars.map(k => CHARS[k].icon + ' ' + CHARS[k].name).join(', ')}!</p>` : ''}
     </div>
     <div class="col" style="margin-top:14px"><button class="opt big" data-a="0" data-n="1">⚔️ Play again<kbd>1</kbd></button><button class="opt big" data-a="1" data-n="2">💠 Spend shards<kbd>2</kbd></button><button class="opt" data-a="3" data-n="3">🃏 Open packs (💎 ${S.gems})<kbd>3</kbd></button><button class="opt" data-a="2" data-n="4">🏠 Title<kbd>4</kbd></button></div>`,
     [() => showCharSelect({ players: r.players.length }), showUpgrades, showTitle, () => showSquadHub('packs', showTitle)]);
   inputLock = performance.now() + 700;
+  };
+  if (hatched.length) { sfx('level'); revealPulls(hatched, { name: hatched.length > 1 ? `Your ${hatched.length} eggs are hatching!` : 'Your egg is hatching!', icon: '🥚' }, summary); }
+  else summary();
 }
 function checkUnlocks() {
   const out = [];
@@ -2297,6 +2610,7 @@ function render() {
   // pickups
   for (const p of G.pick) {
     if (!vis(p.x, p.y)) continue;
+    if (p.egg) { const gold = p.egg === 'goldegg'; cx.shadowColor = gold ? '#ffc23a' : '#c9a8ff'; cx.shadowBlur = 18 + Math.sin(G.now * 6) * 8; cx.font = '24px system-ui'; cx.textAlign = 'center'; cx.fillText('🥚', p.x, p.y + 8); cx.shadowBlur = 0; if (gold) { cx.strokeStyle = '#ffc23a'; cx.lineWidth = 2; cx.beginPath(); cx.arc(p.x, p.y, 17, 0, 6.283); cx.stroke(); } continue; }
     if (p.gold) { cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(p.x, p.y, 5, 0, 6.283); cx.fill(); cx.fillStyle = '#b8901a'; cx.fillRect(p.x - 1, p.y - 3, 2, 6); }
     else { const big = p.v >= 8, med = p.v >= 3; cx.fillStyle = big ? '#ff5c8a' : med ? '#5ee08a' : '#5cc8ff'; const s = big ? 8 : med ? 6 : 5; cx.beginPath(); cx.moveTo(p.x, p.y - s); cx.lineTo(p.x + s * .7, p.y); cx.lineTo(p.x, p.y + s); cx.lineTo(p.x - s * .7, p.y); cx.closePath(); cx.fill(); }
   }
@@ -2361,6 +2675,7 @@ function drawPlayer(pl) {
   if (pl.dashCd > 0) bar(pl.x - 16, pl.y + 20, 32, 4, 1 - pl.dashCd / pl.st.dashCd, '#7fe3ff');
 }
 function drawEnemy(e) {
+  if (e.goblin) { cx.fillStyle = e.flash > 0 ? '#fff' : '#ffd24a'; cx.shadowColor = '#ffd24a'; cx.shadowBlur = 20; cx.beginPath(); cx.arc(e.x, e.y, e.r, 0, 6.283); cx.fill(); cx.shadowBlur = 0; cx.font = '22px system-ui'; cx.textAlign = 'center'; cx.fillText('🤑', e.x, e.y + 8); bar(e.x - 20, e.y - e.r - 10, 40, 4, e.hp / e.maxHp, '#ffd24a'); bar(e.x - 20, e.y - e.r - 5, 40, 2, e.gobT / 12, '#fff'); return; }
   const col = e.flash > 0 ? '#fff' : e.color;
   if (e.type === 'charger' && e.st === 'aim') { cx.strokeStyle = '#ff604066'; cx.lineWidth = e.r * 1.6; cx.beginPath(); cx.moveTo(e.x, e.y); cx.lineTo(e.x + Math.cos(e.ca) * 330, e.y + Math.sin(e.ca) * 330); cx.stroke(); }
   if (e.type === 'sniper' && e.st === 'aim') { cx.strokeStyle = e.stT < .25 ? '#ff2050' : '#ff205066'; cx.lineWidth = e.stT < .25 ? 3 : 1.5; cx.beginPath(); cx.moveTo(e.x, e.y); cx.lineTo(e.x + Math.cos(e.ca) * 900, e.y + Math.sin(e.ca) * 900); cx.stroke(); }
