@@ -244,15 +244,14 @@ Tested headlessly against the live Groq and Gemini APIs; fixes made from what ac
 
 ## 17. Open-world pages (replaces the grid when the AI is on)
 The grid made every objective the same: walk to a square, fill a bar. Now, like a tabletop game master, the game drops you
-somewhere ("You wake up on cold linoleum…") and it's up to you.
-- **World bible (secret).** At the start of a page the AI writes: the start place, ~6 places you can see or hear of, 3 locals with wants, 2 roaming dangers, where the goal is, what's going on there, and 3 rumours. It's **stuff, never solutions**: no routes, keys or "the way out". Any plan that fits your powers and the world can work.
-- **Hidden goal.** The page's objective is secret until you uncover it (ask the right person, follow a rumour, reach the place). If you wander too long, rumours start reaching you, and after ~9 turns (6 in the tutorial) everyone's talking about it.
-- **Engine keeps the facts.** Places visited, what you've learned (📜), what you built, items picked up. They're sent back to the AI every turn, so the world stays consistent. You can't declare things into existence ("I find a helicopter" is ❌ Impossible).
-- **Real progress.** The Judge rates how much each action really moves you toward the goal (0–3); the engine turns that into 📖 Progress, scaled by your power, creativity and verdict, and less for repeating the same approach. Before the goal is known, progress caps at 35%.
-- **The world pushes back.** Loud or reckless moves raise 🚨 Alert and danger; fights (and obstacles) break out, and there's always trouble at 40% and 75%.
-- **Finale.** At 100% you reach the heart of the page: the boss, guardian or objective scene (the objective's meter is shorter since the journey did most of the work; what you learned counts as intel).
+somewhere and it's up to you. Nobody tells you what to do.
+- **World bible (secret).** At the start of a page the AI writes: the start place, ~6 places you can see, 3 locals with wants, 2 roaming dangers, where the goal is, what's going on there, and 4 **signs**: things you might see or hear that come from the goal's situation ("a goblin runs past hugging a stolen cupcake"). It's **stuff, never solutions**: no routes, keys or "the way out". Any plan that fits your powers and the world can work.
+- **The goal is never announced.** You work it out from what you see, hear and are told. If you wander, a sign happens near you, shown and never explained. When you arrive, the goal's scene (boss or objective) starts, and that's when it gets a name.
+- **The Judge is the storyteller while exploring.** One AI call decides what happens *and* describes it in plain words for a 9-year-old. It answers questions ("what do I see?", "what's left after I burn it?") from what really happened. It never says "hint" or "clue", and never reveals the goal directly.
+- **The world remembers.** The engine keeps the last few events (including "that didn't happen" for impossible tries), places, your notes (📝), what you built, what's gone and what's new (burn the candy cane and a smouldering stick is left, which you can pick up). You can't declare things into existence ("I find a helicopter" is ❌ Impossible).
+- **Hidden progress.** No progress or alert bars and no numbers. The Judge rates how much each action really moves you toward the goal (0–3); the engine turns that into hidden progress, scaled by your power, creativity and verdict. Before you run into the goal it caps at 35%. Loud moves secretly raise the danger. Fights (and obstacles) break out, and there's always trouble at 40% and 75%.
+- **Finale.** At 100% you reach the heart of the page: the boss, guardian or objective scene. The objective's meter is shorter, since the journey did most of the work, and your notes count as intel.
 - **No AI?** The page uses the classic grid map instead, so the game still works offline. The Unseen Host keeps its own trap hall.
-- Playtested with an AI player on the live APIs: a full page (find the goal, a fight, a locked gate, the heist finale) took ~27 turns.
 
 ## 18. Playtesting help (built into the game)
 - ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.

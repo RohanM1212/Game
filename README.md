@@ -13,7 +13,7 @@ so the AI can't be talked into "I win".
   Open the game in Chrome, go to ⚙️ Settings, paste them, and press **Save & Test AI**.
   Keys stay in your browser only. They're never in backup codes or bug reports.
 - **Free-limit fallback:** if one model hits its free limit, the game automatically switches to the next one (Groq GPT-OSS / Qwen, then Gemini).
-- **Open-world pages:** no map and no set way through. You wake up somewhere strange, the goal is secret, and it's up to you: explore, talk to people, follow rumours, then do it your way. (With the AI off, pages use the classic grid map.)
+- **Open-world pages:** no map, no set way through, and nobody tells you what to do. You wake up somewhere strange; look around, ask questions, talk to people, work out what's wrong, and fix it your way. The world remembers what you did. (With the AI off, pages use the classic grid map.)
 - **AI that plays fair:** creative ideas are rewarded instead of punished, vague ones get a helpful question, bosses talk back, and the Unseen Host rates your acts ⭐1–5.
 - Already set up before Sep 2026? Nothing to do — the game switches to the new models by itself.
 - **Every power has a sheet:** natural uses, stretches (with minimum level), hard limits, environment needs, and a unique signature rule. See the Power Codex in-game.

@@ -1225,7 +1225,6 @@ function evaluate(pi, P, C) {
   const c = P.creativity || 3;
   score *= .75 + .12 * c;
   if (c >= 4) notes.push(c === 5 ? '🎨 BRILLIANT idea! (creativity 5/5)' : '🎨 Creative! (4/5)');
-  else if (c <= 1) notes.push('🎨 Pretty generic… be more specific or use the scene. (1/5)');
   if (P.verdict === 'stretch') { score *= .7; }
   if (p.st.insight) { score *= 1.35; notes.push('🔍 Your insight pays off (+35%).'); p.st.insight = false; }
   if (p.st.ambush) { score *= 1.3; notes.push('🥷 Striking from hiding (+30%).'); p.st.ambush = false; }
@@ -1236,7 +1235,7 @@ function evaluate(pi, P, C) {
   p.items = p.items.filter(it => it.uses > 0);
   const traitsNow = traitsOf(p, P, C || { objs: [] });
   // scene objects get used up (unless sturdy, like your chair)
-  usedObjs.forEach(o => { if (!o.keep && C && C.objs) { const k = C.objs.indexOf(o); if (k >= 0) { C.objs.splice(k, 1); notes.push(`(The ${o.n} is used up.)`); } } });
+  usedObjs.forEach(o => { if (!o.keep && C && C.objs && !(L.kind === 'open' && !L.ch)) { const k = C.objs.indexOf(o); if (k >= 0) { C.objs.splice(k, 1); notes.push(`(The ${o.n} is used up.)`); } } });
   P.objs = [];
   return { score, notes, traits: traitsNow, scale, crit, pws, cost, sig, lvl };
 }
@@ -1330,6 +1329,7 @@ async function actInner(text) {
     UI.thinking = false;
   }
   if (J) {
+    if ((J.questionOnly === true || J.questionOnly === 'true') && J.says) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('nar', esc(tidyStory(J.says, 50)) + ' <span class="small">(No turn used.)</span>'); noteEvent(L, text, J.says); return save(); }
     if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(No turn used.)</span>`); return save(); }
     P = fromJudge(J, p, C, P0);
     if (P.move && P.dir && host) return hostMove(P.dir);
@@ -1440,7 +1440,7 @@ async function story(pi, P, text, outcome, J, idx) {
     const enemies = C ? C.threats.filter(t => t.hp > 0).map(t => t.n) : [];
     const { story: s, says } = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, enemies: enemies.length ? enemies : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined, previous: L.lastStory || undefined });
     if (!s) return;
-    L.lastStory = s;
+    L.lastStory = s; noteEvent(L, text, s);
     const lines = [{ c: 'nar', h: esc(s) }];
     if (says && C && C.boss) lines.push({ c: 'note', h: `🗣️ <b>${esc(C.boss.n)}:</b> “${esc(says)}”` });
     if (R.level.log[idx] && R.level.log[idx].c === 'nar') R.level.log.splice(idx, 1, ...lines);
@@ -2086,15 +2086,16 @@ function genOpen(entry, seed) {
 const WORLD_SYS = `You are the secret WORLD BUILDER for one page of "The Book Game", a funny, vivid fantasy adventure for young players who can type ANY action. Output ONLY a JSON object.
 Given the world theme and the page's GOAL, invent a small, explorable area. Give it STUFF, never solutions: places, characters, dangers and rumours that clever players can use in many different ways. Never describe a route, key, puzzle answer or "the way" to finish — the players invent their own.
 {
- "opening": "2 short sentences, second person, where they wake up plus one strange sensory detail. Do NOT mention or hint at the goal yet.",
+ "opening": "2 short sentences, second person: where they wake up and one thing they notice. Do NOT mention the goal.",
  "start": {"name": "short place name", "objects": [2-3 of {"name": "a usable thing here", "trait": one of TRAITS}], "env": subset of [water, dark, bright, soil, fog, frozen, burning]},
  "places": [6 of {"name": "short place name", "hint": "what you'd notice about it from afar, max 14 words"}],
  "locals": [3 strings "who they are — what they want", max 14 words each; quirky, some helpful, some not],
  "dangers": [2 short strings: creatures or hazards that roam the area],
  "goalPlace": "the name of one of your places, where the goal is",
  "goalSecret": "1-2 sentences: what is going on with the goal right now (secret; flavour, not a solution)",
- "rumors": [3 vague hints, max 16 words each, that point toward the goal's place without naming the goal]
+ "signs": [4 things the players might see, hear or smell out in the world that come from what is happening at the goal (e.g. "a goblin runs past hugging a stolen cupcake"). Just the event, max 14 words: never name the goal, never explain it, never say it's a clue]
 }
+Use simple, everyday words a 9-year-old knows. Funny and concrete, not poetic.
 TRAITS: air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood.`;
 async function aiWorld(L) {
   const th = THEMES[R.book];
@@ -2114,15 +2115,15 @@ function applyWorld(L, W) {
   L.world = {
     start: W.start, opening: str(W.opening, 320),
     places: (W.places || []).slice(0, 7).map(p => ({ name: str(p && typeof p === 'object' ? p.name : p, 50), hint: str(p && p.hint, 120) })).filter(p => p.name && !sameName(p.name, L.cells[0].place)),
-    locals: list(W.locals, 4, 120), dangers: list(W.dangers, 3, 100), goalPlace: str(W.goalPlace, 50), goalSecret: str(W.goalSecret, 320), rumors: list(W.rumors, 4, 140),
+    locals: list(W.locals, 4, 120), dangers: list(W.dangers, 3, 100), goalPlace: str(W.goalPlace, 50), goalSecret: str(W.goalSecret, 320), signs: list(W.signs || W.rumors, 5, 140),
   };
   const Wd = L.world;
   if (!Wd.goalPlace || !Wd.places.some(p => sameName(p.name, Wd.goalPlace))) { const gp = Wd.places[Wd.places.length - 1]; Wd.goalPlace = gp ? gp.name : 'the far side of the land'; }
   const c = L.cells[0];
   logL(L, 'nar', esc(Wd.opening || `You open your eyes in ${c.place}.`));
   logL(L, 'eff', `📍 ${esc(cap(c.place))}. You notice ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(' and ')}.`);
-  logL(L, 'sys', 'There is no map on this page and no set way through. Look around, go places, talk to people, use your powers. First figure out what this page wants, then do it YOUR way. Loud or reckless moves draw danger.');
-  if (R.trial) logL(L, 'note', '📘 <b>Tutorial page.</b> Try things like “I look around”, “I go to the ruins”, “I ask the fisherman what’s wrong here”. The narrator will explain every verdict: ✅ <b>Natural</b> (full strength), 🌀 <b>Stretch</b> (weaker, riskier, normally needs a higher level), ❌ <b>Impossible</b>. On this page nothing costs you a turn by accident.');
+  logL(L, 'sys', 'Nobody will tell you what to do here. Look around, go places, talk to people, ask questions, use your powers — and see what happens.');
+  if (R.trial) logL(L, 'note', '📘 <b>Tutorial page.</b> Just type what you do or ask, like “what do I see?”, “I walk to the forest” or “I talk to the ant”. If you try something your power can’t do, the narrator tells you why. On this page nothing costs you a turn by accident.');
 }
 async function openBegin(L) {
   if (L.building) return;
@@ -2138,12 +2139,9 @@ async function openBegin(L) {
   }
   save(); if (curView === 'level') render();
 }
-function revealGoal(L, how) {
+function revealGoal(L) { // silent: the players work it out from what they see, nobody announces it
   if (L.goalKnown) return;
-  L.goalKnown = true;
-  if (how) log('note', how);
-  log('big', `❗ Now you know what this page wants: ${esc(openGoal(L))}`);
-  L.prog = Math.max(L.prog, 20);
+  L.goalKnown = true; L.prog = Math.max(L.prog, 20);
 }
 function openGo(pi, J) {
   const L = R.level, W = L.world || {}, want = String(J.goto || '');
@@ -2159,44 +2157,49 @@ function openGo(pi, J) {
   }
   L.x = i; L.w = L.cells.length;
   const c = L.cells[i], first = !c.vis; c.vis = true;
-  log('nar', `${esc(R.players[pi].name)} makes their way to ${esc(c.place)}.`);
-  log('eff', `📍 ${esc(cap(c.place))}${c.env.length ? ` (${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(', ')})` : ''}. You notice ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(' and ') || 'nothing much'}.`);
-  if (first && sameName(c.place, W.goalPlace)) {
-    if (!L.goalKnown) revealGoal(L, '👀 Something big is happening here…');
-    L.prog = Math.min(100, L.prog + 15); log('eff', `📖 You found the heart of the page! Progress → ${L.prog}%`);
-  } else if (first && rnd() < .2) { const g = 3 + Math.floor(rnd() * 6); giveGold(g); log('eff', `🪙 You find ${g} gold on the way.`); }
+  const says = String(J.says || '').trim();
+  log('nar', says ? esc(tidyStory(says, 55)) : `${esc(R.players[pi].name)} walks to ${esc(c.place)}.`);
+  log('eff', `📍 ${esc(cap(c.place))}${c.env.length ? ` (${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(', ')})` : ''}. You see ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(' and ') || 'nothing much'}.`);
+  if (first && sameName(c.place, W.goalPlace)) { revealGoal(L); L.prog = Math.min(100, L.prog + 15); }
+  else if (first && rnd() < .2) { const g = 3 + Math.floor(rnd() * 6); giveGold(g); log('eff', `🪙 You find ${g} gold on the way.`); }
+  noteEvent(L, 'went to ' + c.place, says);
   return true;
 }
-function openResolve(pi, P, ev, J) {
-  const L = R.level, p = R.players[pi], cell = L.cells[L.x];
-  log('nar', fmt(pick(OPEN[P.ap] || OPEN.knowledge), { N: `<b>${esc(p.name)}</b>`, PW: pwPhrase(p, P, ev), T: esc(cell.place) }));
-  const out = [];
+function noteEvent(L, did, happened) { (L.events = L.events || []).push({ did: String(did).slice(0, 90), happened: String(happened || '').slice(0, 260) }); if (L.events.length > 5) L.events.shift(); }
+function openResolve(pi, P, ev, J, text) {
+  const L = R.level, p = R.players[pi], cell = L.cells[L.x], out = [];
+  const says = String(J.says || '').trim();
+  log('nar', says ? esc(tidyStory(says, 55)) : fmt(pick(OPEN[P.ap] || OPEN.knowledge), { N: `<b>${esc(p.name)}</b>`, PW: pwPhrase(p, P, ev), T: esc(cell.place) }));
+  noteEvent(L, text, says);
+  // the world changes because of what you did
+  (Array.isArray(J.gone) ? J.gone : []).forEach(g => { const k = cell.objs.findIndex(o => sameName(o.n, g)); if (k >= 0) cell.objs.splice(k, 1); });
+  (Array.isArray(J.newHere) ? J.newHere : []).slice(0, 2).map(mkObj).filter(Boolean).forEach(o => { if (!cell.objs.some(x => sameName(x.n, o.n))) cell.objs.push(o); });
   if (P.setup || P.world === 'build') {
     const nm = String(P.structure || P.formWord || 'a clever contraption').slice(0, 40);
     const trap = /trap|snare|net|pit|mine|cage|fence/i.test(nm) || P.form === 'trap';
     cell.objs.push({ n: nm.toLowerCase(), i: trap ? '🪤' : '🏗️', traits: ev.traits.filter(t => t !== 'physical'), prep: Math.round(ev.score * 1.1), trap });
-    if (cell.objs.length > 6) cell.objs.splice(0, 1);
-    cell.built.push(nm); out.push(`🏗️ You make ${esc(nm)} here. ${trap ? 'Any enemy that shows up here gets hit by it first.' : 'Use it in a later action for a big bonus.'}`);
+    cell.built.push(nm); out.push(`🏗️ You made ${esc(nm)}. ${trap ? 'Any enemy that shows up here gets hit by it first.' : 'You can use it later.'}`);
   }
+  if (cell.objs.length > 6) cell.objs.splice(0, cell.objs.length - 6);
   const tags = (P.envChange || []).filter(t => PLACE_ENV.includes(t));
-  if (tags.length) { tags.forEach(t => { if (!cell.env.includes(t)) cell.env.push(t); }); out.push(`🌍 ${esc(cap(cell.place))} is now ${tags.join(' and ')}.`); }
-  if (P.ap === 'heal') { const h = R.players.map((q, i) => healP(i, ev.score * .6)).reduce((a, b) => a + b, 0); if (h) out.push(`💚 The team heals +${h} HP.`); }
-  (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => { f = String(f || '').trim().slice(0, 140); if (f && !L.facts.some(x => sameName(x, f))) { L.facts.push(f); out.push(`📜 ${esc(f)}`); } });
+  if (tags.length) tags.forEach(t => { if (!cell.env.includes(t)) cell.env.push(t); });
+  if (P.ap === 'heal') { const h = R.players.map((q, i) => healP(i, ev.score * .6)).reduce((a, b) => a + b, 0); if (h) out.push(`💚 +${h} HP`); }
+  (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => { f = String(f || '').trim().slice(0, 140); if (f && !L.facts.some(x => sameName(x, f))) L.facts.push(f); });
   if (L.facts.length > 24) L.facts.splice(0, L.facts.length - 24);
-  if (J.item && cell.looted < 2) { const it = mkObj({ name: J.item, trait: J.itemTrait }); if (it) { cell.looted++; addFound(p, it.n, it.i, it.traits); out.push(`🎒 ${esc(p.name)} takes ${it.i} ${esc(it.n)}.`); } }
-  // how far did that REALLY get them? (the AI picks 0-3, the engine sets the amount)
+  if (J.item && cell.looted < 2) { const it = mkObj({ name: J.item, trait: J.itemTrait }); if (it) { cell.looted++; addFound(p, it.n, it.i, it.traits); const k = cell.objs.findIndex(o => sameName(o.n, it.n)); if (k >= 0) cell.objs.splice(k, 1); out.push(`🎒 You take the ${it.i} ${esc(it.n)}.`); } }
+  // how far did that REALLY get them? The AI picks 0-3, the engine sets the amount. Hidden from the player.
   let pr = clamp(Math.round(+J.progress || 0), 0, 3);
   if (P.verdict === 'stretch') pr = Math.min(pr, 2);
-  if (J.goalFound === true || J.goalFound === 'true') { if (!L.goalKnown) { revealGoal(L); pr = Math.max(pr, 1); } }
+  if (J.goalFound === true || J.goalFound === 'true') { revealGoal(L); pr = Math.max(pr, 1); }
   let gain = [0, 7, 13, 21][pr] * (.8 + Math.min(40, ev.score) / 60) * (.85 + .06 * P.creativity);
   if (pr && p.st.lastProgAp === P.ap) gain *= .75; // same trick again helps less
   gain = Math.round(Math.min(30, gain));
   const before = L.prog;
   L.prog = Math.min(L.goalKnown ? 100 : 35, L.prog + gain);
-  if (L.prog > before) { out.push(`📖 Progress +${L.prog - before} → ${L.prog}%`); L.stall = 0; p.st.lastProgAp = P.ap; }
-  else { L.stall++; if (gain && !L.goalKnown) out.push('❓ You feel you should find out what this page wants before going further.'); }
-  if (out.length) log('eff', out.join('<br>'));
-  if (ev.notes.length) log('note', ev.notes.join(' '));
+  if (L.prog > before) { L.stall = 0; p.st.lastProgAp = P.ap; } else L.stall++;
+  if (out.length) log('eff', out.join(' · '));
+  const keep = ev.notes.filter(n => /^(📏|😮‍💨|🍄)/.test(n)); // only notes that matter while exploring
+  if (keep.length) log('note', keep.join(' '));
 }
 // the world moves on: danger builds, the page nudges wanderers, milestones bring trouble
 function openTick(risky) {
@@ -2204,15 +2207,11 @@ function openTick(risky) {
   L.turns++;
   if (risky) L.alert = Math.min(100, L.alert + 8);
   L.tension += 7 + (risky ? 20 : 0) + Math.round(L.alert / 10);
-  if (!L.goalKnown && L.turns >= (R.trial ? 6 : 9)) {
-    const r = (W.rumors || [])[L.heard % Math.max(1, (W.rumors || []).length)];
-    return revealGoal(L, `👂 Everyone around here keeps whispering about the same thing${r ? `: <i>“${esc(r)}”</i>` : '.'}`);
-  }
-  if (L.stall >= (R.trial ? 3 : 4)) {
+  if (L.stall >= (R.trial ? 3 : 4)) { // the world keeps happening around wanderers — shown, never explained
     L.stall = 0;
-    const r = (W.rumors || [])[L.heard++ % Math.max(1, (W.rumors || []).length)];
-    const far = (W.places || []).find(p => !L.cells.some(x => sameName(x.place, p.name)));
-    log('note', r ? `👂 You overhear: <i>“${esc(r)}”</i>` : far ? `👀 In the distance you notice ${esc(far.name)}. ${esc(far.hint)}` : '👀 The page seems to be waiting for you to try something bold.');
+    const signs = W.signs || [];
+    const sg = signs.length ? signs[L.heard++ % signs.length] : '';
+    if (sg) { log('nar', esc(cap(sg.replace(/[.!]*$/, '.')))); noteEvent(L, '(something happened nearby)', sg); }
   }
   for (const m of [40, 75]) if (L.prog >= m && !L.marks.includes(m)) { L.marks.push(m); return openTrouble(m === 75 && rnd() < .5 ? 'obs' : 'enc'); }
   if (L.prog >= 100) return openFinale();
@@ -2244,15 +2243,18 @@ async function openAct(pi, text, P0) {
   UI.thinking = false;
   log('you', `${esc(p.name)}: “${esc(text)}”`);
   if (!J) { log('sys', '📴 The narrator lost its voice for a moment (the free AI is busy). Try again in a few seconds — nothing happened.'); return save(); }
+  if ((J.questionOnly === true || J.questionOnly === 'true') && J.says && !J.goto) { // just asking: answer it, time doesn't pass
+    log('nar', esc(tidyStory(J.says, 55))); noteEvent(L, text, J.says);
+    (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => { f = String(f || '').trim().slice(0, 140); if (f && !L.facts.some(x => sameName(x, f))) L.facts.push(f); });
+    return save();
+  }
   if (J.unclear && J.question) { log('note', `🤔 ${esc(J.question)} <span class="small">(Nothing happened yet.)</span>`); return save(); }
   const P = fromJudge(J, p, pseudo, P0);
   const done = () => { if (R.players.length > 1 && !L.ch) R.cur = nextHostPlayer(); save(); };
-  if (P.move && P.verdict === 'impossible') { remember(p, text, 'impossible'); log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'That can\'t happen here.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
+  if (P.move && P.verdict === 'impossible') { remember(p, text, 'impossible'); noteEvent(L, text, 'It did not happen: ' + (P.why || 'impossible')); log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'That can\'t happen here.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
   if (J.goto && (P.move || P.world === 'travel' || P.world === 'move' || !P.ap)) {
-    const mark = L.log.length;
     if (!openGo(pi, J)) return save();
     remember(p, text, 'travel');
-    await story(pi, P, text, L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500), J, mark);
     openTick(false); return done();
   }
   if (P.rest || P.world === 'rest') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); openTick(false); return done(); }
@@ -2261,14 +2263,14 @@ async function openAct(pi, text, P0) {
   remember(p, text, P.verdict);
   (L.debug = L.debug || []).push({ text, via: AIC.last ? AIC.last.p + '/' + AIC.last.m : 'keyword', judge: J, verdict: P.verdict, why: P.why || '' }); if (L.debug.length > 8) L.debug.shift();
   val.notes.forEach(n => log('note', n));
-  if (R.trial && P.verdict !== 'fizzle' && P.verdict !== 'impossible') log('note', `📘 <b>Tutorial:</b> that's <b>${{ natural: '✅ Natural', stretch: '🌀 a Stretch' }[P.verdict]}</b>${P.why ? ' — ' + esc(P.why.replace(/[.!]+$/, '')) : ''}.`);
-  if (P.verdict === 'impossible') { log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'That can\'t happen here.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
-  if (P.verdict === 'fizzle') { p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.${P.hint ? ` 💡 <i>Works now: ${esc(P.hint)}</i>` : ''}`); return save(); }
+  if (R.trial && P.powers.length && P.verdict !== 'fizzle' && P.verdict !== 'impossible') log('note', `📘 <b>Tutorial:</b> that's <b>${{ natural: '✅ Natural', stretch: '🌀 a Stretch' }[P.verdict]}</b> for your power${P.why ? ' — ' + esc(P.why.replace(/[.!]+$/, '')) : ''}.`);
+  if (P.verdict === 'impossible') { noteEvent(L, text, 'It did not happen: ' + (P.why || 'impossible')); log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'That can\'t happen here.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
+  if (P.verdict === 'fizzle') { noteEvent(L, text, 'It fizzled out: the power is not strong enough yet.'); p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.${P.hint ? ` 💡 <i>Works now: ${esc(P.hint)}</i>` : ''}`); return save(); }
   const ev = evaluate(pi, P, pseudo);
   p.en = Math.min(p.maxEn, p.en + Math.floor(ev.cost / 2)); // exploring costs half energy
   const mark = L.log.length;
-  openResolve(pi, P, ev, J);
-  await story(pi, P, text, L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500), J, mark);
+  openResolve(pi, P, ev, J, text);
+  if (!String(J.says || '').trim()) await story(pi, P, text, L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500), J, mark);
   p.st.lastAp2 = p.st.lastAp; p.st.lastAp = P.ap;
   openTick(J.risky === true || J.risky === 'true' || ev.traits.some(t => LOUD_TRAITS.includes(t)));
   return done();
@@ -2281,12 +2283,9 @@ function openPanel(L) {
   const heard = (W.places || []).filter(p => !L.cells.some(x => sameName(x.place, p.name))).map(p => go(`❔ ${esc(p.name)}`, p.name));
   return `<h3>📖 Journal</h3>
   <div class="desc">📍 <b>${esc(cap(c.place))}</b>${c.env.length ? ` <span class="tag">${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(' ')}</span>` : ''}${c.hint ? `<br><span class="small">${esc(c.hint)}</span>` : ''}<br>You see: ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(', ') || 'nothing useful'}.</div>
-  <div class="lbl"><span>🎯 This page wants…</span></div><div class="small" style="margin-bottom:6px">${L.goalKnown ? `<b>${esc(openGoal(L))}</b>` : '❓ <i>Unknown. Explore, talk to people and follow rumours to find out.</i>'}</div>
-  <div class="lbl"><span>📖 Progress</span><span>${L.prog}%</span></div>${bar(L.prog, 100, '#5cb85c')}
-  <div class="lbl"><span>🚨 Alert</span><span>${L.alert}%</span></div>${bar(L.alert, 100, '#d9534f')}
   ${visited.length ? `<div class="small" style="margin-top:6px">Been to:</div>${visited.join('')}` : ''}
-  ${heard.length ? `<div class="small" style="margin-top:6px">You can see or have heard of:</div>${heard.join('')}` : ''}
-  <div class="small" style="margin-top:6px">📜 <b>What you know</b>${L.facts.length ? '<br>' + L.facts.slice(-8).map(f => '• ' + esc(f)).join('<br>') : ': nothing yet.'}</div>`;
+  ${heard.length ? `<div class="small" style="margin-top:6px">You can see from here:</div>${heard.join('')}` : ''}
+  <div class="small" style="margin-top:6px">📝 <b>Your notes</b>${L.facts.length ? '<br>' + L.facts.slice(-8).map(f => '• ' + esc(f)).join('<br>') : ': nothing yet.'}</div>`;
 }
 
 /* =====================================================================
@@ -2417,20 +2416,24 @@ why: short reason (max 15 words) · hint: only if impossible
 creativity: 1-5 (1 = generic "I attack", 3 = specific and sensible, 5 = brilliant use of scene/objects/combos/enemy weaknesses)
 world, dir, setup (true/false), structure (short name), envChange (list)
 unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear
-When "mode" is "open" (free exploration of a living world, no enemy in front of them), also fill these. The world, its places, locals and dangers are real; the GOAL is the page's objective (keep it secret until they uncover it):
-goto: if they travel, the place they head to — a name from "visited" or "world.places", or a short NEW place name if they head somewhere unlisted that plausibly exists nearby; else null. Travelling counts as approach "move".
+questionOnly: true if the player is ONLY asking something (who is that? what does it want? what's left? can I…?) and not doing anything yet — then put a short, plain, honest answer in "says" (max 40 words, simple words, from the situation and "justHappened"). A question is never "unclear".
+When "mode" is "open" (free exploration of a living world, no enemy in front of them), YOU are also the storyteller, and these fields matter most:
+says: what happens, told to the player — 1-3 short sentences (max 50 words), second person ("you"), in simple everyday words a 9-year-old knows (no fancy or poetic words, no strange metaphors). Say exactly what happens because of their action and what they now see, hear or are told. If they ASK something ("what do I see?", "what's left of the mushroom?", "where can I go?"), answer it plainly and honestly from the world, "here" and "justHappened". Stay consistent with "justHappened" and "facts". SHOW, never explain: never say hint, clue, secret, mysterious, or "this means", and never tell them what they should do. Don't announce the goal like a quest ("your mission is…"), but DO describe it when it's in front of them: if "atGoalPlace" is true or they go looking in the right direction, plainly describe what is happening there (from "goalSecret") — the upset troll, the goblins stealing snacks — that is how they find out. Locals talk about their own problems honestly. When looking or listening elsewhere, weave in one of "signs".
+Questions are never "unclear" — answer them. Ordinary actions with no power (looking, walking, talking, picking things up) are natural.
+goto: if they travel, the place they head to — a name from "visited" or "world.places", or a short NEW place name if they head somewhere unlisted that plausibly exists nearby; else null. Travelling counts as approach "move", and "says" describes arriving there.
 newObjects: only when goto is a place not in "visited": 2-3 usable things there, [{"name","trait"}] (trait: air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood). newEnv: tags from [water, dark, bright, soil, fog, frozen, burning]
-learned: 0-2 short NEW facts (max 14 words each) that this action honestly uncovers — what a local says, what they spot, where a rumour leads. Looking around, searching, asking or listening should almost always uncover SOMETHING (use "world.locals", "world.rumors", "world.places", "goalSecret"), unless it repeats a fact they already have. Consistent with the world and "facts"; never hand them a solution.
-item: a small ordinary thing they pick up or make, only if they search/take/craft, else null · itemTrait: one trait from the list above
-progress: 0-3 how much this ACTION really moves them toward the page's goal: 0 = not at all (wandering, showing off, repeating), 1 = a useful step (a clue, an ally, a way forward, getting closer), 2 = a solid step (they learned or changed something that matters for the goal), 3 = a big clever leap. Judge by the goal, "goalSecret" and "facts" — never by the player's claims. Before the goal is known, learning about it IS progress.
-goalFound: true only if this action uncovers what the page's goal is (asking the right local, reaching goalPlace, following a rumour to the end).
+gone: names of things in "here.objects" that are destroyed, eaten or used up by this action ([] if none) · newHere: 0-2 things that now exist here because of it, [{"name","trait"}] (a burnt stump, a puddle, a knocked-down sign)
+learned: 0-2 short notes (max 12 words each) of NEW useful things they found out, written plainly like a kid's notebook ("The ant queen is hungry.", "The river is too fast to swim."). No words like hint, clue, secret or suggests.
+item: a small thing they pick up or make, only if they take/search/craft, else null · itemTrait: one trait from the list above
+progress: 0-3 how much this ACTION really moves them toward the page's goal: 0 = not at all (wandering, showing off, repeating), 1 = a useful step (finding out something that matters, an ally, getting closer), 2 = a solid step, 3 = a big clever leap. Judge by the goal, "goalSecret" and "facts" — never by the player's claims.
+goalFound: true when they reach or clearly run into the goal's situation (they meet the troll, see the stolen cake, arrive at goalPlace).
 risky: true if it's loud, destructive or reckless and would draw danger.
-They cannot make things exist just by saying so ("I find a helicopter", "there's a secret exit here", "I already have the key"): only things in the world, the scene, their items, or ordinary stuff that plausibly belongs there. If they try, verdict impossible, and hint at something real they could try instead. There is no single right way to reach the goal — any plan that makes sense with their powers and the world can work.
+They cannot make things exist just by saying so ("I find a helicopter", "there's a secret exit here", "I already have the key"): only things in the world, the scene, their items, or ordinary stuff that plausibly belongs there. If they try, verdict impossible. There is no single right way to reach the goal — any plan that makes sense with their powers and the world can work.
 When "mode" is "host", also rate the act as the Host would — a bored, hard-to-impress showman who hates reruns and adores surprise, specificity and style: hostRating 1-5 (1 = dull or lazy, 3 = decent, 5 = dazzling and original; lower it if it resembles "hostSeen"), and hostLine: his short in-character reaction (max 16 words, theatrical, never reveal where he or the traps are).`;
 
 const STORY_SYS = `You are the NARRATOR of "The Book Game", a funny, vivid fantasy adventure for young players that can turn epic. Output a JSON object: {"story": "..."}.
-"story": 1-2 punchy sentences (max 40 words, present tense) showing what the player just did and how the scene or enemy visibly reacts. Be concrete and surprising, with a touch of humour; show, don't summarize.
-Follow the OUTCOME exactly, not the player's wishes: if the player claimed things that aren't real (a helicopter, a secret door), they don't appear. Never invent extra damage, wins, deaths, failures or new creatures, and never contradict the verdict (a stretch is shaky, a backfire hurts the player). Stay in the given PLACE. Use "enemies" for who is there.
+"story": 1-2 short sentences (max 35 words, present tense) showing what the player just did and how the scene or enemy reacts. Use simple everyday words a 9-year-old knows — clear and funny, not poetic; no strange metaphors.
+Follow the OUTCOME exactly, not the player's wishes: if the player claimed things that aren't real (a helicopter, a secret door), they don't appear. Never invent extra damage, wins, deaths, failures or new creatures, and never contradict the verdict (a stretch is shaky, a backfire hurts the player). Stay in the given PLACE. Use "enemies" for who is there — if no enemies are given, there are none.
 Refer to the player by name (third person). Don't reuse images or phrases from "previous". Never write numbers, game terms (damage, HP, energy, shield, turn, stun, bonus, verdict, stretch) or lists. No emojis.
 If "villain" is given, ALSO add "villain_says": one short in-character line (max 14 words) the villain shouts in reaction — taunting, rattled, or grudgingly impressed, matching the outcome.`;
 
@@ -2447,16 +2450,19 @@ function situationFor(pi, C) {
     env: envOf(C),
   };
   const recent = (L.hist || []).filter(h => h.who === p.name).slice(-3).map(h => `${h.text} → ${h.v}`);
+  if ((L.events || []).length) sit.justHappened = L.events.slice(-4);
   if (recent.length) sit.recent = recent;
   if (L.kind === 'open' && !C) {
     const cell = L.cells[L.x], W = L.world || {};
     sit.mode = 'open';
     sit.here = { place: cell.place, objects: cell.objs.map(o => o.n), env: cell.env, built: cell.built };
     sit.visited = L.cells.map(c => c.place);
-    sit.world = { places: W.places, locals: W.locals, dangers: W.dangers, rumors: W.rumors };
+    sit.world = { places: W.places, locals: W.locals, dangers: W.dangers };
     sit.facts = L.facts.slice(-10);
+    sit.justHappened = (L.events || []).slice(-4);
+    sit.signs = W.signs;
     sit.goal = (L.goalKnown ? 'KNOWN: ' : 'SECRET, the players have not discovered it yet: ') + openGoal(L);
-    sit.goalPlace = W.goalPlace; sit.goalSecret = W.goalSecret; sit.progress = L.prog + '%';
+    sit.goalPlace = W.goalPlace; sit.goalSecret = W.goalSecret; sit.atGoalPlace = sameName(cell.place, W.goalPlace); sit.progress = L.prog + '%';
     return sit;
   }
   if (L.kind === 'map' && !C) {
@@ -2502,7 +2508,7 @@ async function aiStory(info) {
 async function aiIntro(kind, title, desc) {
   if (!aiReady()) return null;
   try {
-    const r = await ai('story', [{ role: 'system', content: 'You are the narrator of "The Book Game", a funny, vivid fantasy adventure for young players. Write 2 short sentences (max 40 words) introducing this scene, adding ONE surprising, specific, flavourful detail (flavour only, no new rules, no new enemies). No numbers, no emojis, no markdown.' }, { role: 'user', content: JSON.stringify({ kind, title, setup: desc, world: THEMES[R.book] && THEMES[R.book].name }) }], { max: 300, temp: 1 });
+    const r = await ai('story', [{ role: 'system', content: 'You are the narrator of "The Book Game", a funny, vivid fantasy adventure for young players. Write 2 short sentences (max 35 words) introducing this scene in simple everyday words a 9-year-old knows, with ONE funny, specific detail (flavour only, no new rules, no new enemies). No numbers, no emojis, no markdown.' }, { role: 'user', content: JSON.stringify({ kind, title, setup: desc, world: THEMES[R.book] && THEMES[R.book].name }) }], { max: 300, temp: 1 });
     return tidyStory(r.text, 50);
   } catch (e) { return null; }
 }
@@ -2654,7 +2660,7 @@ function setupView() {
 function helpView() {
   app.innerHTML = `<h2>How to Play</h2><div class="panel help" style="max-width:820px"><ul>
   <li><b>Pick a book.</b> Each book is a world with 6 pages (levels). You start with a random power.</li>
-  <li><b>Open pages (AI narrator on):</b> there is no map and no set way through. You wake up somewhere strange. Look around, go places ("I go to the ruins"), talk to people, search, follow rumours. First find out <b>what the page wants</b> (it's secret at the start), then do it <b>your</b> way. Any plan that makes sense with your powers and what's really there can work. The 📖 Journal keeps track of places and what you've learned. Loud moves raise the 🚨 Alert and draw danger.</li>
+  <li><b>Open pages (AI narrator on):</b> no map, no set way through, and nobody tells you what to do. You wake up somewhere strange. Look around, ask questions ("what do I see?"), walk places ("I go to the forest"), talk to people, use your powers. Work out what's going on from what you see and hear, then deal with it <b>your</b> way. The 📖 Journal keeps your notes and the places you know. Loud, reckless moves draw danger.</li>
   <li><b>Classic map (AI off):</b> walk the grid with the arrows or "go north", and change the world: scout, build traps, lure enemies, recruit locals, gather supplies.</li>
   <li><b>Scene objects get used up</b> when you use them. <b>Setup moves</b> (rigging, charging, building) do nothing right away but pay off big later.</li>
   <li><b>Help people</b> (❗) for gold, items, intel or allies. Find the page's goal: an objective, a Guardian, the Unseen Host, or the Boss.</li>
@@ -2820,10 +2826,10 @@ function chipsHtml(p, L, C) {
   h += '<span class="chiplbl"></span><button class="chip gold" data-a="idea">💡 Idea</button><button class="chip" data-a="rest">😴 Rest</button>';
   return h + '</div>';
 }
-const OPEN_CHIPS = [['🔭 look around', 'I look around carefully'], ['🗣️ talk to someone', 'I find someone to talk to and ask what is going on here'], ['🔎 search here', 'I search this place for anything useful'], ['👂 follow a rumour', 'I follow the rumour I heard']];
+const OPEN_CHIPS = [['🔭 look around', 'I look around carefully'], ['🗣️ talk to someone', 'I find someone to talk to and ask what is going on here'], ['🔎 search here', 'I search this place for anything useful'], ['👂 listen', 'I stop and listen carefully']];
 function makeIdea() {
   const L = R.level, C = L.ch, p = R.players[R.cur];
-  if (L.kind === 'open' && !C) { const pw = pdef(pick(p.powers)), far = ((L.world || {}).places || []).find(x => !L.cells.some(c => sameName(c.place, x.name))); return pick([OPEN_CHIPS[0][1], OPEN_CHIPS[1][1], OPEN_CHIPS[2][1], `I use my ${pw.name.toLowerCase()} to get a better look at this place`, far ? `I go to ${far.name}` : OPEN_CHIPS[3][1]]); }
+  if (L.kind === 'open' && !C) { const pw = pdef(pick(p.powers)), far = ((L.world || {}).places || []).find(x => !L.cells.some(c => sameName(c.place, x.name))); return pick([OPEN_CHIPS[0][1], OPEN_CHIPS[1][1], OPEN_CHIPS[2][1], `I use my ${pw.name.toLowerCase()} to get a better look at this place`, far ? `I walk to ${far.name}` : 'what do I see?']); }
   if (L.kind === 'map' && !C) { const pw = pdef(pick(p.powers)); return pick([`I use my ${pw.name.toLowerCase()} to scout the land around me`, `I ask around about where the goal is`, `I use my ${pw.name.toLowerCase()} to build a trap here`, `I use my ${pw.name.toLowerCase()} to change the land to the north`, 'I gather something useful from here', 'go ' + pick(['north', 'south', 'east', 'west'])]); }
   const pw = pick(p.powers), d = pdef(pw);
   const aps = APS.filter(a => d.apt[a] >= 2);
