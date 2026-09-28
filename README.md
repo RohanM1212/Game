@@ -25,5 +25,16 @@ so the AI can't be talked into "I win".
 - Design document: [`docs/book-game-design.md`](docs/book-game-design.md)
 
 ## ⚔️ Rift Runners — `rift-runners.html`
-Action roguelite with a strategy map. WASD/arrows to move, Space to dash, Esc to pause.
-Save backup code: **Stats & Save Backup**.
+A co-op action roguelite. Fully offline: one file, no internet needed (sound is made in code).
+
+- **1 or 2 players on one keyboard.** P1: WASD, Space dash, E ultimate. P2: Arrows, Enter or / dash, Right Shift or . ultimate. Gamepads work too.
+  The camera zooms out to fit both of you; if your partner goes down, stand next to them to revive them.
+- **Rift doors instead of a map.** Clear a room and doors open, each showing its reward (⭐ level-up, 🪙 gold, ❤️ heal, 💀 elite relic, 🛒 shop,
+  ❓ mystery, ⛺ camp, 💎 treasure) and its goal. Walk into the one you want. 8 rooms, then the biome's boss; 3 biomes to win, then Endless.
+- **Rooms with goals:** ⏳ survive, 🎯 hunt the marked beasts, 💎 defend the crystal, 🌀 capture the portal, ✨ collect the sparks.
+- **Arenas with stuff:** pillars block enemy shots, 🛢️ barrels explode, a ⛲ healing shrine, and a hazard per biome (bushes, lava, ice, darkness, storms).
+- **Every runner has an ultimate** (Bulwark Slam, Arrow Rain, Meteor, Carpet Bomb, Firestorm, Blood Moon, Blizzard, Thunderstorm, Cyclone, Jackpot).
+- **Element sets:** weapons are 🔥 fire, ❄️ frost, ⚡ storm, 🗡️ blade or ✨ arcane; own 2 or 4 of one element for a set bonus. Plus evolutions, relics, and new enemies with tells (chargers, snipers, healers, summoners, bats).
+- **Online co-op (experimental):** two computers connect by swapping two codes (no server). Works best at home; school Wi-Fi often blocks it.
+- Progress, upgrades and unlocks save in the browser; **Stats → Save Backup** gives a code to move it. Old saves carry over.
+- Robot testers (for developers): `node tools/playtest-rift/bot.js solo 3` plays whole runs at high speed; `online.js` tests online play; `shots.js` takes screenshots.
