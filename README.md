@@ -34,10 +34,13 @@ A co-op action roguelite. Fully offline: one file, no internet needed (sound is 
 - **Rooms with goals:** ⏳ survive, 🎯 hunt the marked beasts, 💎 defend the crystal, 🌀 capture the portal, ✨ collect the sparks.
 - **Arenas with stuff:** pillars block enemy shots, 🛢️ barrels explode, a ⛲ healing shrine, and a hazard per biome (bushes, lava, ice, darkness, storms).
 - **Every runner has an ultimate** (Bulwark Slam, Arrow Rain, Meteor, Carpet Bomb, Firestorm, Blood Moon, Blizzard, Thunderstorm, Cyclone, Jackpot).
-- **🛡️ Your squad (strategy):** recruit units in the shop or win them, merge 3 copies into ★★ (and ★★★), and arrange them on a 2×3 board —
-  tanks in front, archers in back, assassins dive the back row. Units of the same element give team bonuses. At 🛡️ **Skirmish** doors your
-  squad auto-battles an enemy squad for gold and new recruits; your two best units also fight next to you in action rooms. Press **T** between rooms.
-- **🎰 Casino doors:** slots (gold, relics, level-ups, rare units… or 💀💀💀), a Mystery Egg, and betting on yourself to beat the next room's goal.
+- **🃏 Squad & Packs (collect them all):** 42 squad members in 5 rarities — Common, Uncommon, Rare, Epic and ✨Legendary✨ (0.5% a pull,
+  with pity: an Epic every 10 pulls at most, a Legendary every 60). Open packs with 💎 gems (earned every run, from Skirmishes and a daily free pull)
+  or with 🪙 gold in a run (shop and 🎁 Pack Machine doors). Duplicates power a member up from ★1 to ★5. Every member has its own special
+  (summon wolves, rift-swap the enemy rows, revive allies, freeze the whole team, a Lucky Cat jackpot...).
+- **🛡️ Tactical Skirmishes:** place up to 6 members on a 2×3 board (front row takes the hits), build element and class synergies
+  (🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥), pick a tactic, and press 📯 Rally once at the right moment. Wins give gold, gems and sometimes a member.
+- **🐾 Buddy:** each player brings one member into the action rooms; it fights next to you and uses a class skill every few seconds.
 - **Element sets:** weapons are 🔥 fire, ❄️ frost, ⚡ storm, 🗡️ blade or ✨ arcane; own 2 or 4 of one element for a set bonus. Plus evolutions, relics, and new enemies with tells (chargers, snipers, healers, summoners, bats).
 - **Online co-op (experimental):** two computers connect by swapping two codes (no server). Works best at home; school Wi-Fi often blocks it.
 - Progress, upgrades and unlocks save in the browser; **Stats → Save Backup** gives a code to move it. Old saves carry over.
