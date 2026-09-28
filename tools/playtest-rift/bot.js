@@ -22,7 +22,7 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       window.readInput = i => {
         const pl = PL[i]; if (!pl || pl.down) return { mx: 0, my: 0, dash: false, ult: false };
         let gx = 0, gy = 0, tgt = null;
-        if (G.phase === 'doors') tgt = G.doors[0];
+        if (G.phase === 'doors') { if (G.botDoor === undefined) G.botDoor = Math.floor(Math.random() * G.doors.length); tgt = G.doors[G.botDoor] || G.doors[0]; }
         else if (G.obj === 'collect') tgt = G.sparks.filter(s => !s.got).sort((a, b) => dist(a, pl) - dist(b, pl))[0];
         else if (G.obj === 'capture') tgt = G.zone;
         else if (G.obj === 'defend') tgt = dist(pl, G.crystal) > 150 ? G.crystal : null;
@@ -40,7 +40,9 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       };
       window.BOT.menu = () => { // click through menus sensibly
         const bs = [...ui.querySelectorAll('button:not([disabled])')];
-        const bad = /Give up|Save &|Reroll|Title|Spend shards|Claim|Tab|Volume|Music|shake|^\s*P[12]\b/;
+        const bad = /Give up|Save &|Reroll|Title|Spend shards|Claim|Tab|Volume|Music|shake|Recruit|Sell|empty|^\s*P[12]\b/;
+        const skip = document.querySelector('#bcv') && bs.find(b => /Skip/.test(b.textContent)); if (skip) return skip.click();
+        if (/Rift Casino/.test(ui.innerText)) { const sp = bs.find(b => /Spin · 10/.test(b.textContent)); if (sp && (BOT.spins = (BOT.spins || 0) + 1) % 4) return sp.click(); const lv = bs.find(b => /Leave the casino/.test(b.textContent)); if (lv) return lv.click(); return; }
         const leave = bs.find(b => /Leave shop/.test(b.textContent));
         if (leave && !bs.some(b => b.classList.contains('card'))) return leave.click();
         const card = bs.find(b => b.classList.contains('card')) || bs.find(b => b.classList.contains('opt') && !bad.test(b.textContent)) || bs.find(b => !bad.test(b.textContent));
@@ -49,13 +51,13 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       window.BOT.start = () => { const chars = coop ? [pickC(), pickC()] : [pickC()]; window.BOT.chars = chars; newRun(chars, 0, false); };
       window.BOT.start();
     }, [modeArg === 'coop']);
-    const t0 = Date.now(); let lastRoom = -1, stuck = 0;
+    const t0 = Date.now(); let lastRoom = -1, stuckSince = Date.now();
     while (Date.now() - t0 < maxMin * 60e3) {
       const st = await page.evaluate(() => {
         for (let n = 0; n < 900; n++) { // 30 simulated seconds per call
           if (!run) break;
           if (inputLock > performance.now()) inputLock = 0;
-          if (mode === 'fight' && !paused && G) { update(1 / 30); BOT.simT += 1 / 30; }
+          if (mode === 'fight' && !paused && G) { const n0 = G.projs.length; update(1 / 30); BOT.simT += 1 / 30; if (G && G.comps && G.comps.some(c => c.t > c.d.cd * 1.25)) BOT.comp = (BOT.comp || 0) + 1; }
           else if (ui.className !== 'hidden') { BOT.menu(); }
           else if (mode === 'dead') break;
         }
@@ -64,10 +66,11 @@ const GAME = path.resolve(__dirname, '../../rift-runners.html');
       });
       if (st.over) break;
       if (st.mode === 'dead') { await new Promise(r => setTimeout(r, 1300)); continue; }
-      const key = st.act * 100 + st.room; if (key === lastRoom) stuck++; else { stuck = 0; lastRoom = key; }
-      if (stuck > 12) { errors.push('STUCK in ' + JSON.stringify(st)); break; }
+      if (st.dbg && st.dbg.paused) await new Promise(r => setTimeout(r, 120)); // menus with real-time animations (casino reels, squad battles)
+      const key = st.act * 100 + st.room; if (key !== lastRoom) { lastRoom = key; stuckSince = Date.now(); }
+      if (Date.now() - stuckSince > 90e3) { errors.push('STUCK in ' + JSON.stringify(st)); break; }
     }
-    const res = await page.evaluate(() => ({ chars: BOT.chars, stats: { runs: S.stats.runs, bosses: S.stats.bosses, kills: S.stats.kills, bestAct: S.stats.bestAct, wins: S.stats.wins, ults: S.stats.ults, obj: S.stats.objectives, revives: S.stats.revives }, simMin: +(BOT.simT / 60).toFixed(1), endedAt: run ? { act: run.act, room: run.room } : 'run over' }));
+    const res = await page.evaluate(() => ({ chars: BOT.chars, stats: { compShots: BOT.comp || 0, skirm: S.stats.skirmishes || 0, runs: S.stats.runs, bosses: S.stats.bosses, kills: S.stats.kills, bestAct: S.stats.bestAct, wins: S.stats.wins, ults: S.stats.ults, obj: S.stats.objectives, revives: S.stats.revives }, simMin: +(BOT.simT / 60).toFixed(1), endedAt: run ? { act: run.act, room: run.room } : 'run over' }));
     results.push({ run: k + 1, ...res, errors: [...new Set(errors)].slice(0, 8) });
     console.log(JSON.stringify(results[results.length - 1]));
     await page.close();

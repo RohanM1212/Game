@@ -13,6 +13,7 @@ canvas{position:fixed;inset:0;display:block}
 #ui.hidden{display:none}
 #ui.overlay{background:rgba(5,7,12,.72);justify-content:center}
 #ui.menu{background:transparent}
+#ui.dim{background:rgba(5,7,12,.9)}
 h1{font-size:clamp(34px,6vw,64px);margin:18px 0 4px;letter-spacing:4px;background:linear-gradient(90deg,#7c9cff,#b48cff,#ff7ab8);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
 h2{margin:6px 0 12px;font-size:26px;text-align:center}
 .sub{color:var(--dim);text-align:center;margin-bottom:18px}
@@ -80,6 +81,16 @@ p{line-height:1.5}
 .keys{font-size:13px;color:var(--dim);text-align:center;line-height:1.7}
 .keys b{color:var(--text)}
 .codebox{width:100%;height:110px}
+.sqboard,.sqbench{display:grid;grid-template-columns:repeat(3,120px);gap:8px;justify-content:center;margin:4px auto}
+.sqbench{grid-template-columns:repeat(6,104px)}
+.tile{width:100%;height:96px;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;border-width:2px}
+.tile .ti{font-size:30px;line-height:1.1}.tile .tn{font-size:12px;font-weight:700}.tile .ts{font-size:11px;color:var(--gold)}.tile .te{font-size:10px;color:var(--dim)}
+.tile.empty{opacity:.45;border-style:dashed}.tile.sel{box-shadow:0 0 0 3px #ffd24a;transform:translateY(-3px)}.tile.enemy{background:#2a1520}
+.syn{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0}.syn .ico.on{background:#2a3350}
+.reels{display:flex;gap:14px;justify-content:center;font-size:58px;margin:6px 0}.reels span{background:#0b0d14;border:2px solid var(--line);border-radius:12px;padding:4px 14px;min-width:84px}
+h3{margin:10px 0 4px;text-align:center}
+.small{font-size:13px}
+@media (max-width:700px){.sqbench{grid-template-columns:repeat(3,104px)}}
 </style>
 </head>
 <body>
@@ -260,6 +271,8 @@ const DOOR = {
   event:    { icon: '❓', name: 'Mystery',  tip: 'Something strange. No fight.' },
   treasure: { icon: '💎', name: 'Treasure', tip: 'A relic and gold. No fight.' },
   rest:     { icon: '⛺', name: 'Campfire', tip: 'Rest, train or forage. No fight.' },
+  squad:    { icon: '🛡️', name: 'Skirmish', tip: 'Your squad auto-battles an enemy squad. No action fight.' },
+  casino:   { icon: '🎰', name: 'Casino',   tip: 'Slots, a mystery egg, and bets. No fight.' },
   boss:     { icon: '👹', name: 'BOSS',     tip: 'The guardian of this biome.' },
 };
 // what you must do in a fight room (shown on the door too)
@@ -531,6 +544,8 @@ function newRun(chars, heat, daily, opts = {}) {
   run.rerolls += Math.max(...chars.map(id => CHARS[id].mods.rerolls || 0));
   if (daily) addRelic(pick(Object.keys(RELICS)));
   run.players.forEach((p, i) => { p.hp = calcStats(run, i).maxHp; });
+  run.squad = { board: [null, pick(['squire', 'snowling']), null, null, { id: pick(['archer', 'imp', 'sprite']), star: 1 }, null], bench: [] };
+  run.squad.board[1] = { id: run.squad.board[1], star: 1 };
   S.lastChar = chars.concat(S.lastChar).slice(0, 2); S.heat = heat; S.stats.runs++;
   run.doors = makeDoors();
   saveRun(); showDoors(`🌍 Biome 1: ${actInfo(1).name}`);
@@ -538,17 +553,24 @@ function newRun(chars, heat, daily, opts = {}) {
 function saveRun() {
   if (!run || run.online) return;
   run.seed = RNG.s;
-  S.run = JSON.parse(JSON.stringify(run, (k, v) => (k === 't' || k === 'ang' || k === 'blades' || k === 'lx' || k === 'ly' || k === 'rad') ? undefined : v));
+  const copy = JSON.parse(JSON.stringify(run));
+  copy.players.forEach(p => p.weapons.forEach(w => { for (const k of ['t', 'ang', 'blades', 'lx', 'ly', 'rad']) delete w[k]; })); // only weapon timers — doors also use "t" for their type
+  S.run = copy;
   save();
 }
-function resumeRun() { run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1; if (!run.doors) run.doors = makeDoors(); showDoors('Welcome back!'); }
+function resumeRun() {
+  run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1;
+  if (run.cur && !run.cur.t) run.cur = null;
+  if (!run.doors || !run.doors.length || run.doors.some(d => !d || !DOOR[d.t])) run.doors = makeDoors(); // repair saves from the buggy version
+  mode = 'menu'; G = null; showDoors('Welcome back!');
+}
 
 /* ================= RIFT DOORS (what comes next) ================= */
 function makeDoors() {
   if (run.room >= ROOMS_PER_ACT) return [{ t: 'boss', o: 'boss' }];
   const r = run.room, n = (rnd() < .3 + calcStats(run, 0).luck * .5) ? 3 : 2, out = [];
   const pool = () => [{ t: 'fight', w: 22 }, { t: 'level', w: 16 }, { t: 'gold', w: 12 }, { t: 'elite', w: r >= 2 ? 12 : 0 }, { t: 'shop', w: r >= 2 && run.shops < 2 ? 12 : 0 },
-    { t: 'heal', w: 9 }, { t: 'event', w: r >= 1 ? 12 : 0 }, { t: 'treasure', w: r >= 3 ? 4 : 0 }, { t: 'rest', w: r >= 4 ? 7 : 0 }].filter(o => o.w && !out.some(d => d.t === o.t));
+    { t: 'heal', w: 9 }, { t: 'event', w: r >= 1 ? 10 : 0 }, { t: 'squad', w: r >= 1 ? 15 : 0 }, { t: 'casino', w: r >= 1 && !run.casinos ? 7 : 0 }, { t: 'treasure', w: r >= 3 ? 4 : 0 }, { t: 'rest', w: r >= 4 ? 7 : 0 }].filter(o => o.w && !out.some(d => d.t === o.t));
   if (r === 0) out.push({ t: 'fight' }, { t: 'level' });
   else { if (r === 5 && !run.shops) out.push({ t: 'shop' }); while (out.length < n) out.push({ t: weighted(pool()).t }); }
   out.forEach(d => { if (['fight', 'level', 'gold', 'heal'].includes(d.t)) d.o = r === 0 ? 'survive' : weighted([{ k: 'survive', w: 26 }, { k: 'hunt', w: 18 }, { k: 'defend', w: 16 }, { k: 'capture', w: 16 }, { k: 'collect', w: 16 }]).k; else if (d.t === 'elite') d.o = 'survive'; });
@@ -559,6 +581,8 @@ function enterDoor(d) {
   run.cur = d; run.doors = null;
   if (!['fight', 'level', 'gold', 'heal', 'elite', 'boss'].includes(d.t)) { paused = true; bankHp(); }
   if (d.t === 'shop') { run.shops++; showShop(); }
+  else if (d.t === 'squad') startSkirmish();
+  else if (d.t === 'casino') { run.casinos = (run.casinos || 0) + 1; showCasino(); }
   else if (d.t === 'event') showEvent();
   else if (d.t === 'treasure') showTreasure();
   else if (d.t === 'rest') showRest();
@@ -574,6 +598,7 @@ function roomDone(msg) {
 /* ================= UI HELPERS ================= */
 let inputLock = 0, keyHook = null;
 function screen(html, actions = [], cls = 'menu', hook = null) {
+  if (cls === 'menu' && run && (mode === 'fight' || mode === 'dead')) cls = 'menu dim'; // menus over the arena get a dark backdrop
   ui.className = cls; ui.innerHTML = html; keyHook = hook; ui.scrollTop = 0;
   ui.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (performance.now() < inputLock) return; audioOn(); sfx('click'); const f = actions[+b.dataset.a]; if (f) f(); });
   const first = ui.querySelector('button.opt:not([disabled])') || ui.querySelector('button:not([disabled])');
@@ -645,6 +670,8 @@ function showHelp() {
     <li><b>Level up</b> to pick weapons, upgrades and passives. <b>Evolve</b> a level-5 weapon by owning its matching passive: ${Object.values(WEAPONS).map(w => `${w.icon}+${PASSIVES[w.evo].icon}`).join(' ')}</li>
     <li><b>Element sets:</b> weapons have elements. Own 2 (or 4) of one element for a set bonus: ${Object.values(ELEMENTS).map(e => `${e.icon} ${e.name}`).join(' · ')}.</li>
     <li><b>Arenas</b> have pillars (enemy shots can't pass), 🛢️ barrels (shoot them to explode), a ⛲ healing shrine, and a biome hazard (bushes, lava, ice, darkness, storms).</li>
+    <li><b>🛡️ Your squad:</b> recruit units in the shop (or win them), merge 3 of the same into ★★, and arrange them on a 2×3 board (front row gets hit first). At 🛡️ <b>Skirmish</b> doors your squad auto-battles an enemy squad. Units of the same element give team bonuses. Your two best units follow you into fights as companions. Press <b>T</b> between rooms to manage it.</li>
+    <li><b>🎰 Casino</b> doors: slots, a mystery egg, and a bet on yourself for the next room.</li>
     <li><b>Co-op:</b> share gold, XP and relics; each player has their own runner, weapons and level-up picks. If your partner goes down, <b>stand next to them</b> to revive them.</li>
     <li><b>Shards</b> 💠 are earned every run, win or lose. Spend them on permanent upgrades. New runners unlock as you play.</li>
   </ul></div>${keysHelp()}
@@ -780,11 +807,12 @@ function renderShop() {
   acts.push(() => { if (run.rerolls > 0) { run.rerolls--; showShop(); } });
   acts.push(() => roomDone());
   acts.push(() => { shopFor = (shopFor + 1) % nP(); renderShop(); });
+  acts.push(() => openSquad('recruit', renderShop));
   const tabs = run.coop ? `<div class="tabs">${run.players.map((p, i) => `<button data-a="${n + 2}" class="${i === shopFor ? 'on' : ''}"><span class="who p${i + 1}">${PNAME(i)}</span> ${CHARS[p.char].icon}</button>`).join('')}<span class="keys">Tab = switch player</span></div>` : '';
   screen(`<h2>🛒 Shop</h2><div class="sub">🪙 ${run.gold} gold · ${run.players.map((p, i) => `${PNAME(i)} ❤️ ${Math.ceil(p.hp)}/${calcStats(run, i).maxHp}`).join(' · ')}</div>${tabs}
     <div class="row">${html}</div>
-    <div class="row" style="margin-top:14px"><button data-a="${n}" ${run.rerolls > 0 ? '' : 'disabled'}>🎲 Reroll shop (R) · ${run.rerolls} left</button><button data-a="${n + 1}">Leave shop (L) →</button></div>`,
-    acts, 'menu', k => { if (k === 'r') { acts[n](); return true; } if (k === 'l' || k === 'escape') { acts[n + 1](); return true; } if (k === 'tab') { acts[n + 2](); return true; } });
+    <div class="row" style="margin-top:14px"><button data-a="${n + 3}">🛡️ Recruit squad units (U)</button><button data-a="${n}" ${run.rerolls > 0 ? '' : 'disabled'}>🎲 Reroll shop (R) · ${run.rerolls} left</button><button data-a="${n + 1}">Leave shop (L) →</button></div>`,
+    acts, 'menu', k => { if (k === 'r') { acts[n](); return true; } if (k === 'l' || k === 'escape') { acts[n + 1](); return true; } if (k === 'tab') { acts[n + 2](); return true; } if (k === 'u') { acts[n + 3](); return true; } });
 }
 
 /* ----- rest / treasure ----- */
@@ -952,6 +980,350 @@ function drawLv() {
   inputLock = performance.now() + 380;
 }
 
+
+/* =====================================================================
+   SQUAD — a strategy layer on top of the action. Recruit units with your
+   gold, merge 3 copies into a stronger ★ unit, arrange them on a 2×3 board
+   (front row takes the hits), build element synergies, and send them into
+   auto-battles at 🛡️ Skirmish doors. Your two best units also follow you
+   into action rooms as companions.
+   ===================================================================== */
+const UNITS = {
+  wolf:     { name: 'Wolf',         icon: '🐺', el: 'blade',  tier: 1, role: 'melee',    hp: 70,  atk: 8,  cd: .8,  txt: 'Fast bites.' },
+  squire:   { name: 'Squire',       icon: '🛡️', el: 'arcane', tier: 1, role: 'tank',     hp: 135, atk: 5,  cd: 1.2, txt: 'Tank: takes 25% less damage.' },
+  archer:   { name: 'Archer',       icon: '🏹', el: 'blade',  tier: 1, role: 'ranged',   hp: 50,  atk: 9,  cd: 1.0, txt: 'Shoots from the back row.' },
+  imp:      { name: 'Imp',          icon: '😈', el: 'fire',   tier: 1, role: 'ranged',   hp: 50,  atk: 7,  cd: .9,  txt: 'Throws little fireballs.' },
+  snowling: { name: 'Snowling',     icon: '⛄', el: 'frost',  tier: 1, role: 'melee',    hp: 90,  atk: 6,  cd: 1.0, txt: 'Sturdy and chilly.' },
+  sprite:   { name: 'Spark Sprite', icon: '🧚', el: 'storm',  tier: 1, role: 'ranged',   hp: 45,  atk: 6,  cd: .8,  chain: 1, txt: 'Zaps jump to 1 extra enemy.' },
+  witch:    { name: 'Hedge Witch',  icon: '🧙', el: 'arcane', tier: 2, role: 'healer',   hp: 70,  atk: 7,  cd: 1.4, txt: 'Heals the most hurt ally.' },
+  bear:     { name: 'Ice Bear',     icon: '🐻', el: 'frost',  tier: 2, role: 'tank',     hp: 210, atk: 9,  cd: 1.3, txt: 'Tank: takes 25% less damage.' },
+  rogue:    { name: 'Rogue',        icon: '🥷', el: 'blade',  tier: 2, role: 'assassin', hp: 75,  atk: 13, cd: .9,  txt: 'Jumps straight to the back row.' },
+  sapper:   { name: 'Sapper',       icon: '💣', el: 'fire',   tier: 2, role: 'ranged',   hp: 60,  atk: 10, cd: 1.5, splash: true, txt: 'Bombs also hit the enemies beside the target.' },
+  eel:      { name: 'Volt Eel',     icon: '🐍', el: 'storm',  tier: 2, role: 'melee',    hp: 100, atk: 9,  cd: 1.0, chain: 2, txt: 'Shocks jump to 2 extra enemies.' },
+  drake:    { name: 'Drakeling',    icon: '🦎', el: 'fire',   tier: 3, role: 'ranged',   hp: 110, atk: 14, cd: 1.2, splash: true, txt: 'Fire breath hits a whole row.' },
+  golem:    { name: 'Rune Golem',   icon: '🗿', el: 'arcane', tier: 3, role: 'tank',     hp: 310, atk: 10, cd: 1.5, shieldAll: true, txt: 'Tank. Gives every ally a shield at the start.' },
+  owl:      { name: 'Frost Owl',    icon: '🦉', el: 'frost',  tier: 3, role: 'ranged',   hp: 80,  atk: 11, cd: 1.1, freeze: true, txt: 'Can freeze its target for 1 second.' },
+  thunder:  { name: 'Thunderbird',  icon: '🦅', el: 'storm',  tier: 3, role: 'ranged',   hp: 90,  atk: 12, cd: 1.0, chain: 3, txt: 'Lightning jumps to 3 extra enemies.' },
+  duelist:  { name: 'Duelist',      icon: '🤺', el: 'blade',  tier: 3, role: 'assassin', hp: 115, atk: 18, cd: .8,  txt: 'Assassin with huge damage.' },
+  paladin:  { name: 'Paladin',      icon: '👑', el: 'arcane', tier: 4, role: 'tank',     hp: 400, atk: 14, cd: 1.2, aura: true, txt: 'Tank. Allies deal +15% damage and slowly heal.' },
+  dragon:   { name: 'Ember Dragon', icon: '🐲', el: 'fire',   tier: 4, role: 'ranged',   hp: 160, atk: 20, cd: 1.1, splash: true, rebirth: true, txt: 'Row-wide fire. Comes back to life once.' },
+  kraken:   { name: 'Kraken',       icon: '🐙', el: 'frost',  tier: 4, role: 'tank',     hp: 440, atk: 12, cd: 1.0, freeze: true, txt: 'Giant tank that freezes what it hits.' },
+};
+const SYN = {
+  fire:   { 2: 'Attacks burn.', 4: 'Burn is stronger and +25% damage.' },
+  frost:  { 2: 'Hits slow the enemy\'s attacks by 25%.', 4: 'Slow 45%, and the first hit freezes.' },
+  storm:  { 2: '25% chance attacks chain to another enemy.', 4: '50% chance, chains twice.' },
+  blade:  { 2: '+20% crit chance.', 4: '+40% crit chance, crits hit ×2.5.' },
+  arcane: { 2: 'Everyone starts with a 20% shield.', 4: '40% shield and slow healing.' },
+};
+const UNIT_COST = [0, 12, 22, 35, 55];
+const STAR_MUL = [0, 1, 1.8, 3.2];
+const unitVal = u => UNIT_COST[UNITS[u.id].tier] * Math.pow(3, u.star - 1);
+function tierOdds(level) { const L = Math.min(5, level); return [[70, 30, 0, 0], [70, 30, 0, 0], [45, 40, 15, 0], [30, 35, 28, 7], [20, 30, 35, 15], [12, 25, 38, 25]][L]; }
+function rollUnit(level) { const o = tierOdds(level), t = weighted(o.map((w, i) => ({ t: i + 1, w }))).t, ids = Object.keys(UNITS).filter(k => UNITS[k].tier === t); return pick(ids); }
+function squad() { return run.squad || (run.squad = { board: [null, null, null, null, null, null], bench: [] }); }
+const allUnits = () => { const q = squad(); return q.board.filter(Boolean).concat(q.bench); };
+function addUnit(id, star = 1, silent) {
+  const q = squad();
+  const empty = q.board.findIndex((u, i) => !u && i < 6);
+  const u = { id, star };
+  if (q.bench.length < 6) q.bench.push(u); else if (empty >= 0) q.board[empty] = u; else { run.gold += Math.round(unitVal(u) * .6); if (!silent) toast(`Bench full — sold ${UNITS[id].icon} for gold`); return; }
+  mergeUnits(silent);
+}
+function mergeUnits(silent) { // 3 of the same unit and star → one unit with +1 star
+  const q = squad();
+  for (let again = true; again;) {
+    again = false;
+    const all = [...q.board.map((u, i) => u && { u, where: 'b', i }), ...q.bench.map((u, i) => ({ u, where: 'n', i }))].filter(Boolean);
+    const groups = {}; all.forEach(x => { if (x.u.star < 3) (groups[x.u.id + x.u.star] = groups[x.u.id + x.u.star] || []).push(x); });
+    for (const g of Object.values(groups)) if (g.length >= 3) {
+      const keep = g.find(x => x.where === 'b') || g[0], gone = g.filter(x => x !== keep).slice(0, 2);
+      keep.u.star++;
+      gone.forEach(x => { if (x.where === 'b') q.board[x.i] = null; else x.u._gone = true; });
+      q.bench = q.bench.filter(u => !u._gone);
+      if (!silent) { toast(`★ ${UNITS[keep.u.id].icon} ${UNITS[keep.u.id].name} is now ${'★'.repeat(keep.u.star)}!`, '#ffd24a'); sfx('level'); }
+      again = true; break;
+    }
+  }
+}
+function synCounts(list) { const c = { fire: 0, frost: 0, storm: 0, blade: 0, arcane: 0 }; const seen = new Set(); for (const u of list) if (u && !seen.has(u.id)) { seen.add(u.id); c[UNITS[u.id].el]++; } return c; }
+const synLv = n => n >= 4 ? 4 : n >= 2 ? 2 : 0;
+
+/* ----- auto-battle ----- */
+function genEnemySquad() { // grows smoothly with the biome and room
+  const a = run.act, lvl = a + Math.floor(run.room / 4), n = clamp(2 + Math.floor((a - 1) * 1.2 + run.room / 3), 2, 6);
+  const p2 = clamp((a - 1) * .16 + run.room * .015, 0, .7), p3 = a >= 4 ? .05 * (a - 3) : 0;
+  const board = [null, null, null, null, null, null], units = [];
+  for (let k = 0; k < n; k++) { const id = rollUnit(lvl), r = rnd(); units.push({ id, star: r < p3 ? 3 : r < p3 + p2 ? 2 : 1 }); }
+  units.sort((x, y) => (UNITS[y.id].role === 'tank') - (UNITS[x.id].role === 'tank') || (UNITS[y.id].role === 'melee') - (UNITS[x.id].role === 'melee'));
+  const order = [1, 0, 2, 4, 3, 5]; units.forEach((u, k) => board[order[k]] = u);
+  return { board, mul: .92 + .06 * (a - 1) + .015 * run.room + .1 * run.heat };
+}
+function makeFighters(board, side, mul) {
+  const syn = synCounts(board), f = [];
+  board.forEach((u, slot) => { if (!u) return; const d = UNITS[u.id], m = STAR_MUL[u.star] * mul;
+    f.push({ side, slot, u, d, hp: d.hp * m, maxHp: d.hp * m, atk: d.atk * m, cd: d.cd, t: .3 + slot * .08 + (side ? .05 : 0), shield: 0, slowT: 0, frz: 0, burnT: 0, burnD: 0, alive: true, reborn: false, syn, fx: 0 }); });
+  const sa = synLv(syn.arcane), gol = f.some(x => x.d.shieldAll), pal = f.some(x => x.d.aura);
+  f.forEach(x => { x.shield = x.maxHp * ((sa >= 4 ? .4 : sa ? .2 : 0) + (gol ? .15 : 0)); if (pal) x.atk *= 1.15; x.regen = (sa >= 4 ? .006 : 0) + (pal ? .01 : 0); });
+  return f;
+}
+function battleNew(enemy) {
+  const q = squad();
+  return { t: 0, done: null, anims: [], texts: [], f: makeFighters(q.board, 0, 1).concat(makeFighters(enemy.board, 1, enemy.mul)) };
+}
+function pickTarget(B, a) {
+  const foes = B.f.filter(x => x.alive && x.side !== a.side); if (!foes.length) return null;
+  const front = foes.filter(x => x.slot < 3), back = foes.filter(x => x.slot >= 3), col = a.slot % 3;
+  const byCol = l => l.slice().sort((x, y) => Math.abs(x.slot % 3 - col) - Math.abs(y.slot % 3 - col))[0];
+  if (a.d.role === 'assassin') return back.length ? back.slice().sort((x, y) => x.hp - y.hp)[0] : byCol(front);
+  if (a.d.role === 'ranged' || a.d.role === 'healer') return front.length && rnd() < .7 ? byCol(front) : foes[Math.floor(rnd() * foes.length)];
+  return front.length ? byCol(front) : byCol(back);
+}
+function hitF(B, a, t, dmg, color) {
+  if (!t || !t.alive) return;
+  const syn = a.syn, bl = synLv(syn.blade);
+  if (rnd() < (bl >= 4 ? .45 : bl ? .25 : .05)) { dmg *= bl >= 4 ? 2.5 : 2; B.texts.push({ f: t, s: Math.round(dmg) + '!', c: '#ffd24a', t: .8 }); } else B.texts.push({ f: t, s: Math.round(dmg), c: '#fff', t: .6 });
+  if (synLv(syn.fire) >= 2) { t.burnT = 3; t.burnD = a.atk * (synLv(syn.fire) >= 4 ? .3 : .15); }
+  if (synLv(syn.fire) >= 4) dmg *= 1.25;
+  const fr = synLv(syn.frost); if (fr) { t.slowT = 2; t.slowAmt = fr >= 4 ? .45 : .25; if (fr >= 4 && !t.frozeOnce) { t.frozeOnce = true; t.frz = 1; } }
+  if (a.d.freeze && rnd() < .25) t.frz = 1;
+  if (t.d.role === 'tank') dmg *= .75;
+  const s = Math.min(t.shield, dmg); t.shield -= s; dmg -= s;
+  t.hp -= dmg; t.fx = .15;
+  B.anims.push({ a, t, c: color, life: .25 });
+  if (t.hp <= 0) { if (t.d.rebirth && !t.reborn) { t.reborn = true; t.hp = t.maxHp * .5; B.texts.push({ f: t, s: 'REBORN', c: '#ff8a3c', t: 1 }); } else t.alive = false; }
+}
+function battleStep(B, dt) {
+  if (B.done) return;
+  B.t += dt;
+  for (const x of B.f) if (x.alive) {
+    if (x.burnT > 0) { x.burnT -= dt; x.hp -= x.burnD * dt; if (x.hp <= 0) x.alive = false; }
+    if (x.regen) x.hp = Math.min(x.maxHp, x.hp + x.maxHp * x.regen * dt);
+    if (x.frz > 0) { x.frz -= dt; continue; }
+    if (x.slowT > 0) x.slowT -= dt;
+    x.t -= dt * (x.slowT > 0 ? 1 - x.slowAmt : 1);
+    if (x.fx > 0) x.fx -= dt;
+    if (x.t > 0) continue;
+    x.t = x.cd;
+    const col = ELEMENTS[x.d.el].color;
+    if (x.d.role === 'healer') { const hurt = B.f.filter(y => y.alive && y.side === x.side && y.hp < y.maxHp * .85).sort((p, q) => p.hp / p.maxHp - q.hp / q.maxHp)[0]; if (hurt) { hurt.hp = Math.min(hurt.maxHp, hurt.hp + x.atk * 2.2); B.anims.push({ a: x, t: hurt, c: '#5ee08a', life: .3 }); B.texts.push({ f: hurt, s: '+' + Math.round(x.atk * 2.2), c: '#5ee08a', t: .6 }); continue; } }
+    const t = pickTarget(B, x); if (!t) break;
+    hitF(B, x, t, x.atk, col);
+    if (x.d.splash) B.f.filter(y => y.alive && y.side === t.side && y !== t && Math.floor(y.slot / 3) === Math.floor(t.slot / 3) && Math.abs(y.slot % 3 - t.slot % 3) === 1).forEach(y => hitF(B, x, y, x.atk * .5, col));
+    const st = synLv(x.syn.storm); let chains = (x.d.chain || 0) + (st && rnd() < (st >= 4 ? .5 : .25) ? (st >= 4 ? 2 : 1) : 0);
+    let last = t; while (chains-- > 0) { const n = B.f.filter(y => y.alive && y.side === t.side && y !== last)[0]; if (!n) break; hitF(B, { ...x, syn: { ...x.syn, fire: 0 } }, n, x.atk * .6, '#fff27a'); last = n; }
+  }
+  for (const a of B.anims) a.life -= dt; B.anims = B.anims.filter(a => a.life > 0);
+  for (const t of B.texts) t.t -= dt; B.texts = B.texts.filter(t => t.t > 0);
+  const alive = s => B.f.some(x => x.alive && x.side === s);
+  if (!alive(1)) B.done = 'win'; else if (!alive(0)) B.done = 'lose';
+  else if (B.t > 45) { const pct = s => B.f.filter(x => x.side === s).reduce((a, x) => a + Math.max(0, x.hp) / x.maxHp, 0); B.done = pct(0) >= pct(1) ? 'win' : 'lose'; }
+}
+function simulate(enemy) { const B = battleNew(enemy); while (!B.done) battleStep(B, .05); return B.done; }
+
+/* ----- squad screens ----- */
+let SQ = { sel: null, mode: 'manage', offers: null, enemy: null, battle: null, speed: 1, back: null };
+function tileHTML(u, key, sel, enemy) {
+  if (!u) return `<button class="tile empty ${sel ? 'sel' : ''}" data-a="${key}"><span class="small">empty</span></button>`;
+  const d = UNITS[u.id];
+  return `<button class="tile ${sel ? 'sel' : ''} ${enemy ? 'enemy' : ''}" data-a="${key}" title="${esc(d.name + ' — ' + d.txt)}" style="border-color:${ELEMENTS[d.el].color}">
+    <span class="ti">${d.icon}</span><span class="tn">${d.name}</span><span class="ts">${'★'.repeat(u.star)}</span><span class="te">${ELEMENTS[d.el].icon} ${d.role}</span></button>`;
+}
+function synHTML(list) {
+  const c = synCounts(list);
+  return `<div class="syn">${Object.keys(SYN).map(el => { const n = c[el], L = synLv(n); return `<span class="ico ${L ? 'on' : ''}" title="${esc(ELEMENTS[el].name + ' (' + n + '): 2 — ' + SYN[el][2] + ' 4 — ' + SYN[el][4])}" style="${L ? 'border-color:' + ELEMENTS[el].color : ''}">${ELEMENTS[el].icon} ${n}${L ? ` <b>${L >= 4 ? 'II' : 'I'}</b>` : ''}</span>`; }).join('')}</div>`;
+}
+function openSquad(mode, back) { SQ = { sel: null, mode, offers: SQ.offers && mode === 'recruit' ? SQ.offers : null, enemy: SQ.enemy, battle: null, speed: SQ.speed || 1, back }; if (mode === 'recruit' && !SQ.offers) rollOffers(); drawSquad(); }
+function rollOffers() { SQ.offers = Array.from({ length: 5 }, () => ({ id: rollUnit(run.act), sold: false })); }
+function selectTile(key) {
+  const q = squad();
+  if (SQ.sel === null) { const u = key < 6 ? q.board[key] : q.bench[key - 6]; if (u) SQ.sel = key; drawSquad(); return; }
+  const a = SQ.sel, b = key; SQ.sel = null;
+  if (a !== b) {
+    const get = k => k < 6 ? q.board[k] : q.bench[k - 6] || null, set = (k, u) => { if (k < 6) q.board[k] = u; else if (u) q.bench[k - 6] = u; else q.bench.splice(k - 6, 1); };
+    const ua = get(a), ub = get(b);
+    if (a >= 6 && b >= 6) { q.bench[a - 6] = ub; q.bench[b - 6] = ua; q.bench = q.bench.filter(Boolean); }
+    else if (a < 6 && b < 6) { q.board[a] = ub; q.board[b] = ua; }
+    else { const bo = a < 6 ? a : b, be = a < 6 ? b : a; const uBo = q.board[bo], uBe = q.bench[be - 6] || null; q.board[bo] = uBe; if (uBo) { if (be - 6 < q.bench.length) q.bench[be - 6] = uBo; else q.bench.push(uBo); } else q.bench.splice(be - 6, 1); }
+  }
+  drawSquad();
+}
+function sellSel() {
+  const q = squad(), k = SQ.sel; if (k === null) return;
+  const u = k < 6 ? q.board[k] : q.bench[k - 6]; if (!u) return;
+  if (allUnits().length <= 1) { toast('Keep at least one unit!'); return; }
+  const g = Math.round(unitVal(u) * .6); run.gold += g; sfx('gold');
+  if (k < 6) q.board[k] = null; else q.bench.splice(k - 6, 1);
+  SQ.sel = null; toast(`Sold ${UNITS[u.id].icon} for ${g} gold`); drawSquad();
+}
+function drawSquad() {
+  const q = squad(), acts = [], A = f => { acts.push(f); return acts.length - 1; };
+  const board = [0, 1, 2, 3, 4, 5].map(i => tileHTML(q.board[i], A(() => selectTile(i)), SQ.sel === i)), benchT = [];
+  for (let i = 0; i < 6; i++) benchT.push(tileHTML(q.bench[i], A(() => selectTile(6 + i)), SQ.sel === 6 + i));
+  const selU = SQ.sel === null ? null : SQ.sel < 6 ? q.board[SQ.sel] : q.bench[SQ.sel - 6];
+  const info = selU ? (() => { const d = UNITS[selU.id], m = STAR_MUL[selU.star]; return `<div class="panel small" style="max-width:720px"><b>${d.icon} ${d.name} ${'★'.repeat(selU.star)}</b> · ${ELEMENTS[d.el].icon} ${ELEMENTS[d.el].name} · ${d.role} · ❤️ ${Math.round(d.hp * m)} ⚔️ ${Math.round(d.atk * m)} every ${d.cd}s — ${d.txt}
+    <button data-a="${A(sellSel)}" style="margin-left:10px">💰 Sell for ${Math.round(unitVal(selU) * .6)}</button> <span class="keys">Click another slot to move it there.</span></div>`; })() : `<div class="keys">Click a unit, then click a slot to move it. <b>Front row</b> gets hit first — put tanks there. 3 of the same unit merge into ★★.</div>`;
+  let extra = '';
+  if (SQ.mode === 'recruit') {
+    extra = `<h3>🛒 Recruit <span class="tag">🪙 ${run.gold}</span></h3><div class="row">${SQ.offers.map((o, i) => { const d = UNITS[o.id], c = UNIT_COST[d.tier], own = allUnits().filter(u => u.id === o.id && u.star === 1).length;
+      return `<button class="card opt" data-a="${A(() => { if (o.sold || run.gold < c) return; if (q.bench.length >= 6 && !q.board.some(u => !u)) { toast('No room — sell a unit first'); return; } run.gold -= c; o.sold = true; sfx('gold'); addUnit(o.id); drawSquad(); })}" ${o.sold || run.gold < c ? 'disabled' : ''} style="width:150px;min-height:150px;border-color:${ELEMENTS[d.el].color}">
+        <div class="ci">${d.icon}</div><div class="ct">${d.name}</div><div class="cs">Tier ${d.tier} · ${ELEMENTS[d.el].icon} ${d.role}</div><div class="cd">${d.txt}${own === 2 ? '<br><b style="color:#ffd24a">Buy → ★★!</b>' : own ? `<br><small>(you have ${own})</small>` : ''}</div><div class="price">${o.sold ? 'SOLD' : c + ' 🪙'}</div></button>`; }).join('')}</div>
+      <div class="row"><button data-a="${A(() => { if (run.gold < 5) return; run.gold -= 5; rollOffers(); drawSquad(); })}" ${run.gold < 5 ? 'disabled' : ''}>🎲 New recruits (5 🪙)</button></div>`;
+  }
+  if (SQ.mode === 'battle') extra = `<h3>👹 Enemy squad</h3><div class="sqboard">${[3, 4, 5, 0, 1, 2].map(i => tileHTML(SQ.enemy.board[i], A(() => {}), false, true)).join('')}</div><div class="keys">Their front row is the bottom row here (closest to you).</div>`;
+  const main = SQ.mode === 'battle' ? `<button class="opt big" data-a="${A(startBattle)}" ${q.board.some(Boolean) ? '' : 'disabled'}>⚔️ Fight!</button>` : `<button class="opt big" data-a="${A(closeSquad)}">✔ Done</button>`;
+  screen(`<h2>🛡️ Your Squad</h2>${synHTML(q.board)}${extra}
+    <h3>Your board <span class="keys">(back row on top, front row below)</span></h3><div class="sqboard">${[3, 4, 5].map(i => board[i]).join('')}${[0, 1, 2].map(i => board[i]).join('')}</div>
+    <h3>Bench <span class="keys">(benched units don't fight)</span></h3><div class="sqbench">${benchT.join('')}</div>${info}
+    <div class="col" style="margin-top:10px">${main}</div>`, acts, 'menu', k => { if (k === 'escape' && SQ.mode !== 'battle') { closeSquad(); return true; } if (k === 's' && SQ.sel !== null) { sellSel(); return true; } });
+}
+function closeSquad() { SQ.sel = null; const b = SQ.back; SQ.back = null; if (b) b(); else { paused = false; hideUI(); } }
+function startSkirmish() {
+  if (!allUnits().length) addUnit(rollUnit(1), 1, true);
+  const q = squad(); if (!q.board.some(Boolean)) { while (q.bench.length && q.board.some(u => !u)) { const i = q.board.findIndex(u => !u); q.board[i] = q.bench.shift(); } }
+  SQ.enemy = genEnemySquad(); openSquad('battle');
+}
+function startBattle() {
+  SQ.battle = battleNew(SQ.enemy); SQ.mode = 'fighting';
+  screen(`<h2>⚔️ Skirmish</h2><canvas id="bcv" width="760" height="400" style="position:static;max-width:100%;background:#0e1220;border-radius:12px;border:1px solid var(--line)"></canvas>
+    <div class="row" style="margin-top:8px"><button data-a="0">▶ 1×</button><button data-a="1">⏩ 3×</button><button data-a="2">⏭ Skip</button></div>`,
+    [() => SQ.speed = 1, () => SQ.speed = 3, () => { while (!SQ.battle.done) battleStep(SQ.battle, .05); }]);
+  SQ.last = performance.now();
+  const tick = now => {
+    const B = SQ.battle; if (!B || SQ.mode !== 'fighting') return;
+    const dt = Math.min(.05, (now - SQ.last) / 1000) * SQ.speed; SQ.last = now;
+    battleStep(B, dt); drawBattle(B);
+    if (B.done) { SQ.mode = 'over'; setTimeout(() => battleOver(B.done), 700); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function fPos(x) { const col = x.slot % 3, row = Math.floor(x.slot / 3); return x.side === 0 ? { x: 290 - row * 110, y: 80 + col * 120 } : { x: 470 + row * 110, y: 80 + col * 120 }; }
+function drawBattle(B) {
+  const c = $('#bcv'); if (!c) return; const g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  g.fillStyle = '#ffffff08'; g.fillRect(380, 0, 1, 400);
+  g.font = 'bold 13px system-ui'; g.textAlign = 'center'; g.fillStyle = '#9fb4ff'; g.fillText('YOUR SQUAD', 200, 22); g.fillStyle = '#ff9aa8'; g.fillText('ENEMY SQUAD', 560, 22);
+  for (const a of B.anims) { const p = fPos(a.a), q = fPos(a.t), k = 1 - a.life / .25; g.strokeStyle = a.c; g.lineWidth = 3; g.globalAlpha = a.life * 4; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x + (q.x - p.x) * Math.min(1, k * 1.5), p.y + (q.y - p.y) * Math.min(1, k * 1.5)); g.stroke(); g.globalAlpha = 1; }
+  for (const x of B.f) { const p = fPos(x);
+    g.globalAlpha = x.alive ? 1 : .18;
+    g.fillStyle = x.side ? '#3a1a22' : '#1a2440'; g.strokeStyle = x.frz > 0 ? '#9fe8ff' : ELEMENTS[x.d.el].color; g.lineWidth = x.frz > 0 ? 4 : 2;
+    g.beginPath(); g.arc(p.x + (x.fx > 0 ? (x.side ? 4 : -4) : 0), p.y, 30, 0, 6.283); g.fill(); g.stroke();
+    g.font = '28px system-ui'; g.fillStyle = '#fff'; g.fillText(x.d.icon, p.x, p.y + 10);
+    g.font = '11px system-ui'; g.fillStyle = '#ffd24a'; g.fillText('★'.repeat(x.u.star), p.x, p.y - 34);
+    g.fillStyle = '#000a'; g.fillRect(p.x - 30, p.y + 36, 60, 6); g.fillStyle = x.side ? '#ff6070' : '#5ee08a'; g.fillRect(p.x - 30, p.y + 36, 60 * Math.max(0, x.hp / x.maxHp), 6);
+    if (x.shield > 0) { g.fillStyle = '#7fe3ff'; g.fillRect(p.x - 30, p.y + 43, 60 * Math.min(1, x.shield / x.maxHp), 3); }
+    g.globalAlpha = 1; }
+  for (const t of B.texts) { const p = fPos(t.f); g.globalAlpha = Math.min(1, t.t * 3); g.font = 'bold 14px system-ui'; g.fillStyle = t.c; g.fillText(t.s, p.x, p.y - 44 - (1 - t.t) * 20); g.globalAlpha = 1; }
+  g.font = '12px system-ui'; g.fillStyle = '#fff8'; g.fillText(`${B.t.toFixed(1)}s`, 380, 392);
+}
+function battleOver(res) {
+  const won = res === 'win'; sfx(won ? 'win' : 'lose');
+  SQ.battle = null;
+  if (won) {
+    const g = Math.round((18 + 10 * run.act) * calcStats(run, 0).goldMul); run.gold += g; S.stats.gold += g; S.stats.skirmishes = (S.stats.skirmishes || 0) + 1;
+    const opts = Array.from({ length: 3 }, () => rollUnit(run.act + 1));
+    const acts = opts.map(id => () => { addUnit(id); roomDone(`🛡️ Skirmish won! +${g} gold`); });
+    acts.push(() => roomDone(`🛡️ Skirmish won! +${g} gold`));
+    screen(`<h2>🏆 Your squad won! <span class="tag">+${g} 🪙</span></h2><div class="sub">Pick a new recruit to join you.</div>
+      <div class="row">${opts.map((id, i) => { const d = UNITS[id]; return `<button class="card opt" data-a="${i}" data-n="${i + 1}" style="border-color:${ELEMENTS[d.el].color}"><div class="ci">${d.icon}</div><div class="ct">${d.name}</div><div class="cs">Tier ${d.tier} · ${ELEMENTS[d.el].icon} ${d.role}</div><div class="cd">${d.txt}</div><kbd>${i + 1}</kbd></button>`; }).join('')}</div>
+      <div class="col" style="margin-top:12px"><button data-a="3">Skip</button></div>`, acts);
+  } else {
+    hurtAll(.15);
+    screen(`<h2>💔 Your squad lost.</h2><div class="sub">The defeat drains you: everyone loses 15% HP. Recruit more units, merge them into ★★, or rearrange the board.</div>
+      <div class="col"><button class="opt big" data-a="0" data-n="1">Continue<kbd>1</kbd></button></div>`, [() => roomDone('🛡️ Skirmish lost.')]);
+  }
+  inputLock = performance.now() + 400;
+}
+
+/* ----- companions: your two best units fight next to you in action rooms ----- */
+function makeCompanions() {
+  const best = squad().board.filter(Boolean).slice().sort((a, b) => (UNITS[b.id].tier * 10 + b.star * 12) - (UNITS[a.id].tier * 10 + a.star * 12)).slice(0, 2);
+  G.comps = best.map((u, k) => { const pl = PL[k % PL.length]; return { u, d: UNITS[u.id], own: pl.i, x: pl.x + 30, y: pl.y + 20, t: .5 + k * .3, ang: k * Math.PI }; });
+}
+function updateCompanions(dt) {
+  if (!G.comps || G.phase !== 'fight') return;
+  for (const c of G.comps) {
+    const pl = PL[c.own] && !PL[c.own].down ? PL[c.own] : PL.find(p => !p.down) || PL[0];
+    c.ang += dt * 1.4; const tx = pl.x + Math.cos(c.ang) * 46, ty = pl.y + Math.sin(c.ang) * 46;
+    c.x += (tx - c.x) * Math.min(1, dt * 6); c.y += (ty - c.y) * Math.min(1, dt * 6);
+    c.t -= dt; if (c.t > 0) continue;
+    c.t = c.d.cd * 1.3;
+    const m = STAR_MUL[c.u.star] * (1 + .25 * (run.act - 1)) * .9;
+    if (c.d.role === 'healer') { const h = alivePL().sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp)[0]; if (h && h.hp < h.st.maxHp) { h.hp = Math.min(h.st.maxHp, h.hp + c.d.atk * .5 * STAR_MUL[c.u.star]); G.rings.push({ x: h.x, y: h.y, r: 4, max: 24, t: .3, color: '#5ee08a' }); } continue; }
+    const t = nearest(c.x, c.y, c.d.role === 'ranged' ? 460 : 220); if (!t) { c.t = .2; continue; }
+    P = pl; ST = pl.st;
+    const a = Math.atan2(t.y - c.y, t.x - c.x), col = ELEMENTS[c.d.el].color;
+    shoot(c.x, c.y, a, 480, c.d.splash ? 7 : 5, c.d.atk * m, 1 + (c.d.chain || 0), 1.2, col, { el: c.d.el, chill: c.d.el === 'frost' });
+  }
+}
+function drawCompanions() {
+  if (!G.comps) return;
+  for (const c of G.comps) { cx.fillStyle = '#0b0d14cc'; cx.strokeStyle = ELEMENTS[c.d.el].color; cx.lineWidth = 2; cx.beginPath(); cx.arc(c.x, c.y, 13, 0, 6.283); cx.fill(); cx.stroke(); cx.font = '15px system-ui'; cx.textAlign = 'center'; cx.fillStyle = '#fff'; cx.fillText(c.d.icon, c.x, c.y + 5); }
+}
+
+/* =====================================================================
+   🎰 CASINO — slots, a mystery egg, and betting on yourself
+   ===================================================================== */
+const SLOT = [{ s: '🍒', w: 30 }, { s: '🔔', w: 20 }, { s: '🪙', w: 15 }, { s: '⭐', w: 10 }, { s: '🐺', w: 10 }, { s: '💎', w: 7 }, { s: '💀', w: 8 }];
+let CZ = { reels: ['🎰', '🎰', '🎰'], msg: '', spinning: false, levels: 0, relic: false };
+function showCasino() { CZ = { reels: ['🍒', '⭐', '💎'], msg: 'Feeling lucky?', spinning: false, levels: 0, relic: false, spins: 0 }; drawCasino(); }
+function drawCasino() {
+  const g = run.gold, wagerAmt = Math.max(10, Math.round(g * .3)), acts = [];
+  const bet = b => () => spinSlots(b);
+  acts.push(bet(10), bet(25), bet(50));
+  acts.push(() => { if (run.gold < 45 || CZ.spinning) return; run.gold -= 45; const lvl = run.act + (Math.random() < .25 ? 2 : 1); const id = rollUnit(lvl), st = Math.random() < .1 ? 2 : 1; addUnit(id, st); CZ.msg = `🥚 The egg hatches: ${UNITS[id].icon} ${UNITS[id].name} ${'★'.repeat(st)}!`; sfx('level'); drawCasino(); });
+  acts.push(() => { if (run.wager || run.gold < 10 || CZ.spinning) return; run.gold -= wagerAmt; run.wager = wagerAmt; CZ.msg = `🤝 You bet ${wagerAmt} gold that you complete the next room's goal. Win: ${Math.round(wagerAmt * 2.2)} gold.`; sfx('gold'); drawCasino(); });
+  acts.push(leaveCasino);
+  screen(`<h2>🎰 Rift Casino</h2><div class="sub">🪙 ${g} gold${run.wager ? ` · 🤝 wager on: ${run.wager}` : ''}</div>
+    <div class="panel" style="max-width:560px;text-align:center">
+      <div class="reels">${CZ.reels.map(r => `<span>${r}</span>`).join('')}</div>
+      <p style="min-height:24px">${CZ.msg}</p>
+      <div class="row"><button class="opt" data-a="0" ${g < 10 || CZ.spinning ? 'disabled' : ''}>Spin · 10 🪙</button><button class="opt" data-a="1" ${g < 25 || CZ.spinning ? 'disabled' : ''}>Spin · 25 🪙</button><button class="opt" data-a="2" ${g < 50 || CZ.spinning ? 'disabled' : ''}>Spin · 50 🪙</button></div>
+      <p class="keys">3 🍒 ×3 · 3 🔔 ×5 · 3 🪙 ×8 · 3 ⭐ two level-ups · 3 🐺 a ★★ unit · 3 💎 a relic · 2 of a kind: money back ×1.5 · 3 💀 everyone loses 20% HP</p>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="opt" data-a="3" ${g < 45 || CZ.spinning ? 'disabled' : ''}>🥚 Mystery Egg · 45 🪙<br><small>A random unit for your squad (sometimes rare or ★★)</small></button>
+      <button class="opt" data-a="4" ${run.wager || g < 10 || CZ.spinning ? 'disabled' : ''}>🤝 Bet on yourself · ${wagerAmt} 🪙<br><small>Complete the next room's goal → ×2.2</small></button>
+    </div>
+    <div class="col" style="margin-top:12px"><button data-a="5" ${CZ.spinning ? 'disabled' : ''}>Leave the casino →</button></div>`, acts, 'menu', k => { if (k === 'escape' && !CZ.spinning) { leaveCasino(); return true; } });
+}
+function spinSlots(b) {
+  if (CZ.spinning || run.gold < b) return;
+  run.gold -= b; CZ.spinning = true; CZ.spins++; CZ.msg = '…';
+  const luck = calcStats(run, 0).luck, roll = () => weighted(SLOT).s;
+  let res = [roll(), roll(), roll()];
+  if (res[0] !== res[1] && res[1] === res[2] && Math.random() < luck * .5) res[0] = res[1]; // luck nudges a near-miss
+  let n = 0; drawCasino();
+  const iv = setInterval(() => {
+    n++; CZ.reels = [n < 8 ? rpick(SLOT).s : res[0], n < 12 ? rpick(SLOT).s : res[1], n < 16 ? rpick(SLOT).s : res[2]]; sfx('click');
+    const el = ui.querySelector('.reels'); if (el) el.innerHTML = CZ.reels.map(r => `<span>${r}</span>`).join('');
+    if (n >= 16) { clearInterval(iv); CZ.spinning = false; payout(res, b); drawCasino(); }
+  }, 70);
+}
+function payout(r, b) {
+  const [a, c, d] = r, three = a === c && c === d, two = !three && (a === c || c === d || a === d);
+  let msg;
+  if (three) {
+    if (a === '🍒') { run.gold += b * 3; msg = `🍒🍒🍒 +${b * 3} gold!`; }
+    else if (a === '🔔') { run.gold += b * 5; msg = `🔔🔔🔔 +${b * 5} gold!`; }
+    else if (a === '🪙') { run.gold += b * 8; msg = `🪙🪙🪙 JACKPOT! +${b * 8} gold!`; }
+    else if (a === '⭐') { CZ.levels += 2; msg = '⭐⭐⭐ Two free level-ups when you leave!'; }
+    else if (a === '🐺') { const id = rollUnit(run.act + 1); addUnit(id, 2); msg = `🐺🐺🐺 ${UNITS[id].icon} ${UNITS[id].name} ★★ joins your squad!`; }
+    else if (a === '💎') { CZ.relic = true; msg = '💎💎💎 A relic is waiting for you when you leave!'; }
+    else { hurtAll(.2); msg = '💀💀💀 Ouch — everyone loses 20% HP.'; }
+    sfx(a === '💀' ? 'hurt' : 'win');
+  } else if (two && !r.every(x => x === '💀')) { const back = Math.round(b * 1.5); run.gold += back; msg = `Two of a kind: +${back} gold.`; sfx('gold'); }
+  else { msg = 'No luck this time.'; }
+  CZ.msg = msg;
+}
+function leaveCasino() {
+  if (CZ.spinning) return;
+  const go = () => roomDone('🎰 You leave the casino.');
+  const afterRelic = () => CZ.levels ? queueLevelUps(CZ.levels, go) : go();
+  if (CZ.relic) relicChoice('💎 Casino relic!', afterRelic); else afterRelic();
+}
+
 /* ================= ROOMS ================= */
 const WORLD = 2200;
 function actScale() {
@@ -1002,6 +1374,7 @@ function startRoom(door) {
   if (obj === 'capture') { G.zone = newZone(); G.charge = 0; }
   if (type === 'elite') G.eliteT = [3, 18];
   if (type === 'boss') { spawnBoss(); sfx('boss'); }
+  makeCompanions();
   G.banner = { text: type === 'boss' ? '👹 BOSS: ' + G.boss.name : `${OBJ[obj] ? OBJ[obj].icon + ' ' + OBJ[obj].name.toUpperCase() : ''}${type === 'elite' ? ' · 💀 ELITE' : ''}`, sub: type === 'boss' ? 'It gets angrier at half health.' : OBJ[obj] ? OBJ[obj].desc : '', t: 3 };
   if (S.stats.runs <= 1 && run.floors === 0) G.banner.sub = run.coop ? 'P1: WASD + Space · P2: Arrows + Enter · ultimates: E / Right Shift' : 'WASD / Arrows to move · SPACE to dash · E for your ultimate';
 }
@@ -1024,7 +1397,7 @@ function showDoors(msg) {
     G.obs = G.obs.filter(o => Math.hypot(o.x - x, o.y - y) > o.r + 70);
     return { d, x, y, r: 40, hold: 0 };
   });
-  G.banner = { text: msg || (run.room >= ROOMS_PER_ACT ? '👹 The boss awaits' : 'Choose a rift door'), sub: 'Walk into a door (or press ' + G.doors.map((_, k) => k + 1).join(' / ') + ')', t: 3.5 };
+  G.banner = { text: msg || (run.room >= ROOMS_PER_ACT ? '👹 The boss awaits' : 'Choose a rift door'), sub: 'Walk into a door (or press ' + G.doors.map((_, k) => k + 1).join(' / ') + ') · T = your squad', t: 3.5 };
   checkAch();
 }
 function mid() { const a = PL.filter(p => !p.down); const L = a.length ? a : PL; return { x: L.reduce((s, p) => s + p.x, 0) / L.length, y: L.reduce((s, p) => s + p.y, 0) / L.length }; }
@@ -1341,6 +1714,7 @@ function update(dt) {
   // weapons
   if (G.phase === 'fight') for (const pl of PL) if (!pl.down) asPlayer(pl, () => { for (const w of pl.weapons) WUPD[w.id](w, dt); });
   P = PL[0]; ST = PL[0].st;
+  updateCompanions(dt); P = PL[0]; ST = PL[0].st;
   spawnTick(dt);
   updateEnemies(dt);
   separate();
@@ -1563,7 +1937,8 @@ function finishRoom() {
   run.gold += g; S.stats.gold += g;
   if (!G.tookDmg) S.stats.noHit++;
   for (const pl of PL) for (const w of pl.weapons) { delete w.lx; delete w.ly; delete w.blades; }
-  const msg = `${ok ? '✅ Room cleared!' : '😓 Room over.'} +${g} gold`;
+  let msg = `${ok ? '✅ Room cleared!' : '😓 Room over.'} +${g} gold`;
+  if (run.wager) { if (ok) { const w = Math.round(run.wager * 2.2); run.gold += w; msg += ` · 🤝 Bet won: +${w} gold!`; } else msg += ' · 🤝 Bet lost.'; run.wager = 0; }
   const back = () => { if (mode === 'fight') roomDone(msg); };
   if (door.t === 'elite') { run.elites++; S.stats.elites++; relicChoice(`💀 Elite defeated! +${g} gold`, back); }
   else if (door.t === 'boss') bossReward(g);
@@ -1589,7 +1964,7 @@ function bossReward(g) {
   });
 }
 function nextAct() {
-  run.act++; run.room = 0; run.shops = 0; run.cur = null; run.floors++;
+  run.act++; run.room = 0; run.shops = 0; run.casinos = 0; run.cur = null; run.floors++;
   S.stats.bestAct = Math.max(S.stats.bestAct, run.act);
   run.doors = makeDoors();
   mode = 'menu'; G = null; // fresh arena for the new biome
@@ -1737,6 +2112,7 @@ function render() {
   for (const p of G.parts) { if (!vis(p.x, p.y)) continue; cx.globalAlpha = Math.min(1, p.t * 3); cx.fillStyle = p.c; cx.fillRect(p.x - p.r / 2, p.y - p.r / 2, p.r, p.r); }
   cx.globalAlpha = 1;
   // players
+  drawCompanions();
   for (const pl of PL) drawPlayer(pl);
   if (G) { cx.textAlign = 'center'; for (const t of G.texts) { cx.globalAlpha = Math.min(1, t.t * 3); cx.font = `bold ${t.big ? 17 : 13}px system-ui,sans-serif`; cx.fillStyle = '#000'; cx.fillText(t.s, t.x + 1, t.y + 1); cx.fillStyle = t.c; cx.fillText(t.s, t.x, t.y); } cx.globalAlpha = 1; }
   cx.restore();
@@ -1837,7 +2213,7 @@ function drawHUD() {
   // objective / timer (top centre)
   cx.textAlign = 'center';
   let line = '';
-  if (G.phase === 'doors') line = 'Choose a rift door';
+  if (G.phase === 'doors') line = 'Choose a rift door · T = squad';
   else if (G.obj === 'survive') { const left = Math.max(0, Math.ceil(G.dur - G.time)); line = `⏳ ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`; }
   else if (G.obj === 'hunt') line = `🎯 Beasts: ${3 - G.beastsLeft}/3`;
   else if (G.obj === 'defend' && G.crystal) line = `💎 Crystal ${Math.max(0, Math.round(G.crystal.hp / G.crystal.maxHp * 100))}% · charging ${Math.floor(G.crystal.charge)}%`;
@@ -2036,6 +2412,7 @@ addEventListener('keydown', e => {
   if (mode === 'fight' && !paused && ui.className === 'hidden') {
     if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) pauseMenu();
     if (G && G.phase === 'doors' && /^[1-3]$/.test(k) && !e.repeat && !(run.online && NET.role === 'guest')) { const d = G.doors[+k - 1]; if (d) { G.doors = []; enterDoor(d.d); } }
+    if (G && G.phase === 'doors' && e.code === 'KeyT' && !e.repeat && !(run.online && NET.role === 'guest')) { paused = true; bankHp(); openSquad('manage'); }
     return;
   }
   if (ui.className === 'hidden' || e.repeat && !k.startsWith('arrow')) return;

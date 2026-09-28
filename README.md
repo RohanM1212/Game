@@ -34,6 +34,10 @@ A co-op action roguelite. Fully offline: one file, no internet needed (sound is 
 - **Rooms with goals:** ⏳ survive, 🎯 hunt the marked beasts, 💎 defend the crystal, 🌀 capture the portal, ✨ collect the sparks.
 - **Arenas with stuff:** pillars block enemy shots, 🛢️ barrels explode, a ⛲ healing shrine, and a hazard per biome (bushes, lava, ice, darkness, storms).
 - **Every runner has an ultimate** (Bulwark Slam, Arrow Rain, Meteor, Carpet Bomb, Firestorm, Blood Moon, Blizzard, Thunderstorm, Cyclone, Jackpot).
+- **🛡️ Your squad (strategy):** recruit units in the shop or win them, merge 3 copies into ★★ (and ★★★), and arrange them on a 2×3 board —
+  tanks in front, archers in back, assassins dive the back row. Units of the same element give team bonuses. At 🛡️ **Skirmish** doors your
+  squad auto-battles an enemy squad for gold and new recruits; your two best units also fight next to you in action rooms. Press **T** between rooms.
+- **🎰 Casino doors:** slots (gold, relics, level-ups, rare units… or 💀💀💀), a Mystery Egg, and betting on yourself to beat the next room's goal.
 - **Element sets:** weapons are 🔥 fire, ❄️ frost, ⚡ storm, 🗡️ blade or ✨ arcane; own 2 or 4 of one element for a set bonus. Plus evolutions, relics, and new enemies with tells (chargers, snipers, healers, summoners, bats).
 - **Online co-op (experimental):** two computers connect by swapping two codes (no server). Works best at home; school Wi-Fi often blocks it.
 - Progress, upgrades and unlocks save in the browser; **Stats → Save Backup** gives a code to move it. Old saves carry over.
