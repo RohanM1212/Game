@@ -44,7 +44,11 @@ input:focus{outline:none;border-color:var(--acc)}
 .tag.w{border-color:#5a8a4a;color:var(--good)}
 .tag.r{border-color:#8a4a4a;color:var(--bad)}
 .log{height:min(56vh,560px);overflow-y:auto;background:var(--paper);color:var(--ink);border-radius:6px 12px 12px 6px;padding:14px 16px;font-size:16px;line-height:1.5;box-shadow:inset 8px 0 12px #0003}
-.log p{margin:0 0 8px}
+.log p{margin:0 0 8px;position:relative}
+.log .flag{border:0;background:none;padding:0 2px;margin-left:4px;font-size:12px;opacity:.18;cursor:pointer}
+.log p:hover .flag{opacity:.8}
+.log p.flagged{background:#ffd9d4;border-radius:4px}
+.log p.flagged .flag{opacity:1}
 .log .you{color:#5a3a1a;font-style:italic}
 .log .nar{color:#2a1f14}
 .log .eff{color:#1a5a2a;font-weight:bold;font-size:14px}
@@ -444,7 +448,7 @@ SH('lightning', ['lightning bolts', 'chain strikes between targets', 'stunning',
 SH('plants', ['vines that grab and bind', 'thorn walls', 'climbing vines and ladders', 'hiding in foliage', 'growing fruit and food'],
   [['healing herbs', 2], ['cracking stone with roots', 3], ['plant creatures', 5], ['a giant tree bridge or fortress', 6], ['spore clouds that make things sleepy', 4]],
   ['growing plants on bare metal or in open sky without soil/water above small size', 'fire', 'anything made of metal'], ['soil', 'water'], 'SEEDS GROW: a planted seed attacks every round and gets stronger.', 'fire, cold');
-SH('ice', ['freezing water and enemies', 'ice walls and domes', 'icicles', 'slippery ice floors', 'cooling things down'],
+SH('ice', ['freezing water, puddles, fog or snow into any shape', 'small ice blades, daggers, spikes and icicles you can hold (pulled from moisture in the air)', 'ice walls and domes', 'slippery ice floors', 'freezing enemies', 'cooling things down'],
   [['an ice bridge over water or gaps', 2], ['ice armor', 3], ['a blizzard', 5], ['ice sculptures and decoys', 3]],
   ['heat or fire', 'healing burns fast', 'working in extreme heat without a water source'], [], 'LASTING: ice shields stay up for the next round too.', 'fire, heat');
 SH('light', ['blinding flashes', 'light beams', 'glowing and lighting dark places', 'revealing hidden things', 'warm gentle healing light'],
@@ -626,6 +630,7 @@ function newRun(names, mode) {
 function pickBooks() { return shuffle(Object.keys(THEMES)).slice(0, 3); }
 function chooseBook(theme) {
   R.book = theme; R.page = 0;
+  R.bm = { chars: [], memories: [], recaps: [] }; // what this book remembers: people, choices, recaps
   const th = THEMES[theme];
   // starting powers (only if they have none — i.e., first book of the run)
   const pool = shuffle(STARTERS);
@@ -797,8 +802,8 @@ function parse(text, p, C) {
 function traitsOf(p, P, C) {
   const tr = new Set();
   P.powers.forEach(i => pdef(p.powers[i]).traits.forEach(t => tr.add(t)));
-  P.items.forEach(i => itemDef(p.items[i]).traits.forEach(t => tr.add(t)));
-  P.objs.forEach(i => C.objs[i].traits.forEach(t => tr.add(t)));
+  P.items.forEach(i => { if (p.items[i]) itemDef(p.items[i]).traits.forEach(t => tr.add(t)); });
+  P.objs.forEach(i => { if (C.objs[i]) C.objs[i].traits.forEach(t => tr.add(t)); });
   if (!P.powers.length && !P.items.length) tr.add('physical');
   return [...tr];
 }
@@ -859,7 +864,7 @@ const TIER = [
 function tierLine(s) { let r = TIER[0][1]; for (const [m, l] of TIER) if (s >= m) r = l; return pick(r); }
 function pwPhrase(p, P, ev) {
   const pws = ev.pws.map(pdef);
-  const items = P.items.map(i => p.items[i] ? itemDef(p.items[i]).n : '').filter(Boolean);
+  const items = P.itemNames || P.items.map(i => p.items[i] ? itemDef(p.items[i]).n : '').filter(Boolean);
   let s;
   if (!pws.length) s = items.length ? `a ${items.join(' and ')}` : 'sheer determination';
   else if (pws.length === 2) s = `${pws[0].adj} ${pws[1].noun.toLowerCase()} power`;
@@ -1048,7 +1053,7 @@ function checkWin() {
 }
 function finishChallenge(escaped) {
   const L = R.level, C = L.ch, cell = L.cells[L.y * L.w + L.x];
-  cell.done = true; L.ch = null; L.acted = []; R.cur = firstAlive();
+  cell.done = true; L.ch = null; L.acted = []; R.cur = firstAlive(); L.calm = 3;
   R.players.forEach(q => { q.st.hidden = q.st.dodge = false; });
   if (C.kind === 'enc') {
     if (escaped) { log('big', '🏃 You got away!'); }
@@ -1071,7 +1076,7 @@ function giveGold(g) {
   else R.gold += g;
 }
 function levelComplete(C) {
-  const base = 40 + 12 * R.page + (C.kind === 'boss' ? 40 : 0);
+  let base = 40 + 12 * R.page + (C.kind === 'boss' ? 40 : 0);
   let winner = null;
   if (R.mode === 'versus') { winner = R.players.filter(q => !q.out).sort((a, b) => b.score - a.score)[0]; }
   giveGold(base);
@@ -1084,10 +1089,17 @@ function levelComplete(C) {
     S.bossMem[b.id] = { ap: topAp ? topAp[0] : null, tr: topTr ? topTr[0] : null };
     S.lastBosses = [b.id].concat((S.lastBosses || []).filter(x => x !== b.id)).slice(0, 4);
   }
-  R.result = { title: C.kind === 'boss' ? `${C.boss.i} ${C.boss.n} defeated!` : `${C.icon} ${C.title} — complete!`, gold: base, winner: winner ? winner.name : null, scores: R.players.map(q => [q.name, q.score]) };
+  const how = C.kind === 'host' ? 'friends' : endingOf(C), E = ENDINGS[how]; // the Host is won over by entertaining him
+  let gift = null;
+  if (how === 'fought') { const g = Math.round(base * .2); giveGold(g); base += g; }
+  else { const id = pick(Object.keys(ITEMS)), who = pick(alive().length ? alive() : R.players); addItem(who, id); gift = `${ITEMS[id].i} ${ITEMS[id].n} for ${who.name}`; }
+  const title = C.kind === 'boss' ? `${E.i} ${E.boss(C.boss.n)}` : C.kind === 'host' ? '🎩 You amazed the Unseen Host!' : `${E.i} ${E.obj(C.title)}`;
+  addMemory(C.kind === 'host' ? 'The players amazed the Unseen Host.' : C.kind === 'boss' ? `${E.boss(C.boss.n).replace(/^You/, 'The players').replace(/!$/, '.')}` : `The players finished ${C.title} ${E.tag}.`);
+  R.result = { title, how: E.tag, gift, gold: base, winner: winner ? winner.name : null, scores: R.players.map(q => [q.name, q.score]) };
   R.screen = R.page >= 6 ? 'bookdone' : 'pagedone';
   if (R.page >= 6) { S.stats.books++; R.vol++; S.stats.bestVol = Math.max(S.stats.bestVol, R.vol); }
   save();
+  makeRecap(R.result);
 }
 function failLevel() {
   if (R.screen !== 'level') return;
@@ -1149,7 +1161,10 @@ function validateVerdict(pi, P, C) {
   const lvl = pws.length ? Math.max(...pws.map(pw => pw.lvl)) : 1;
   if (v !== 'impossible') {
     const unmet = pws.filter(pw => !needsMet(sheetOf(pw), env));
-    if (unmet.length && v === 'natural') { v = 'stretch'; P.minLevel = Math.max(P.minLevel || 1, 1); notes.push(`🌍 ${unmet.map(pw => pdef(pw).name).join(' & ')} is weaker here (needs: ${(sheetOf(unmet[0]).needs || []).map(x => x.replace('!', 'no ')).join(' or ')}) — counts as a stretch.`); }
+    const envKey = R.level && R.level.kind === 'open' ? unmet.map(pw => pw.id).join('+') + '@' + (R.level.cells[R.level.x] || {}).place : null;
+    const quietEnv = envKey && (R.level.envNoted = R.level.envNoted || []).includes(envKey); // say it once per place, not every turn
+    if (envKey && !quietEnv) R.level.envNoted.push(envKey);
+    if (unmet.length && v === 'natural') { v = 'stretch'; P.minLevel = Math.max(P.minLevel || 1, 1); if (!quietEnv) notes.push(`🌍 ${unmet.map(pw => pdef(pw).name).join(' & ')} is weaker here (needs: ${(sheetOf(unmet[0]).needs || []).map(x => x.replace('!', 'no ')).join(' or ')}) — counts as a stretch.`); }
     const tp = targetProps(P, C);
     const tname = P.target && P.target.type === 'threat' ? P.target.t.n : C && C.boss ? C.boss.n : 'it';
     if (P.ap === 'persuade' && tp.includes('mindless')) { v = 'impossible'; P.why = `${tname} has no mind to reason with.`; P.hint = 'Trick it, trap it, avoid it, or fight it instead.'; }
@@ -1204,7 +1219,6 @@ function evaluate(pi, P, C) {
     score += 3;
     if (o.prep) { score += o.prep * .8; notes.push(`✨ Your prepared ${o.n} pays off!`); }
     else if (o.traits.some(t => ptr.has(t)) || (o.traits.includes('death') && ptr.has('summon'))) { score += 5; notes.push(`🌟 The ${o.n} supercharges your power!`); }
-    else notes.push(`👍 Using the ${o.n}.`);
   });
   P.usedObjs = usedObjs;
   score *= SCALES[scale].mul;
@@ -1220,6 +1234,13 @@ function evaluate(pi, P, C) {
   else if (nov < .9) notes.push(`🥱 You've done that ${cnt} time${cnt > 1 ? 's' : ''} already — it's getting predictable.`);
   if (p.st.lastAp === ap && p.st.lastAp2 === ap && !(L.kind === 'open' && !L.ch)) { nov *= .85; notes.push(`(Third ${AP[ap].n} in a row — mix it up!)`); }
   L.nov[pi][sig] = cnt + 1;
+  const sm = p.st.sigMove && (p.moves || []).find(m => m.name === p.st.sigMove);
+  if (sm) {
+    nov = Math.max(nov, .9) * (1 + .06 * Math.min(8, sm.uses)); sm.uses++;
+    notes.push(`✨ ${sm.name}!${sm.uses > 1 ? ` (mastery ${Math.min(9, sm.uses)})` : ''}`);
+    if (C && C.boss) { C.boss.learned = C.boss.learned || {}; C.boss.learned[sm.name] = (C.boss.learned[sm.name] || 0) + 1; if (C.boss.learned[sm.name] > 2) { nov *= .55; notes.push(`😈 ${C.boss.n} has learned your ${sm.name}!`); } }
+    p.st.sigMove = null;
+  }
   score *= nov;
   // creativity (judged)
   const c = P.creativity || 3;
@@ -1231,11 +1252,14 @@ function evaluate(pi, P, C) {
   score *= luck ? 1 + rnd() * .25 : .8 + rnd() * .4;
   let crit = false;
   if (rnd() < (luck ? .2 : .08)) { score *= 1.5; crit = true; }
-  P.items.forEach(i => { p.items[i].uses--; });
+  const traitsNow = traitsOf(p, P, C || { objs: [] }); // read the items BEFORE any get used up
+  P.itemNames = P.items.map(i => p.items[i] ? itemDef(p.items[i]).n : '').filter(Boolean);
+  P.items.forEach(i => { if (p.items[i]) p.items[i].uses--; });
   p.items = p.items.filter(it => it.uses > 0);
-  const traitsNow = traitsOf(p, P, C || { objs: [] });
+  P.items = [];
   // scene objects get used up (unless sturdy, like your chair)
-  usedObjs.forEach(o => { if (!o.keep && C && C.objs && !(L.kind === 'open' && !L.ch)) { const k = C.objs.indexOf(o); if (k >= 0) { C.objs.splice(k, 1); notes.push(`(The ${o.n} is used up.)`); } } });
+  // things don't vanish just because you used them (the Judge says what really breaks); prepared set-ups get spent
+  usedObjs.forEach(o => { if (o.prep && !o.keep && C && C.objs) { const k = C.objs.indexOf(o); if (k >= 0) C.objs.splice(k, 1); } });
   P.objs = [];
   return { score, notes, traits: traitsNow, scale, crit, pws, cost, sig, lvl };
 }
@@ -1299,13 +1323,42 @@ let BUSY = false;
 async function act(text) {
   if (BUSY || !R || !R.level || !String(text).trim()) return;
   BUSY = true;
+  // a pasted log line ("Mia: “I stab them”") → just the action
+  text = String(text); for (let k = 0; k < 3; k++) { const m = text.match(/^\s*([^:“"]{1,20}):\s*[“"](.*?)[”"]?\s*$/); if (m && R.players.some(q => norm(q.name) === norm(m[1]))) text = m[2]; else break; }
+  if (!text.trim()) { BUSY = false; return; }
   try { await actInner(String(text).slice(0, 400)); }
   catch (e) { console.error(e); log('sys', '⚠️ Something went wrong with that turn: ' + esc(e.message)); save(); }
   finally { BUSY = false; UI.thinking = false; if (typeof render === 'function' && curView === 'level') render(); }
 }
+/* ---------------- signature moves: name a clever move, reuse it by name ---------------- */
+const NAME_RX = /^\s*(?:i\s+)?(?:(?:will\s+)?call|name)\s+(?:that|it|this)(?:\s+move)?\s+(?:as\s+|the\s+)?["“']?([^"”']{2,24}?)["”'!.]*\s*$/i;
+function nameMove(p, text) {
+  const m = String(text).match(NAME_RX); if (!m) return false;
+  const L = R.level, last = (L.hist || []).filter(h => h.who === p.name && h.full && !['impossible', 'fizzle', 'travel'].includes(h.v)).slice(-1)[0];
+  log('you', `${esc(p.name)}: “${esc(text)}”`);
+  if (!last) { log('note', '✨ Do something cool first, then name it!'); return true; }
+  const name = m[1].trim().replace(/\b\w/g, c => c.toUpperCase());
+  p.moves = (p.moves || []).filter(x => norm(x.name) !== norm(name));
+  if (p.moves.length >= 6) p.moves.shift();
+  p.moves.push({ name, text: last.full.slice(0, 160), uses: 0 });
+  log('big', `✨ New signature move: <b>${esc(name)}</b>! <span class="small">Type “${esc(name)}!” any time to do it again — it gets stronger the more you use it well.</span>`);
+  save(); return true;
+}
+function findMove(p, text) { const t = norm(text); return (p.moves || []).find(m => t.includes(norm(m.name))); }
 async function actInner(text) {
   const L = R.level, pi = R.cur, p = R.players[pi];
   const host = L.kind === 'host', C = host ? null : L.ch;
+  if (nameMove(p, text)) return;
+  const inl = String(text).match(/^(.{8,}?)[\s.!,;—-]*\bi\s+(?:will\s+)?call\s+(?:that|it|this)(?:\s+move)?\s+["“']?([^"”'.!]{2,24})["”']?[.!]*\s*$/i);
+  if (inl) { // "I smash it with the chain. I call that Chain Smash" → do it AND save it as a move
+    text = inl[1].trim();
+    const name = inl[2].trim().replace(/\b\w/g, c => c.toUpperCase());
+    p.moves = (p.moves || []).filter(x => norm(x.name) !== norm(name)); if (p.moves.length >= 6) p.moves.shift();
+    p.moves.push({ name, text: text.slice(0, 160), uses: 0 });
+    log('big', `✨ New signature move: <b>${esc(name)}</b>! <span class="small">Type “${esc(name)}!” to do it again.</span>`);
+  }
+  const mv = findMove(p, text); p.st.sigMove = null;
+  if (mv) { text = `${text} (my signature move ${mv.name}: ${mv.text})`.slice(0, 400); p.st.sigMove = mv.name; }
   const P0 = parse(text, p, C);
   // quick local commands (no AI needed)
   if (P0.dir && L.kind !== 'open' && (P0.move || (!P0.ap && P0.toks.length <= 3))) return host ? hostMove(P0.dir) : moveParty(P0.dir);
@@ -1317,7 +1370,7 @@ async function actInner(text) {
   }
   if (!host && !C) {
     if (L.kind === 'map' && P0.items.some(i => p.items[i].id === 'mapscrap')) { log('you', `${esc(p.name)}: “${esc(text)}”`); useMapScrap(p, P0); return save(); }
-    if (P0.rest && P0.toks.length <= 3) { log('you', `${esc(p.name)}: “${esc(text)}”`); R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
+    if (L.kind !== 'open' && P0.rest && P0.toks.length <= 3) { log('you', `${esc(p.name)}: “${esc(text)}”`); R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); return save(); }
     return L.kind === 'open' ? openAct(pi, text, P0) : exploreAct(pi, text, P0);
   }
   if (P0.rest && P0.toks.length <= 3) return doRest(pi, text, host);
@@ -1329,11 +1382,11 @@ async function actInner(text) {
     UI.thinking = false;
   }
   if (J) {
-    if ((J.questionOnly === true || J.questionOnly === 'true') && J.says) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('nar', esc(tidyStory(J.says, 50)) + ' <span class="small">(No turn used.)</span>'); noteEvent(L, text, J.says); return save(); }
+    if ((J.questionOnly === true || J.questionOnly === 'true') && J.says) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('nar', esc(tidyStory(J.says, 50)) + ' <span class="small">(No turn used.)</span>'); noteEvent(L, text, J.says); if (C) applyChanges(pi, { newHere: J.newHere, learned: J.learned, forget: J.forget }, C.objs); return save(); }
     if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(No turn used.)</span>`); return save(); }
     P = fromJudge(J, p, C, P0);
     if (P.move && P.dir && host) return hostMove(P.dir);
-    if (P.move && C) { P.move = false; if (C.kind === 'quest') { L.ch = null; return moveParty(P.dir || 'n'); } P.ap = 'speed'; log('note', '(The narrator reads that as trying to get past.)'); }
+    if (P.move && C) { P.move = false; if (C.kind === 'quest') { L.ch = null; return moveParty(P.dir || 'n'); } P.ap = 'speed'; }
     if (P.rest) return doRest(pi, text, host);
   } else {
     fallbackVerdict(P, p);
@@ -1375,7 +1428,7 @@ async function actInner(text) {
   }
   const mark = L.log.length;
   if (!host && P.setup) {
-    const nm = P.structure || 'a prepared trick';
+    const nm = P.structure || (P.form === 'trap' ? 'a trap' : 'a prepared trick');
     const trap = /trap|snare|net|pit|mine|cage|fence/i.test(nm);
     C.objs.push({ n: nm, i: trap ? '🪤' : '✨', traits: ev.traits.filter(t => t !== 'physical'), prep: Math.round(ev.score * 1.2), trap });
     log('nar', `${esc(p.name)} prepares ${esc(nm)}.`);
@@ -1383,6 +1436,8 @@ async function actInner(text) {
     if (ev.notes.length) log('note', ev.notes.join(' '));
   }
   else if (host) hostResolve(pi, P, ev); else resolve(pi, P, ev, C);
+  if (J && !host) { const ch = applyChanges(pi, J, C.objs, text); if (ch.length) log('eff', ch.join(' · ')); meetPeople(J); }
+  if (C && (C.kind === 'obj' || C.kind === 'boss')) { C.style = C.style || {}; C.style[P.ap] = (C.style[P.ap] || 0) + 1; }
   if (J) {
     const outcome = L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500);
     UI.thinking = true; render();
@@ -1430,15 +1485,15 @@ async function exploreAct(pi, text, P0) {
   if (R.players.length > 1 && !L.ch) R.cur = nextHostPlayer();
   save();
 }
-function remember(p, text, v) { const L = R.level; (L.hist = L.hist || []).push({ who: p.name, text: String(text).slice(0, 80), v }); if (L.hist.length > 8) L.hist.shift(); }
+function remember(p, text, v) { const L = R.level; (L.hist = L.hist || []).push({ who: p.name, text: String(text).slice(0, 80), full: String(text).replace(/ \(my signature move [^)]*\)$/, '').slice(0, 200), v }); if (L.hist.length > 8) L.hist.shift(); }
 async function story(pi, P, text, outcome, J, idx) {
   if (!J || !aiReady()) return;
   const C = R.level.ch;
   try {
     const L = R.level, cell = L.kind === 'map' || L.kind === 'open' ? L.cells[L.y * L.w + L.x] : null;
-    const clean = String(outcome).replace(/[+−-]?\d+%?/g, '').replace(/\(\s*\)/g, '').replace(/\s+/g, ' ');
+    const clean = String(outcome).replace(/−(\d+)/g, (_, n) => +n >= 15 ? ' is hit hard' : +n >= 6 ? ' is hit' : ' is barely scratched').replace(/[+−-]?\d+%?/g, '').replace(/\(\s*\)/g, '').replace(/\s+/g, ' ');
     const enemies = C ? C.threats.filter(t => t.hp > 0).map(t => t.n) : [];
-    const { story: s, says } = await aiStory({ player: R.players[pi].name, action: text, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, enemies: enemies.length ? enemies : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined, previous: L.lastStory || undefined });
+    const { story: s, says } = await aiStory({ player: R.players[pi].name, several_players: R.players.length > 1 || undefined, action: text, attempt: J.attempt || undefined, verdict: P.verdict, why: P.why, outcome: clean, place: cell ? cell.place : 'a vast white hall', world: THEMES[R.book] && THEMES[R.book].name, scene: C ? C.title : undefined, enemies: enemies.length ? enemies : undefined, villain: C && C.boss ? `${C.boss.n}: ${BOSSES[C.boss.id].intro}` : undefined, previous: L.lastStory || undefined });
     if (!s) return;
     L.lastStory = s; noteEvent(L, text, s);
     const lines = [{ c: 'nar', h: esc(s) }];
@@ -1490,8 +1545,8 @@ const VILLAGES = [['a small village', '🏘️'], ['a traveling camp', '⛺'], [
 const ENV_ICONS = { burning: '🔥', frozen: '🧊', water: '🌊', fog: '🌫️', dark: '🌑', bright: '☀️', soil: '🌱' };
 
 const itemDef = it => it.custom || ITEMS[it.id];
-function addFound(p, name, icon, traits) {
-  p.items.push({ id: 'found_' + Math.random().toString(36).slice(2, 7), uses: 1, custom: { n: name, i: icon || '📦', traits: traits.slice(), kw: nameWords(name).join(' ') || name, apt: {}, d: 'Found in the world.', cost: 0, uses: 1 } });
+function addFound(p, name, icon, traits, uses = 3) {
+  p.items.push({ id: 'found_' + Math.random().toString(36).slice(2, 7), uses, custom: { n: name, i: icon || '📦', traits: traits.slice(), kw: nameWords(name).join(' ') || name, apt: {}, d: 'Found in the world.', cost: 0, uses } });
 }
 const cellAt = (L, x, y) => (x >= 0 && y >= 0 && x < L.w && y < L.h) ? L.cells[y * L.w + x] : null;
 const DXY = { n: [0, -1], s: [0, 1], e: [1, 0], w: [-1, 0] };
@@ -2059,13 +2114,15 @@ function hostWin() {
    gets you toward the (hidden) goal, and throws fights and complications
    at you. With the AI off, pages fall back to the classic grid map.
    ===================================================================== */
-const OBJ_TRAITS = ['air', 'animal', 'earth', 'elastic', 'electric', 'explosive', 'fire', 'food', 'gravity', 'holy', 'light', 'metal', 'mind', 'physical', 'plant', 'poison', 'slippery', 'soft', 'sound', 'sticky', 'time', 'water', 'wood'];
-const OBJ_ICON = { water: '💧', plant: '🌿', wood: '🪵', metal: '⚙️', fire: '🔥', food: '🍎', animal: '🐾', earth: '🪨', light: '✨', sound: '🔔', electric: '⚡', sticky: '🍯', holy: '🗿', explosive: '💥', soft: '🧶', elastic: '🪢', gravity: '🪨', mind: '📜', poison: '☠️', slippery: '🧼', air: '🌬️', time: '⏳', physical: '📦' };
+const OBJ_TRAITS = ['ice', 'air', 'animal', 'earth', 'elastic', 'electric', 'explosive', 'fire', 'food', 'gravity', 'holy', 'light', 'metal', 'mind', 'physical', 'plant', 'poison', 'slippery', 'soft', 'sound', 'sticky', 'time', 'water', 'wood'];
+const OBJ_ICON = { ice: '🧊', water: '💧', plant: '🌿', wood: '🪵', metal: '⚙️', fire: '🔥', food: '🍎', animal: '🐾', earth: '🪨', light: '✨', sound: '🔔', electric: '⚡', sticky: '🍯', holy: '🗿', explosive: '💥', soft: '🧶', elastic: '🪢', gravity: '🪨', mind: '📜', poison: '☠️', slippery: '🧼', air: '🌬️', time: '⏳', physical: '📦' };
 const PLACE_ENV = ['water', 'dark', 'bright', 'soil', 'fog', 'burning', 'frozen'];
 const sameName = (a, b) => { a = norm(a).replace(/^(the|a|an) /, ''); b = norm(b).replace(/^(the|a|an) /, ''); return !!a && !!b && (a === b || a.includes(b) || b.includes(a)); };
-function mkObj(o) { // from a theme row [name, icon, traits] or an AI {name, trait}
+const DETAIL_WORDS = ['sound', 'sounds', 'noise', 'noises', 'smell', 'smells', 'scent', 'odor', 'odour', 'air', 'breeze', 'wind', 'fog', 'mist', 'smoke', 'light', 'glow', 'shadow', 'shadows', 'echo', 'echoes', 'voice', 'voices', 'whisper', 'whispers', 'bloop', 'feeling', 'taste', 'silence', 'darkness', 'sunlight', 'heat', 'cold', 'cloud', 'haze', 'aura', 'vibe', 'atmosphere', 'music', 'song', 'hum', 'humming', 'buzz', 'buzzing'];
+const isThing = n => { const w = norm(n).replace(/[^a-z\s-]/g, '').split(/[\s-]+/).filter(Boolean); return w.length > 0 && !DETAIL_WORDS.includes(w[w.length - 1]); };
+function mkObj(o) { // from a theme row [name, icon, traits] or an AI {name, trait}. Only real, touchable things.
   if (Array.isArray(o)) return { n: o[0], i: o[1], traits: o[2].split(' ') };
-  const n = String(o && typeof o === 'object' ? (o.name || o.n || '') : o || '').slice(0, 30).toLowerCase().trim(); if (!n) return null;
+  const n = String(o && typeof o === 'object' ? (o.name || o.n || '') : o || '').slice(0, 30).toLowerCase().trim(); if (!n || !isThing(n)) return null;
   const tr = [].concat(o.traits || o.trait || []).map(norm).filter(t => OBJ_TRAITS.includes(t)).slice(0, 2);
   const t = tr.length ? tr : ['physical'];
   return { n, i: OBJ_ICON[t[0]] || '📦', traits: t };
@@ -2086,8 +2143,8 @@ function genOpen(entry, seed) {
 const WORLD_SYS = `You are the secret WORLD BUILDER for one page of "The Book Game", a funny, vivid fantasy adventure for young players who can type ANY action. Output ONLY a JSON object.
 Given the world theme and the page's GOAL, invent a small, explorable area. Give it STUFF, never solutions: places, characters, dangers and rumours that clever players can use in many different ways. Never describe a route, key, puzzle answer or "the way" to finish — the players invent their own.
 {
- "opening": "2 short sentences, second person: where they wake up and one thing they notice. Do NOT mention the goal.",
- "start": {"name": "short place name", "objects": [2-3 of {"name": "a usable thing here", "trait": one of TRAITS}], "env": subset of [water, dark, bright, soil, fog, frozen, burning]},
+ "opening": "2 short sentences, second person: they wake up IN the start place (use its name) and notice one thing. Do NOT mention the goal.",
+ "start": {"name": "short place name", "objects": [2-3 of {"name": "a real, touchable thing here (never a sound, smell, light or air)", "trait": one of TRAITS}], "env": subset of [water, dark, bright, soil, fog, frozen, burning]},
  "places": [6 of {"name": "short place name", "hint": "what you'd notice about it from afar, max 14 words"}],
  "locals": [3 strings "who they are — what they want", max 14 words each; quirky, some helpful, some not],
  "dangers": [2 short strings: creatures or hazards that roam the area],
@@ -2096,10 +2153,12 @@ Given the world theme and the page's GOAL, invent a small, explorable area. Give
  "signs": [4 things the players might see, hear or smell out in the world that come from what is happening at the goal (e.g. "a goblin runs past hugging a stolen cupcake"). Just the event, max 14 words: never name the goal, never explain it, never say it's a clue]
 }
 Use simple, everyday words a 9-year-old knows. Funny and concrete, not poetic.
-TRAITS: air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood.`;
+TRAITS: ice, air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood.
+If "bookMemory" is given, this page is later in the same book: bring back 1-2 of those people as locals where it fits (same names; friends may help, enemies may cause trouble), and make the world reflect what happened (a burned library stays burned; people talk about what the players did).`;
 async function aiWorld(L) {
   const th = THEMES[R.book];
   const info = { world: th.name, theme_places: th.places, theme_things: th.objs.map(o => o[0]), creatures: th.threats.map(t => t[0]), goal: openGoal(L), page: R.page };
+  const bm = bookMem(); if (bm.chars.length || bm.memories.length) info.bookMemory = { people: bm.chars.slice(-8).map(c => `${c.name} (${c.who}) — feels ${c.feeling}: ${c.note}`), happened: bm.memories };
   const r = await ai('judge', [{ role: 'system', content: WORLD_SYS }, { role: 'user', content: JSON.stringify(info) }], { json: true, max: 1400, temp: 1, timeout: 40000 });
   const W = parseJSON(r.text);
   if (!W || !Array.isArray(W.places) || W.places.length < 3) throw new Error('bad world from ' + r.m);
@@ -2155,7 +2214,7 @@ function openGo(pi, J) {
     if (L.cells.length > 16) L.cells.splice(1, 1); // forget an old side-place, never the start
     i = L.cells.length - 1;
   }
-  L.x = i; L.w = L.cells.length;
+  L.x = i; L.w = L.cells.length; L.calm = 2; // no ambush the moment you walk in
   const c = L.cells[i], first = !c.vis; c.vis = true;
   const says = String(J.says || '').trim();
   log('nar', says ? esc(tidyStory(says, 55)) : `${esc(R.players[pi].name)} walks to ${esc(c.place)}.`);
@@ -2165,6 +2224,94 @@ function openGo(pi, J) {
   noteEvent(L, 'went to ' + c.place, says);
   return true;
 }
+/* ---------------- the book remembers: people you met and choices you made ---------------- */
+const bookMem = () => (R.bm = R.bm || { chars: [], memories: [], recaps: [] });
+const FEEL = { friend: '😊', grateful: '🙏', neutral: '😐', annoyed: '😠', enemy: '😡' };
+function meetPeople(J) {
+  const bm = bookMem();
+  (Array.isArray(J.people) ? J.people : []).slice(0, 3).forEach(x => {
+    if (!x || !x.name) return;
+    const name = String(x.name).slice(0, 30), feeling = FEEL[norm(x.feeling)] ? norm(x.feeling) : 'neutral';
+    let c = bm.chars.find(c => sameName(c.name, name));
+    const was = c ? c.feeling : null;
+    if (!c) { c = { name, who: String(x.who || '').slice(0, 50), feeling, note: '', page: R.page }; bm.chars.push(c); }
+    c.feeling = feeling; if (x.note) c.note = String(x.note).slice(0, 90); if (x.who && !c.who) c.who = String(x.who).slice(0, 50); c.page = R.page;
+    if (was !== feeling && feeling !== 'neutral') log('note', `👥 ${FEEL[feeling]} <b>${esc(name)}</b> ${{ friend: 'likes you now', grateful: 'is grateful to you', annoyed: 'is annoyed with you', enemy: 'will remember this…' }[feeling]}.`);
+  });
+  if (bm.chars.length > 14) { const k = bm.chars.findIndex(c => c.feeling === 'neutral'); bm.chars.splice(k >= 0 ? k : 0, 1); }
+}
+function addMemory(m) { const bm = bookMem(); m = String(m || '').trim().slice(0, 110); if (m && !bm.memories.some(x => sameName(x, m))) { bm.memories.push(m); if (bm.memories.length > 10) bm.memories.shift(); } }
+// how you won shapes the ending
+const ENDINGS = {
+  fought: { aps: ['force'], i: '⚔️', boss: n => `${n} is defeated!`, obj: t => `${t} — done the hard way!`, tag: 'by force' },
+  friends: { aps: ['persuade', 'entertain', 'heal'], i: '🤝', boss: n => `You made peace with ${n}!`, obj: t => `${t} — everyone's friends now!`, tag: 'as friends' },
+  tricked: { aps: ['trick', 'sneak', 'speed'], i: '🃏', boss: n => `You outwitted ${n}!`, obj: t => `${t} — nobody saw it coming!`, tag: 'by trickery' },
+  clever: { aps: ['knowledge', 'protect'], i: '🧠', boss: n => `You outsmarted ${n}!`, obj: t => `${t} — a clever plan!`, tag: 'by cleverness' },
+};
+function endingOf(C) {
+  const st = C.style || {}; let best = 'fought', bv = -1;
+  Object.entries(ENDINGS).forEach(([k, e]) => { const v = e.aps.reduce((a, ap) => a + (st[ap] || 0), 0); if (v > bv) { bv = v; best = k; } });
+  return best;
+}
+const RECAP_SYS = `You write the end-of-page recap for "The Book Game", a funny fantasy adventure for young players. Output JSON only:
+{"title": "a funny title, max 6 words", "panels": [4-6 comic-strip captions, max 20 words each, past tense, using the players' names, simple everyday words], "best": "the single best moment, max 15 words", "memories": [1-3 short facts the world should remember later in this book, max 12 words each — choices with consequences, like "The library burned down." or "Gus the goblin owes Sam a favour."]}
+Use ONLY what really happened in the LOG (what they did, made, who they met, how it ended). No numbers, no game terms (HP, damage, turn, stretch), no emojis.`;
+async function makeRecap(res) {
+  if (!aiReady() || !R.level) return;
+  const L = R.level, lines = L.log.filter(l => ['you', 'nar', 'big', 'eff'].includes(l.c)).map(l => l.h.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ')).join('\n').slice(-5000);
+  try {
+    const r = await ai('story', [{ role: 'system', content: RECAP_SYS }, { role: 'user', content: JSON.stringify({ players: R.players.map(p => p.name), world: THEMES[R.book].name, page: R.page, ending: res.title, how: res.how, log: lines }) }], { json: true, max: 900, temp: .9, timeout: 40000 });
+    const j = parseJSON(r.text) || {};
+    const panels = (Array.isArray(j.panels) ? j.panels : []).slice(0, 6).map(x => tidyStory(x, 26)).filter(Boolean);
+    if (!panels.length) return;
+    res.recap = { title: String(j.title || res.title).slice(0, 60), panels, best: j.best ? tidyStory(j.best, 20) : '' };
+    (Array.isArray(j.memories) ? j.memories : []).slice(0, 3).forEach(addMemory);
+    bookMem().recaps.push({ page: R.page, title: res.recap.title, panels, best: res.recap.best, how: res.how });
+    save(); if (curView === 'pagedone' || curView === 'bookdone') render();
+  } catch (e) { AIC.lastErr = e.message; }
+}
+function recapText(rc, page) { return `📖 ${THEMES[R.book].name} — Page ${page}: ${rc.title}\n` + rc.panels.map((x, i) => `${i + 1}. ${x}`).join('\n') + (rc.best ? `\n⭐ Best moment: ${rc.best}` : ''); }
+// match what the player calls an item ("the icicle spear") to what they carry ("glass-tipped icicle")
+function itemMatch(p, name) {
+  const w = nameWords(String(name || '')).concat(norm(name).split(/[\s-]+/)).filter(x => x.length > 2);
+  let best = -1, bs = 0;
+  p.items.forEach((it, i) => { if (it.uses <= 0) return; const n = norm(itemDef(it).n); if (n === norm(name)) { best = i; bs = 99; return; } const sc = w.filter(x => n.includes(x)).length; if (sc > bs) { bs = sc; best = i; } });
+  return best;
+}
+function craftItem(c) {
+  const t = [].concat(c.trait || [], c.trait2 || []).map(norm).filter(x => OBJ_TRAITS.includes(x)).slice(0, 2);
+  const tr = t.length ? t : ['physical'], ap = APS.includes(norm(c.bestFor)) ? norm(c.bestFor) : 'force';
+  const dur = clamp(Math.round(+c.durability || 3), 1, 5), n = String(c.name).slice(0, 34).toLowerCase();
+  return { id: 'craft_' + Math.random().toString(36).slice(2, 7), uses: dur, custom: { n, i: OBJ_ICON[tr[0]] || '🛠️', traits: tr, kw: nameWords(n).join(' ') || n, apt: { [ap]: 2 }, d: String(c.desc || 'Something you made.').slice(0, 70), cost: 0, uses: dur, crafted: true } };
+}
+function addNote(L, f) {
+  f = String(f || '').trim().slice(0, 120); if (!f) return;
+  const k = L.facts.findIndex(x => sameName(x, f)); if (k >= 0) L.facts.splice(k, 1);
+  L.facts.push(f); if (L.facts.length > 16) L.facts.splice(0, L.facts.length - 16);
+}
+const HANDHELD = /\b(sword|dagger|knife|blade|spear|lance|club|bat|hammer|axe|shield|torch|rope|lasso|whip|bow|arrows?|staff|wand|stick|key|hook|slingshot|sling|net|pick|shovel|helmet|armou?r|gloves?|boots?|cloak|mask|shiv|icicle)\b/;
+const MAKING = /\b(make|made|craft|shape|form|freeze|froze|turn|build|carve|forge|fashion|create|twist|tie|sharpen|mould|mold)\b/;
+function applyChanges(pi, J, objs, text = '') {
+  const L = R.level, p = R.players[pi], out = [];
+  // safety net: "I freeze the puddle into a sword" — if the AI left the sword lying in the scene, it's in your hand
+  if (!(J.craft && J.craft.name) && MAKING.test(norm(text)) && Array.isArray(J.newHere)) {
+    const k = J.newHere.findIndex(o => o && o.name && HANDHELD.test(norm(o.name)) && nameWords(o.name).some(w => norm(text).includes(w)));
+    if (k >= 0) { const o = J.newHere.splice(k, 1)[0]; J.craft = { name: o.name, desc: 'Something you made.', trait: o.trait, bestFor: 'force', durability: 3 }; }
+  }
+  L.facts = L.facts || [];
+  (Array.isArray(J.gone) ? J.gone : []).forEach(g => { const k = objs.findIndex(o => sameName(o.n, g)); if (k >= 0) objs.splice(k, 1); });
+  (Array.isArray(J.consumed) ? J.consumed : []).forEach(g => { const i = itemMatch(p, g); if (i >= 0) { out.push(`${itemDef(p.items[i]).i} Your ${esc(itemDef(p.items[i]).n)} is gone.`); p.items[i].uses = 0; } });
+  p.items = p.items.filter(it => it.uses > 0);
+  if (J.craft && typeof J.craft === 'object' && J.craft.name && isThing(J.craft.name)) {
+    const it = craftItem(J.craft); p.items.push(it);
+    out.push(`🛠️ You made ${it.custom.i} <b>${esc(it.custom.n)}</b> — ${esc(it.custom.d)}`);
+  }
+  (Array.isArray(J.newHere) ? J.newHere : []).slice(0, 3).map(mkObj).filter(Boolean).forEach(o => { if (!objs.some(x => sameName(x.n, o.n)) && !p.items.some(it => sameName(itemDef(it).n, o.n))) objs.push(o); });
+  if (objs.length > 7) objs.splice(0, objs.length - 7);
+  (Array.isArray(J.forget) ? J.forget : []).forEach(f => { const k = L.facts.findIndex(x => sameName(x, f)); if (k >= 0) L.facts.splice(k, 1); });
+  (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => addNote(L, f));
+  return out;
+}
 function noteEvent(L, did, happened) { (L.events = L.events || []).push({ did: String(did).slice(0, 90), happened: String(happened || '').slice(0, 260) }); if (L.events.length > 5) L.events.shift(); }
 function openResolve(pi, P, ev, J, text) {
   const L = R.level, p = R.players[pi], cell = L.cells[L.x], out = [];
@@ -2172,21 +2319,18 @@ function openResolve(pi, P, ev, J, text) {
   log('nar', says ? esc(tidyStory(says, 55)) : fmt(pick(OPEN[P.ap] || OPEN.knowledge), { N: `<b>${esc(p.name)}</b>`, PW: pwPhrase(p, P, ev), T: esc(cell.place) }));
   noteEvent(L, text, says);
   // the world changes because of what you did
-  (Array.isArray(J.gone) ? J.gone : []).forEach(g => { const k = cell.objs.findIndex(o => sameName(o.n, g)); if (k >= 0) cell.objs.splice(k, 1); });
-  (Array.isArray(J.newHere) ? J.newHere : []).slice(0, 2).map(mkObj).filter(Boolean).forEach(o => { if (!cell.objs.some(x => sameName(x.n, o.n))) cell.objs.push(o); });
-  if (P.setup || P.world === 'build') {
-    const nm = String(P.structure || P.formWord || 'a clever contraption').slice(0, 40);
-    const trap = /trap|snare|net|pit|mine|cage|fence/i.test(nm) || P.form === 'trap';
+  out.push(...applyChanges(pi, J, cell.objs, text));
+  meetPeople(J);
+  if (!(J.craft && J.craft.name) && (P.setup || P.world === 'build')) {
+    const nm = String(P.structure || P.formWord || (P.form === 'trap' ? 'a trap' : 'something you built')).slice(0, 40);
+    const trap = /trap|snare|net|pit|mine|cage|fence|tripwire/i.test(nm) || P.form === 'trap';
     cell.objs.push({ n: nm.toLowerCase(), i: trap ? '🪤' : '🏗️', traits: ev.traits.filter(t => t !== 'physical'), prep: Math.round(ev.score * 1.1), trap });
-    cell.built.push(nm); out.push(`🏗️ You made ${esc(nm)}. ${trap ? 'Any enemy that shows up here gets hit by it first.' : 'You can use it later.'}`);
+    cell.built.push(nm); out.push(`${trap ? '🪤' : '🏗️'} You built <b>${esc(nm)}</b> here.${trap ? ' It will spring on the next enemy here.' : ''}`);
   }
-  if (cell.objs.length > 6) cell.objs.splice(0, cell.objs.length - 6);
   const tags = (P.envChange || []).filter(t => PLACE_ENV.includes(t));
   if (tags.length) tags.forEach(t => { if (!cell.env.includes(t)) cell.env.push(t); });
   if (P.ap === 'heal') { const h = R.players.map((q, i) => healP(i, ev.score * .6)).reduce((a, b) => a + b, 0); if (h) out.push(`💚 +${h} HP`); }
-  (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => { f = String(f || '').trim().slice(0, 140); if (f && !L.facts.some(x => sameName(x, f))) L.facts.push(f); });
-  if (L.facts.length > 24) L.facts.splice(0, L.facts.length - 24);
-  if (J.item && cell.looted < 2) { const it = mkObj({ name: J.item, trait: J.itemTrait }); if (it) { cell.looted++; addFound(p, it.n, it.i, it.traits); const k = cell.objs.findIndex(o => sameName(o.n, it.n)); if (k >= 0) cell.objs.splice(k, 1); out.push(`🎒 You take the ${it.i} ${esc(it.n)}.`); } }
+  if (J.item && cell.looted < 3) { const it = mkObj({ name: J.item, trait: J.itemTrait }); if (it) { cell.looted++; addFound(p, it.n, it.i, it.traits); const k = cell.objs.findIndex(o => sameName(o.n, it.n)); if (k >= 0) cell.objs.splice(k, 1); out.push(`🎒 You take the ${it.i} ${esc(it.n)}.`); } }
   // how far did that REALLY get them? The AI picks 0-3, the engine sets the amount. Hidden from the player.
   let pr = clamp(Math.round(+J.progress || 0), 0, 3);
   if (P.verdict === 'stretch') pr = Math.min(pr, 2);
@@ -2213,8 +2357,9 @@ function openTick(risky) {
     const sg = signs.length ? signs[L.heard++ % signs.length] : '';
     if (sg) { log('nar', esc(cap(sg.replace(/[.!]*$/, '.')))); noteEvent(L, '(something happened nearby)', sg); }
   }
-  for (const m of [40, 75]) if (L.prog >= m && !L.marks.includes(m)) { L.marks.push(m); return openTrouble(m === 75 && rnd() < .5 ? 'obs' : 'enc'); }
   if (L.prog >= 100) return openFinale();
+  if (L.calm > 0) { L.calm--; return; }
+  for (const m of [40, 75]) if (L.prog >= m && !L.marks.includes(m)) { L.marks.push(m); return openTrouble(m === 75 && rnd() < .5 ? 'obs' : 'enc'); }
   if (L.turns > (R.trial ? 5 : 2) && (L.tension >= 100 || rnd() < L.tension / (R.trial ? 700 : 320))) return openTrouble('enc');
 }
 function openTrouble(kind) {
@@ -2240,12 +2385,14 @@ async function openAct(pi, text, P0) {
   let J = null;
   UI.thinking = true; render();
   try { J = (await aiJudge(pi, null, text)).j; } catch (e) { AIC.lastErr = e.message; }
+  if (!J) { await new Promise(r => setTimeout(r, 5000)); try { J = (await aiJudge(pi, null, text)).j; } catch (e) { AIC.lastErr = e.message; } } // the free AI is busy: one quiet retry
   UI.thinking = false;
   log('you', `${esc(p.name)}: “${esc(text)}”`);
   if (!J) { log('sys', '📴 The narrator lost its voice for a moment (the free AI is busy). Try again in a few seconds — nothing happened.'); return save(); }
   if ((J.questionOnly === true || J.questionOnly === 'true') && J.says && !J.goto) { // just asking: answer it, time doesn't pass
     log('nar', esc(tidyStory(J.says, 55))); noteEvent(L, text, J.says);
-    (Array.isArray(J.learned) ? J.learned : []).slice(0, 2).forEach(f => { f = String(f || '').trim().slice(0, 140); if (f && !L.facts.some(x => sameName(x, f))) L.facts.push(f); });
+    applyChanges(pi, { newHere: J.newHere, learned: J.learned, forget: J.forget }, cell.objs); // a puddle you asked about becomes something you can use
+    meetPeople(J);
     return save();
   }
   if (J.unclear && J.question) { log('note', `🤔 ${esc(J.question)} <span class="small">(Nothing happened yet.)</span>`); return save(); }
@@ -2257,7 +2404,12 @@ async function openAct(pi, text, P0) {
     remember(p, text, 'travel');
     openTick(false); return done();
   }
-  if (P.rest || P.world === 'rest') { R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); }); log('nar', 'You take a moment to rest. (+10 HP, +6 energy)'); openTick(false); return done(); }
+  if (P.rest || P.world === 'rest') { // waiting lets time pass: you recover, and the world may do something
+    R.players.forEach((q, i) => { healP(i, 10); q.en = Math.min(q.maxEn, q.en + 6); });
+    const says = String(J.says || '').trim();
+    log('nar', esc(says ? tidyStory(says, 45) : 'You wait a little and catch your breath.')); noteEvent(L, text, says || 'waited');
+    L.stall += 2; openTick(false); return done();
+  }
   P.move = false; P.ap = P.ap || 'knowledge';
   const val = validateVerdict(pi, P, pseudo); P.verdict = val.v;
   remember(p, text, P.verdict);
@@ -2285,6 +2437,7 @@ function openPanel(L) {
   <div class="desc">📍 <b>${esc(cap(c.place))}</b>${c.env.length ? ` <span class="tag">${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(' ')}</span>` : ''}${c.hint ? `<br><span class="small">${esc(c.hint)}</span>` : ''}<br>You see: ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(', ') || 'nothing useful'}.</div>
   ${visited.length ? `<div class="small" style="margin-top:6px">Been to:</div>${visited.join('')}` : ''}
   ${heard.length ? `<div class="small" style="margin-top:6px">You can see from here:</div>${heard.join('')}` : ''}
+  ${R.bm && R.bm.chars.length ? `<div class="small" style="margin-top:6px">👥 <b>People</b><br>${R.bm.chars.slice(-8).map(c => `${FEEL[c.feeling] || '😐'} ${esc(c.name)}${c.who ? ` <span style="opacity:.7">— ${esc(c.who)}</span>` : ''}`).join('<br>')}</div>` : ''}
   <div class="small" style="margin-top:6px">📝 <b>Your notes</b>${L.facts.length ? '<br>' + L.facts.slice(-8).map(f => '• ' + esc(f)).join('<br>') : ': nothing yet.'}</div>`;
 }
 
@@ -2400,10 +2553,6 @@ If the action is too vague to picture ("do something clever", "use my power", "h
 Intimidating, threatening or scaring = trick (or persuade if the target is social). Using an object as a weapon uses that object's nature (a tesla coil is electric).
 If the action PREPARES something for later instead of having an immediate effect (rigging, charging, setting a trap, planting, building), set "setup": true and name it in "structure".
 
-When "mode" is "exploring" (no enemy in front of them), also classify the action as a WORLD action in "world":
-scout (look around, climb, send scouts) | clear (destroy an obstacle/enemies in an ADJACENT area from afar) | build (make a structure, bridge, trap or fort here or toward a direction) | lure (draw enemies from an adjacent area to here — or "away") | recruit (convince locals to join you) | gather (take a scene object along) | travel (cover 2-3 areas fast: flying, portals, riding) | alter (change the land: flood, freeze, burn, darken, fog, grow plants) | intel (ask around / investigate the goal) | rest | move (just walking) | none
-dir: n/s/e/w or "here". envChange: list from [water, frozen, burning, dark, bright, fog, soil] when altering the land.
-
 Fields:
 approach: force | trick | persuade | sneak | protect | speed | entertain | knowledge | heal | move | rest
 dir: n/s/e/w only if approach is move
@@ -2417,24 +2566,41 @@ creativity: 1-5 (1 = generic "I attack", 3 = specific and sensible, 5 = brillian
 world, dir, setup (true/false), structure (short name), envChange (list)
 unclear: true only if you truly cannot tell what they want · question: short clarifying question if unclear
 questionOnly: true if the player is ONLY asking something (who is that? what does it want? what's left? can I…?) and not doing anything yet — then put a short, plain, honest answer in "says" (max 40 words, simple words, from the situation and "justHappened"). A question is never "unclear".
+attempt: one short sentence in second person of exactly what they are trying, using the real names of their items and the things around them ("You freeze the puddle into a dagger and stab at the monitor.").
+WHAT CHANGED (every mode):
+craft: if they MAKE a thing they can hold or carry (a dagger, a torch, a rope ladder), {"name": short name, "desc": what it is, max 10 words, "trait": main trait (ice, air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood), "trait2": optional, "bestFor": the approach it helps most, "durability": 1-5 (ice 2, wood 3, metal 5)}; else null. A thing you hold is a craft, NEVER a setup or newHere — also in fights: "I freeze the puddle into a sword and stab them" = craft the sword (they keep holding it) AND attack with it. Only things built INTO the place (a trap, a wall, a bridge) are setup — and then always give "structure" a real short name ("tripwire of vines", never "contraption").
+consumed: names of the player's OWN items that are used up, eaten, thrown away or broken by this action (ingredients of a craft, a smashed bottle). [] if none. Using a weapon normally does not break it, but real wear counts: an ice item near fire or heat melts, glass smashed hard breaks.
+gone: names of things in the scene that are destroyed, eaten, taken or used up by this action ([] if none). Using something doesn't make it vanish — only if it really would.
+newHere: 0-3 real things that now exist here because of the action or that "says" mentions for the first time (a burnt stump, a puddle, a knocked-down sign): [{"name","trait"}]. Anything touchable you describe that isn't in the scene must be listed here so they can use it.
+Things vs details: sounds, smells, light, air, fog, echoes and feelings are DETAILS — describe them, but never list them as objects, items or newHere.
+learned: 0-2 short notes (max 12 words) of NEW useful things they found out, written plainly like a kid's notebook ("The ant queen is hungry."). Only things worth remembering later; no rules of the game; no words like hint, clue, secret or suggests. forget: exact notes from "facts" that are now wrong ([] if none).
+people: characters the player meaningfully dealt with this action (talked to, helped, tricked, fought, befriended), [{"name": a real short name (invent one if needed, e.g. "Gus the goblin"), "who": max 6 words, "feeling": friend | grateful | neutral | annoyed | enemy (how they now feel about the player), "note": what happened, max 12 words}]; [] if none. "knownPeople" met the player earlier in this book: keep their names and let them act on how they feel (friends help or give tips, grateful ones return favours, annoyed ones refuse, enemies hold grudges). "bookMemories" are things the players did earlier in this book — the world remembers them.
+The world does not know or help the player on purpose: never hand them notes telling them where to go, items with their name on them, or convenient answers. Show the world; don't guide them. Never reuse phrases or images from "justHappened".`;
+// mode-specific rules are only sent when they apply (keeps each turn small for the free AI limits)
+const JUDGE_MODE = {
+  exploring: `
+When "mode" is "exploring" (no enemy in front of them), also classify the action as a WORLD action in "world":
+scout (look around, climb, send scouts) | clear (destroy an obstacle/enemies in an ADJACENT area from afar) | build (make a structure, bridge, trap or fort here or toward a direction) | lure (draw enemies from an adjacent area to here — or "away") | recruit (convince locals to join you) | gather (take a scene object along) | travel (cover 2-3 areas fast: flying, portals, riding) | alter (change the land: flood, freeze, burn, darken, fog, grow plants) | intel (ask around / investigate the goal) | rest | move (just walking) | none
+dir: n/s/e/w or "here". envChange: list from [water, frozen, burning, dark, bright, fog, soil] when altering the land.`,
+  open: `
 When "mode" is "open" (free exploration of a living world, no enemy in front of them), YOU are also the storyteller, and these fields matter most:
 says: what happens, told to the player — 1-3 short sentences (max 50 words), second person ("you"), in simple everyday words a 9-year-old knows (no fancy or poetic words, no strange metaphors). Say exactly what happens because of their action and what they now see, hear or are told. If they ASK something ("what do I see?", "what's left of the mushroom?", "where can I go?"), answer it plainly and honestly from the world, "here" and "justHappened". Stay consistent with "justHappened" and "facts". SHOW, never explain: never say hint, clue, secret, mysterious, or "this means", and never tell them what they should do. Don't announce the goal like a quest ("your mission is…"), but DO describe it when it's in front of them: if "atGoalPlace" is true or they go looking in the right direction, plainly describe what is happening there (from "goalSecret") — the upset troll, the goblins stealing snacks — that is how they find out. Locals talk about their own problems honestly. When looking or listening elsewhere, weave in one of "signs".
 Questions are never "unclear" — answer them. Ordinary actions with no power (looking, walking, talking, picking things up) are natural.
 goto: if they travel, the place they head to — a name from "visited" or "world.places", or a short NEW place name if they head somewhere unlisted that plausibly exists nearby; else null. Travelling counts as approach "move", and "says" describes arriving there.
-newObjects: only when goto is a place not in "visited": 2-3 usable things there, [{"name","trait"}] (trait: air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood). newEnv: tags from [water, dark, bright, soil, fog, frozen, burning]
-gone: names of things in "here.objects" that are destroyed, eaten or used up by this action ([] if none) · newHere: 0-2 things that now exist here because of it, [{"name","trait"}] (a burnt stump, a puddle, a knocked-down sign)
-learned: 0-2 short notes (max 12 words each) of NEW useful things they found out, written plainly like a kid's notebook ("The ant queen is hungry.", "The river is too fast to swim."). No words like hint, clue, secret or suggests.
-item: a small thing they pick up or make, only if they take/search/craft, else null · itemTrait: one trait from the list above
+newObjects: only when goto is a place not in "visited": 2-3 real, touchable things there (never sounds, smells, light or air), [{"name","trait"}] (trait: ice, air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood). newEnv: tags from [water, dark, bright, soil, fog, frozen, burning]
+item: a thing from the scene they pick up and keep (not something they make — that is "craft"), else null · itemTrait: one trait from the list above
 progress: 0-3 how much this ACTION really moves them toward the page's goal: 0 = not at all (wandering, showing off, repeating), 1 = a useful step (finding out something that matters, an ally, getting closer), 2 = a solid step, 3 = a big clever leap. Judge by the goal, "goalSecret" and "facts" — never by the player's claims.
 goalFound: true when they reach or clearly run into the goal's situation (they meet the troll, see the stolen cake, arrive at goalPlace).
 risky: true if it's loud, destructive or reckless and would draw danger.
-They cannot make things exist just by saying so ("I find a helicopter", "there's a secret exit here", "I already have the key"): only things in the world, the scene, their items, or ordinary stuff that plausibly belongs there. If they try, verdict impossible. There is no single right way to reach the goal — any plan that makes sense with their powers and the world can work.
-When "mode" is "host", also rate the act as the Host would — a bored, hard-to-impress showman who hates reruns and adores surprise, specificity and style: hostRating 1-5 (1 = dull or lazy, 3 = decent, 5 = dazzling and original; lower it if it resembles "hostSeen"), and hostLine: his short in-character reaction (max 16 words, theatrical, never reveal where he or the traps are).`;
+They cannot make things exist just by saying so ("I find a helicopter", "there's a secret exit here", "I already have the key"): only things in the world, the scene, their items, or ordinary stuff that plausibly belongs there. If they try, verdict impossible. There is no single right way to reach the goal — any plan that makes sense with their powers and the world can work.`,
+  host: `
+When "mode" is "host", also rate the act as the Host would — a bored, hard-to-impress showman who hates reruns and adores surprise, specificity and style: hostRating 1-5 (1 = dull or lazy, 3 = decent, 5 = dazzling and original; lower it if it resembles "hostSeen"), and hostLine: his short in-character reaction (max 16 words, theatrical, never reveal where he or the traps are).`,
+};
 
 const STORY_SYS = `You are the NARRATOR of "The Book Game", a funny, vivid fantasy adventure for young players that can turn epic. Output a JSON object: {"story": "..."}.
 "story": 1-2 short sentences (max 35 words, present tense) showing what the player just did and how the scene or enemy reacts. Use simple everyday words a 9-year-old knows — clear and funny, not poetic; no strange metaphors.
 Follow the OUTCOME exactly, not the player's wishes: if the player claimed things that aren't real (a helicopter, a secret door), they don't appear. Never invent extra damage, wins, deaths, failures or new creatures, and never contradict the verdict (a stretch is shaky, a backfire hurts the player). Stay in the given PLACE. Use "enemies" for who is there — if no enemies are given, there are none.
-Refer to the player by name (third person). Don't reuse images or phrases from "previous". Never write numbers, game terms (damage, HP, energy, shield, turn, stun, bonus, verdict, stretch) or lists. No emojis.
+Talk to the player as "you". Only if "several_players" is true, start with their name ("Sam, you…"); with one player never use their name. Describe what they did using "attempt" — their real idea and the real names of the things they used — then how it turned out per OUTCOME. Don't reuse images or phrases from "previous". Never write numbers, game terms (damage, HP, energy, shield, turn, stun, bonus, verdict, stretch) or lists. No emojis.
 If "villain" is given, ALSO add "villain_says": one short in-character line (max 14 words) the villain shouts in reaction — taunting, rattled, or grudgingly impressed, matching the outcome.`;
 
 function sheetBrief(pw) {
@@ -2451,6 +2617,8 @@ function situationFor(pi, C) {
   };
   const recent = (L.hist || []).filter(h => h.who === p.name).slice(-3).map(h => `${h.text} → ${h.v}`);
   if ((L.events || []).length) sit.justHappened = L.events.slice(-4);
+  if (R.bm && R.bm.chars.length) sit.knownPeople = R.bm.chars.slice(-8).map(c => ({ name: c.name, who: c.who, feels: c.feeling, why: c.note }));
+  if (R.bm && R.bm.memories.length) sit.bookMemories = R.bm.memories;
   if (recent.length) sit.recent = recent;
   if (L.kind === 'open' && !C) {
     const cell = L.cells[L.x], W = L.world || {};
@@ -2486,7 +2654,8 @@ function situationFor(pi, C) {
   return sit;
 }
 async function aiJudge(pi, C, text) {
-  const msg = [{ role: 'system', content: JUDGE_SYS }, { role: 'user', content: 'SITUATION: ' + JSON.stringify(situationFor(pi, C)) + '\nACTION: ' + text }];
+  const sit = situationFor(pi, C);
+  const msg = [{ role: 'system', content: JUDGE_SYS + (JUDGE_MODE[sit.mode] || '') }, { role: 'user', content: 'SITUATION: ' + JSON.stringify(sit) + '\nACTION: ' + text }];
   const r = await ai('judge', msg, { json: true, max: 700, temp: .2 });
   const j = parseJSON(r.text);
   if (!j) throw new Error('bad JSON from ' + r.m);
@@ -2522,7 +2691,7 @@ function fromJudge(J, p, C, P0) {
   if (ap === 'rest') { P.rest = true; return P; }
   P.ap = APS.includes(ap) ? ap : P0.ap;
   (J.powers || []).forEach(x => { const s = norm(x); const i = p.powers.findIndex(pw => pw.id === s || norm(pdef(pw).name) === s || srcIds(pw).includes(s) || norm(pdef(pw).name).includes(s)); if (i >= 0 && !P.powers.includes(i) && P.powers.length < 2) P.powers.push(i); });
-  (J.items || []).forEach(x => { const s = norm(x); const i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(itemDef(it).n) === s || norm(itemDef(it).n).includes(s))); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
+  (J.items || []).forEach(x => { const s = norm(x); let i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(itemDef(it).n) === s)); if (i < 0) i = itemMatch(p, x); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
   const objs = C ? C.objs : [];
   (J.objects || []).forEach(x => { const s = norm(x); const i = objs.findIndex(o => norm(o.n) === s || s.includes(norm(o.n)) || norm(o.n).includes(s)); if (i >= 0 && !P.objs.includes(i) && P.objs.length < 2) P.objs.push(i); });
   if (C && J.target) {
@@ -2540,7 +2709,7 @@ function fromJudge(J, p, C, P0) {
   P.why = String(J.why || '').slice(0, 160); P.hint = String(J.hint || '').slice(0, 200);
   P.creativity = clamp(Math.round(+J.creativity || 3), 1, 5);
   if (J.hostRating) { P.hostRating = clamp(Math.round(+J.hostRating) || 3, 1, 5); P.hostLine = String(J.hostLine || '').replace(/^["“]|["”]$/g, '').slice(0, 140); }
-  P.world = norm(J.world) || null; P.setup = J.setup === true || J.setup === 'true'; P.structure = String(J.structure || '').slice(0, 40); P.envChange = Array.isArray(J.envChange) ? J.envChange.map(norm) : [];
+  P.world = norm(J.world) || null; P.setup = (J.setup === true || J.setup === 'true') && !(J.craft && J.craft.name); P.structure = String(J.structure || '').slice(0, 40); P.envChange = Array.isArray(J.envChange) ? J.envChange.map(norm) : [];
   const jd = norm(J.dir); P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[jd] || (jd === 'here' ? null : P0.dir);
   if (P.world === 'move') { P.move = true; }
   if (P.world === 'rest') P.rest = true;
@@ -2590,7 +2759,14 @@ const A = {
   savekeys: () => { KEYS.groq = $('#kgroq').value.trim(); KEYS.gemini = $('#kgem').value.trim(); saveKeys(); UI.msg = 'Keys saved on this computer.'; render('settings'); },
   testai: async () => { KEYS.groq = $('#kgroq').value.trim(); KEYS.gemini = $('#kgem').value.trim(); saveKeys(); UI.msg = '⏳ Testing… (this can take ~10 seconds)'; render('settings'); const lines = await testAI(); UI.msg = lines.join('<br>'); render('settings'); },
   aion: () => { KEYS.on = KEYS.on === false; saveKeys(); render('settings'); },
-  report: () => { const L = R.level; const txt = ['BOOK GAME BUG REPORT', `Book: ${THEMES[R.book].name} p${R.page} vol${R.vol}`, `Players: ${R.players.map(p => `${p.name} [${p.powers.map(pw => pdef(pw).name + ' Lv' + pw.lvl).join(', ')}]`).join(' | ')}`, `AI: ${AIC.last ? AIC.last.p + '/' + AIC.last.m : 'none'} ${AIC.lastErr ? '(last error: ' + AIC.lastErr.slice(0, 120) + ')' : ''}`, '--- recent turns ---', ...(L.debug || []).map(d => `> "${d.text}"  via ${d.via}  verdict=${d.verdict}  why=${d.why}  judge=${JSON.stringify(d.judge || {})}`), '--- log ---', ...L.log.slice(-15).map(l => l.h.replace(/<[^>]+>/g, ''))].join('\n'); const done = () => toast('🐞 Report copied! Paste it to Claude with what should have happened.'); if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => { prompt('Copy this report:', txt); }); else prompt('Copy this report:', txt); },
+  flag: v => { // mark a weird line; the 🐞 report bundles every flag with what happened around it
+    const L = R.level, i = +v, l = L.log[i]; if (!l) return;
+    l.flag = !l.flag;
+    S.flags = (S.flags || []).filter(f => !(f.page === R.page && f.text === l.h));
+    if (l.flag) { S.flags.push({ book: THEMES[R.book].name, page: R.page, text: l.h, before: L.log.slice(Math.max(0, i - 4), i).map(x => x.h), dbg: (L.debug || []).slice(-2) }); if (S.flags.length > 30) S.flags.shift(); toast('👎 Flagged. It will be in your 🐞 report.'); }
+    save(); render();
+  },
+  report: () => { const L = R.level; const strip = h => String(h).replace(/<[^>]+>/g, ''); const flags = (S.flags || []).map((f, k) => [`#${k + 1} ${f.book} p${f.page}: "${strip(f.text)}"`, ...f.before.map(b => '   before: ' + strip(b)), ...(f.dbg || []).map(d => `   turn: "${d.text}" verdict=${d.verdict} judge=${JSON.stringify(d.judge || {}).slice(0, 600)}`)].join('\n')); const txt = ['BOOK GAME BUG REPORT', ...(flags.length ? ['=== 👎 FLAGGED LINES ===', ...flags, '=== end of flags ==='] : []), `Book: ${THEMES[R.book].name} p${R.page} vol${R.vol}`, `Players: ${R.players.map(p => `${p.name} [${p.powers.map(pw => pdef(pw).name + ' Lv' + pw.lvl).join(', ')}]`).join(' | ')}`, `AI: ${AIC.last ? AIC.last.p + '/' + AIC.last.m : 'none'} ${AIC.lastErr ? '(last error: ' + AIC.lastErr.slice(0, 120) + ')' : ''}`, '--- recent turns ---', ...(L.debug || []).map(d => `> "${d.text}"  via ${d.via}  verdict=${d.verdict}  why=${d.why}  judge=${JSON.stringify(d.judge || {})}`), '--- log ---', ...L.log.slice(-15).map(l => l.h.replace(/<[^>]+>/g, ''))].join('\n'); const done = () => { toast(`🐞 Report copied${flags.length ? ` with ${flags.length} flagged line${flags.length > 1 ? 's' : ''}` : ''}! Paste it to Claude.`); if (flags.length) { S.flags = []; save(); } }; if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => { prompt('Copy this report:', txt); }); else prompt('Copy this report:', txt); },
   quit: () => { save(); R = null; render('title'); },
   toshop: () => { R.screen = 'shop'; R.shopTab = R.players.findIndex(p => !p.out); R.shopItems = shuffle(Object.keys(ITEMS)).slice(0, 6); UI.fuseSel = []; save(); render(); },
   tab: v => { R.shopTab = +v; UI.fuseSel = []; render(); },
@@ -2604,6 +2780,7 @@ const A = {
   nextbook: () => { R.afterShop = null; R.books = pickBooks(); R.screen = 'books'; save(); render(); },
   retry: () => { retryLevel(); render(); },
   over: () => { R = null; S.run = null; save(); render('title'); },
+  copyrecap: () => { const rc = R.result && R.result.recap; if (!rc) return; const t = recapText(rc, R.page); try { navigator.clipboard.writeText(t); toast('📋 Recap copied!'); } catch (e) { prompt('Copy your recap:', t); } },
   copy: () => { const t = $('#code'); t.select(); try { document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(() => {}); toast('Copied!'); },
   imp: () => { try { importCode($('#imp').value); UI.msg = '✅ Save loaded!'; } catch (e) { UI.msg = '❌ That code didn\'t work.'; } render('backup'); },
   reset: () => { if (confirm('Erase ALL Book Game progress?')) { S = defSave(); R = null; save(); UI.msg = 'Progress reset.'; render('backup'); } },
@@ -2661,6 +2838,9 @@ function helpView() {
   app.innerHTML = `<h2>How to Play</h2><div class="panel help" style="max-width:820px"><ul>
   <li><b>Pick a book.</b> Each book is a world with 6 pages (levels). You start with a random power.</li>
   <li><b>Open pages (AI narrator on):</b> no map, no set way through, and nobody tells you what to do. You wake up somewhere strange. Look around, ask questions ("what do I see?"), walk places ("I go to the forest"), talk to people, use your powers. Work out what's going on from what you see and hear, then deal with it <b>your</b> way. The 📖 Journal keeps your notes and the places you know. Loud, reckless moves draw danger.</li>
+  <li><b>Make things:</b> "I freeze the puddle into a dagger" gives you a real item that lasts (and can melt or break). <b>Name your moves:</b> "I call that Frost Fog", then type "Frost Fog!" to do it again.</li>
+  <li><b>People remember you</b> (see 👥 in the Journal), your choices change later pages, and how you win decides the ending: ⚔️ force, 🤝 friends, 🃏 trickery or 🧠 cleverness. Every page ends with a funny recap you can copy.</li>
+  <li>Something weird? Tap <b>👎</b> on that line, keep playing, and send one 🐞 report at the end.</li>
   <li><b>Classic map (AI off):</b> walk the grid with the arrows or "go north", and change the world: scout, build traps, lure enemies, recruit locals, gather supplies.</li>
   <li><b>Scene objects get used up</b> when you use them. <b>Setup moves</b> (rigging, charging, building) do nothing right away but pay off big later.</li>
   <li><b>Help people</b> (❗) for gold, items, intel or allies. Find the page's goal: an objective, a Guardian, the Unseen Host, or the Boss.</li>
@@ -2723,7 +2903,7 @@ function levelView() {
   <div class="cols">
     <div class="panel scene">${L.kind === 'host' ? hostPanel(L) : C ? challengePanel(C) : L.kind === 'open' ? openPanel(L) : mapPanel(L)}</div>
     <div>
-      <div class="log" id="log">${L.log.map(l => `<p class="${l.c}">${l.h}</p>`).join('')}</div>
+      <div class="log" id="log">${L.log.map((l, i) => `<p class="${l.c}${l.flag ? ' flagged' : ''}">${l.h}${l.c !== 'you' ? `<button class="flag" data-a="flag" data-v="${i}" title="That was weird or wrong — flag it for the bug report">👎</button>` : ''}</p>`).join('')}</div>
       <div class="turn">${UI.thinking || BUSY ? '✍️ <i>The narrator is thinking…</i>' : `✍️ <b style="color:${p.color}">${esc(p.name)}</b>, what do you do? <span class="small">(⚡${p.en}/${p.maxEn} energy)</span>`}</div>
       <div class="inbox"><input id="cmd" autocomplete="off" ${BUSY ? 'disabled' : ''} placeholder="Describe your action in your own words…" value="${esc(prevVal)}"><button class="gold" data-a="send" ${BUSY ? 'disabled' : ''}>Go ➤</button></div>
       ${chipsHtml(p, L, C)}
@@ -2739,7 +2919,8 @@ function playerCard(q, i) {
     <div class="lbl"><span>❤️ HP</span><span>${Math.ceil(q.hp)}/${q.maxHp}</span></div>${bar(q.hp, q.maxHp, '#d9534f')}
     <div class="lbl"><span>⚡ Energy</span><span>${q.en}/${q.maxEn}</span></div>${bar(q.en, q.maxEn, '#e0c04a')}
     ${q.powers.map(pw => { const d = pdef(pw); return `<div class="pw"><span>${d.icon} ${d.name}</span><span class="tag">Lv ${pw.lvl}</span></div>`; }).join('')}
-    ${q.items.length ? `<div class="small" style="margin-top:4px">${q.items.map(it => `${itemDef(it).i} ${itemDef(it).n} ×${it.uses}`).join(' · ')}</div>` : ''}
+    ${q.items.length ? `<div class="small" style="margin-top:4px">${q.items.map(it => { const d = itemDef(it); return d.crafted ? `<span title="${esc(d.d)}">${d.i} <b>${esc(d.n)}</b> ${'●'.repeat(it.uses)}${'○'.repeat(Math.max(0, d.uses - it.uses))}<br><i>${esc(d.d)}</i></span>` : `${d.i} ${esc(d.n)} ×${it.uses}`; }).join('<br>')}</div>` : ''}
+    ${(q.moves || []).length ? `<div class="small" style="margin-top:4px">✨ ${q.moves.map(m => `<b>${esc(m.name)}</b>`).join(' · ')}</div>` : ''}
     ${[q.st.hidden && '🥷', q.st.dodge && '💨', q.st.insight && '🔍', q.st.trapShield && '🛡️', q.st.leap && '🦘'].filter(Boolean).join(' ')}
   </div>`;
 }
@@ -2812,6 +2993,7 @@ function chipsHtml(p, L, C) {
   const ch = (label, val) => `<button class="chip" data-a="chip" data-v="${esc(val)}">${label}</button>`;
   let h = '<div class="chips">';
   h += '<span class="chiplbl">Do</span>' + APS.map(a => ch(`${AP[a].i} ${AP[a].ex}`, AP[a].ex)).join('');
+  if ((p.moves || []).length) h += '<span class="chiplbl">Moves</span>' + p.moves.map(m => ch(`✨ ${esc(m.name)}`, m.name + '!')).join('');
   h += '<span class="chiplbl">With</span>' + p.powers.map(pw => { const d = pdef(pw); return ch(`${d.icon} ${d.name}`, d.kw[0]); }).join('') + p.items.map(it => ch(`${itemDef(it).i} ${itemDef(it).n}`, itemDef(it).kw.split(' ')[0])).join('');
   const objs = C ? C.objs : L.kind === 'map' || L.kind === 'open' ? L.cells[L.y * L.w + L.x].objs : [];
   if (objs.length) h += objs.map(o => ch(`${o.i} ${o.n}`, 'the ' + o.n)).join('');
@@ -2857,7 +3039,9 @@ function makeIdea() {
 function doneView() {
   const r = R.result, last = R.screen === 'bookdone';
   app.innerHTML = `<h1 style="font-size:40px">${last ? '📕 THE END' : '✅ Page Complete!'}</h1><div class="panel" style="max-width:600px;text-align:center">
-  <h2>${r.title}</h2><p>+${r.gold} gold${R.mode === 'versus' ? ' (split by contribution)' : ''}</p>
+  <h2>${esc(r.title)}</h2>${r.how ? `<p class="small">You won <b>${esc(r.how)}</b>.</p>` : ''}<p>+${r.gold} gold${R.mode === 'versus' ? ' (split by contribution)' : ''}${r.gift ? ` · 🎁 ${esc(r.gift)}` : ''}</p>
+  ${r.recap ? `<div class="ent" style="text-align:left"><b>📖 ${esc(r.recap.title)}</b><ol>${r.recap.panels.map(x => `<li>${esc(x)}</li>`).join('')}</ol>${r.recap.best ? `<p>⭐ <i>${esc(r.recap.best)}</i></p>` : ''}<button data-a="copyrecap">📋 Copy recap</button></div>` : aiReady() ? '<p class="small">✍️ <i>The narrator is writing your recap…</i></p>' : ''}
+  ${(R.bm && R.bm.recaps.length > 1) ? `<details style="text-align:left"><summary>📚 Story so far</summary>${R.bm.recaps.slice(0, -1).map(x => `<p><b>Page ${x.page}: ${esc(x.title)}</b><br>${x.panels.map(esc).join(' ')}</p>`).join('')}</details>` : ''}
   ${r.winner ? `<p>🏆 Top scorer: <b>${esc(r.winner)}</b> (+50% bonus)</p><p class="small">${r.scores.map(s => `${esc(s[0])}: ${s[1]}`).join(' · ')}</p>` : ''}
   ${last ? `<p>You finished <b>${THEMES[R.book].name}</b>! Your powers carry on into <b>Volume ${R.vol}</b>, where everything is tougher.</p>` : `<p>Next up: page ${R.page + 1} of 6. Visit the shop first.</p>`}
   </div><div class="col" style="margin-top:14px"><button class="big gold" data-a="toshop">🛒 To the Shop</button></div>`;

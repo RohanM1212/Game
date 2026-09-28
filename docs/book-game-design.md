@@ -253,7 +253,22 @@ somewhere and it's up to you. Nobody tells you what to do.
 - **Finale.** At 100% you reach the heart of the page: the boss, guardian or objective scene. The objective's meter is shorter, since the journey did most of the work, and your notes count as intel.
 - **No AI?** The page uses the classic grid map instead, so the game still works offline. The Unseen Host keeps its own trap hall.
 
-## 18. Playtesting help (built into the game)
+## 18. Crafting, moves, people, memories, endings, recaps (Sep 2026)
+- **Crafting that lasts.** Make things from what's around you ("I freeze the puddle into a dagger"). They become real items with a name, a short description, a material and durability (●●○). They wear out with real use (ice melts near fire, glass shatters) and carry on to later pages. Combine items to make new ones. Making something you hold is never a "trap".
+- **Things vs details.** Only touchable things are objects. Sounds, smells, fog and light are part of the description. If the story mentions a thing (a puddle), it becomes usable. Nothing is "used up" just because you used it; it only goes if your action would really destroy it.
+- **Signature moves.** Do something clever, then say "I call that Frost Fog" (or say it in the same sentence). Type "Frost Fog!" later to repeat it. Moves resist the repeat penalty and grow with mastery, but a boss learns a move you spam on it.
+- **People remember you.** Characters get names and a feeling about you (😊 friend, 🙏 grateful, 😐, 😠 annoyed, 😡 enemy). They're listed in the Journal, act on how they feel, and come back on later pages of the same book.
+- **Choices carry over.** Each page leaves "book memories" (how you won, big choices). The next page's world is written knowing them.
+- **More than one ending.** How you handle the finale picks the ending: ⚔️ by force (bonus gold), 🤝 as friends, 🃏 by trickery, 🧠 by cleverness (each gives a gift item). Bosses can be defeated, befriended or outwitted.
+- **Page recap.** At the end of each page the AI writes a short, funny comic-style recap of what *you* did, with a 📋 Copy button. The "📚 Story so far" list keeps every page's recap for the book.
+- **One narrator voice.** Fights are narrated from your actual idea (the Judge's "attempt"), always as "you", and the narrator is told whether a hit was big or small. Questions never use a turn.
+
+## 19. Robot testers (`tools/playtest/`)
+- `run-scenarios.js`: every bug a player reported is a saved scenario (wet bloop, icicle crash, helicopter, …), replayed with the real AI. It also checks rules that must always hold: no sounds as objects, nothing "used up" by just using it, no progress numbers, no "hint/clue", the goal never announced, no crashes.
+- `autoplay.js`: robot players with personalities (asker, crafter, breaker, lazy, hero) play a page, then a critic AI reads the transcript and lists contradictions, ignored actions, weird words and unfair verdicts.
+- In-game **👎** on any story line flags it; the 🐞 report bundles all flags with what happened around them.
+
+## 20. Playtesting help (built into the game)
 - ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.
 - An indicator showing which AI is currently narrating.
 - 🐞 **Report** button: copies your last few turns (what you typed, the verdict, what happened) so you can paste it to Claude with "this was wrong because…".
