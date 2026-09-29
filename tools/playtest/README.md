@@ -3,6 +3,7 @@
 These play `book-game.html` in a headless browser with the **real** free AI (the same Groq/Gemini keys the game uses).
 
 ```bash
+node tools/playtest/mock-test.js --shots      # NO keys needed: a scripted fake AI checks discovery, problems, enemy plans, friends
 export GROQ_API_KEY=...   # and/or GEMINI_API_KEY
 node tools/playtest/run-scenarios.js          # every bug a player reported, replayed and checked
 node tools/playtest/autoplay.js asker 15      # a robot player (asker | crafter | breaker | lazy | hero) + a robot critic

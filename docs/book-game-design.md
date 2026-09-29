@@ -272,3 +272,25 @@ somewhere and it's up to you. Nobody tells you what to do.
 - ⚙️ Settings: paste keys + a **Test AI** button that confirms each key works.
 - An indicator showing which AI is currently narrating.
 - 🐞 **Report** button: copies your last few turns (what you typed, the verdict, what happened) so you can paste it to Claude with "this was wrong because…".
+
+## 21. Discovery, problems, readable fights and friends (Sep 2026)
+Playtest feedback: "Why can I see so much? Clearly the objective is to check out all these places." And: more flexibility,
+real challenges in fights and problem solving, frustration only of the good kind, and it should be fun with friends.
+- **You only know what you've found.** At the start you know 2 nearby places (never the goal). Looking around, climbing up,
+  asking people or following what you see reveals more (the Judge's `discovered`). The Journal only lists places you know.
+- **Problems in the way.** The world bible now has 2 problems (one always guards the goal): a name, plain facts and 2-3 facets
+  (hot, locked, guarded, sleeping, high…). Arriving there starts a problem scene. The facts are shown, the answer never is.
+  The Judge rates every action's `solves` 0-3 against the facts: any plan that fits works (×1.5), plans that don't barely dent it
+  (×0.2). Facets make matching traits and approaches stronger, hot/cold ones hurt a little each round, guarded ones have a guard.
+  You can walk away and come back (progress is kept). The goal's problem must be solved to reach the heart of the page.
+- **Backlash.** Reckless stunts you could have seen coming (licking a hot gate) hurt you (Judge `backlash` 0-3). Good ideas that
+  simply don't work never do.
+- **Fights you can read.** Every enemy shows its plan for the end of the round: 🗡️ attack X, 💥 a BIG hit on X, 🌪️ hit everyone,
+  🛡️ guard (half damage), 🫳 grab X's item, 📣 call for help, 💚 heal. Stunning cancels the plan. Stolen items come back when you
+  win. The Judge sees each enemy's `about_to`, so smart counters score high on `solves`.
+- **Friends.** On open pages each player has their own spot: go alone or say "we go…" to move together. A fight or problem happens
+  where it starts; friends elsewhere keep exploring on their turns or run over to help. "Sam and I team up: …" combines both
+  players' powers into one bigger move (it uses Sam's turn). Building on a friend's last action is a 🔗 combo (+30%).
+  Actions done TO a friend count: help (heal + next action +35%), prank (harmless fun) or hurt (a little real damage).
+  Goofing off is welcome: silly actions are judged fairly and change the world.
+- **Offline engine test:** `node tools/playtest/mock-test.js --shots` plays a 2-player page against a scripted fake AI (no keys needed).

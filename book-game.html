@@ -40,6 +40,7 @@ input:focus{outline:none;border-color:var(--acc)}
 .lbl{display:flex;justify-content:space-between;font-size:13px}
 .ent{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 9px;margin:6px 0}
 .ent .nm{font-weight:bold}
+.intent{font-size:13px;margin:3px 0}.intent.warn{color:#ff7a4a;font-weight:bold}
 .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;background:#0006;border:1px solid var(--line);color:var(--dim);margin:1px}
 .tag.w{border-color:#5a8a4a;color:var(--good)}
 .tag.r{border-color:#8a4a4a;color:var(--bad)}
@@ -714,6 +715,7 @@ function mkChallenge(kind, cell) {
     if (mem) { b.memAp = mem.ap; b.memTr = mem.tr; }
     setupBoss(C);
   }
+  if (C.threats.length) planIntents(C);
   return C;
 }
 
@@ -922,6 +924,7 @@ function resolve(pi, P, ev, C) {
   if (tgt.type === 'threat') {
     const t = tgt.t;
     let m = traitMul(ev.traits, t.weak, t.resist, notes, t.n) * formMul(P.form, true, false, notes);
+    if (t.intent === 'guard' && ap === 'force') { m *= .5; notes.push(`🛡️ ${t.n} is guarding — half damage. (Tricks, stuns or hitting something else work better.)`); }
     let dmg = 0;
     if (ap === 'force') dmg = sc * m;
     else if (ap === 'trick') { dmg = sc * .55 * m; t.stun = (P.form && FORMS[P.form].kind === 'trap') ? 2 : 1; eff.push(`🌀 ${t.n} is fooled and loses a turn`); }
@@ -962,6 +965,79 @@ function spawnThreat(C) {
   const d = C.obj ? OBJ[C.obj].threats[0] : pick(THEMES[R.book].threats);
   const t = mkThreatInst(d); C.threats.push(t);
   log('bad', `${t.i} More ${t.n} arrive!`);
+  planIntents(C, [t]);
+}
+/* ---------------- enemy intents: every enemy shows what it will do at the end of the round ----------------
+   Fights are puzzles you can read: stun the one winding up a big hit, shield the friend it's aiming at,
+   grab your stuff back, stop the one calling for help. */
+const INTENT = {
+  attack: { i: '🗡️', txt: (t, n) => `will attack ${n}` },
+  heavy: { i: '💥', txt: (t, n) => `is winding up a BIG hit on ${n}!` },
+  sweep: { i: '🌪️', txt: () => 'is about to hit everyone' },
+  guard: { i: '🛡️', txt: () => 'is guarding (takes half damage this round)' },
+  grab: { i: '🫳', txt: (t, n, it) => `is eyeing ${n}'s ${it}` },
+  call: { i: '📣', txt: () => 'is about to call for help' },
+  heal: { i: '💚', txt: () => 'is about to patch itself up' },
+};
+const presentIdx = () => R.players.map((q, i) => i).filter(i => !R.players[i].ko && !R.players[i].out && atFight(i));
+function planIntents(C, only) {
+  const who = presentIdx();
+  (only || C.threats).forEach(t => {
+    if (t.hp <= 0) return;
+    const pr = t.props || [], w = [['attack', 5], ['heavy', t.lastIntent === 'heavy' ? 0 : 2], ['sweep', 1], ['guard', 1], ['grab', 0], ['call', 0], ['heal', t.hp < t.maxHp * .6 ? 1 : 0]];
+    const W = Object.fromEntries(w);
+    if (pr.includes('armored')) { W.guard += 2; W.heavy += W.heavy ? 1 : 0; }
+    if (pr.includes('swarm')) { W.sweep += 3; W.call += 1; }
+    if (pr.includes('mindless')) { W.attack += 2; W.heavy += W.heavy ? 1 : 0; }
+    if (pr.includes('animal')) { W.attack += 2; W.grab += 1; }
+    if (pr.includes('social')) { W.call += 2; W.grab += 2; }
+    if (pr.includes('flying')) { W.attack += 1; W.grab += 1; }
+    if (C.threats.filter(x => x.hp > 0).length >= (C.boss ? 3 : 2)) W.call = 0;
+    const rich = who.filter(i => R.players[i].items.length);
+    if (!rich.length || pr.includes('mindless')) W.grab = 0;
+    let roll = rnd() * Object.values(W).reduce((a, b) => a + b, 0), k = 'attack';
+    for (const [key, v] of Object.entries(W)) { roll -= v; if (roll < 0 && v > 0) { k = key; break; } }
+    t.intent = k; t.lastIntent = k;
+    const pool = k === 'grab' ? rich : who;
+    t.aim = pool.length ? pick(pool) : null;
+    t.aimItem = k === 'grab' && t.aim !== null ? pick(R.players[t.aim].items).id : null;
+  });
+}
+function intentLine(t) {
+  const I = INTENT[t.intent]; if (!I || t.hp <= 0) return '';
+  const q = t.aim !== null && t.aim !== undefined ? R.players[t.aim] : null;
+  const it = q && t.aimItem ? q.items.find(x => x.id === t.aimItem) : null;
+  return `${I.i} ${I.txt(t, q ? q.name : 'someone', it ? itemDef(it).n : 'stuff')}`;
+}
+function dropLoot(C, won) {
+  C.threats.forEach(t => {
+    if (!(t.loot || []).length || (!won && t.hp > 0)) return;
+    t.loot.forEach(l => { const q = R.players[l.from] || R.players[0]; q.items.push(l.it); log('eff', `🎒 ${esc(q.name)} gets the ${itemDef(l.it).i} ${esc(itemDef(l.it).n)} back!`); });
+    t.loot = [];
+  });
+}
+function runIntents(C) {
+  const pres = presentIdx();
+  for (const t of C.threats) {
+    if (t.hp <= 0) continue;
+    if (t.stun > 0) { t.stun--; if (['heavy', 'call', 'grab', 'heal'].includes(t.intent)) log('eff', `💫 ${t.i} ${t.n} is dazed — its plan falls apart!`); continue; }
+    if (!pres.length) break;
+    let aim = pres.includes(t.aim) ? t.aim : pick(pres);
+    const vis = pres.filter(i => !R.players[i].st.hidden);
+    if (t.intent !== 'sweep' && R.players[aim].st.hidden) { if (!vis.length) { log('nar', `${t.i} ${t.n} can't find anyone!`); continue; } aim = pick(vis); }
+    const nm = esc(R.players[aim].name);
+    if (t.intent === 'heavy') { const d = hurtP(aim, t.dmg * 2.2, 'threat'); log('bad', `💥 ${t.i} ${t.n} SLAMS ${nm}${d ? ' −' + d + ' HP' : ' — blocked!'}`); }
+    else if (t.intent === 'sweep') { const hits = pres.map(i => { const d = hurtP(i, t.dmg * .65, 'threat'); return `${esc(R.players[i].name)}${d ? ' −' + d : ' blocked'}`; }); log('bad', `🌪️ ${t.i} ${t.n} hits everyone: ${hits.join(', ')}`); }
+    else if (t.intent === 'guard') { const d = hurtP(aim, t.dmg * .5, 'threat'); if (d) log('bad', `${t.i} ${t.n} jabs ${nm} from behind its guard −${d} HP`); }
+    else if (t.intent === 'heal') { const h = Math.round(t.maxHp * .25); t.hp = Math.min(t.maxHp, t.hp + h); log('bad', `💚 ${t.i} ${t.n} patches itself up (+${h})`); }
+    else if (t.intent === 'call') { log('bad', `📣 ${t.i} ${t.n} calls for help!`); spawnThreat(C); }
+    else if (t.intent === 'grab') {
+      const q = R.players[aim], k = q.items.findIndex(x => x.id === t.aimItem);
+      if (k >= 0) { const it = q.items.splice(k, 1)[0]; (t.loot = t.loot || []).push({ it, from: aim }); log('bad', `🫳 ${t.i} ${t.n} snatches ${nm}'s ${itemDef(it).i} ${esc(itemDef(it).n)}! Beat it to get it back.`); }
+      else { const d = hurtP(aim, t.dmg, 'threat'); log('bad', `${t.i} ${t.n} attacks ${nm}${d ? ' −' + d + ' HP' : ' — blocked!'}`); }
+    }
+    else { const d = hurtP(aim, t.dmg, 'threat'); log('bad', `${t.i} ${t.n} attacks ${nm}${d ? ' −' + d + ' HP' : ' — blocked!'}`); }
+  }
 }
 function endTurn() {
   const L = R.level, C = L.ch;
@@ -998,17 +1074,10 @@ function worldPhase() {
   applyTraps(C, C);
   if (lines.length) log('eff', lines.join(' · '));
   if (checkWin()) return;
-  // threats attack
-  const targets = () => R.players.map((q, i) => i).filter(i => !R.players[i].ko && !R.players[i].out);
-  for (const t of C.threats) {
-    if (t.hp <= 0) continue;
-    if (t.stun > 0) { t.stun--; continue; }
-    const tg = targets(); if (!tg.length) break;
-    const vis = tg.filter(i => !R.players[i].st.hidden);
-    if (!vis.length) { log('nar', `${t.i} ${t.n} can't find anyone!`); continue; }
-    const i = pick(vis); const d = hurtP(i, t.dmg, 'threat');
-    log('bad', `${t.i} ${t.n} attacks ${esc(R.players[i].name)}${d ? ' −' + d + ' HP' : ' — blocked!'}`);
-  }
+  // threats carry out the plans they showed
+  const targets = presentIdx;
+  runIntents(C);
+  if (C.hazard) targets().forEach(i => { const d = hurtP(i, C.hazard * dmgMul(), 'hazard'); if (d) log('bad', `⚠️ ${esc(C.title)} hurts ${esc(R.players[i].name)} −${d}`); });
   // hooks
   const hk = C.obj ? OBJ[C.obj].hooks : {};
   if (C.obj) {
@@ -1033,9 +1102,10 @@ function worldPhase() {
   C.shield = C.shieldNext; C.shieldNext = 0;
   R.players.forEach(q => { q.st.hidden = q.st.hideT > 0; if (q.st.hideT) q.st.hideT--; q.st.dodge = false; if (!q.ko) q.en = Math.min(q.maxEn, q.en + 4); });
   L.lastDmg = L.dmgRound || {};
+  dropLoot(C, false);
   C.threats = C.threats.filter(t => t.hp > 0);
   if (alive().length === 0) return failLevel();
-  checkWin();
+  if (!checkWin()) planIntents(C);
 }
 
 /* ---------------- win / lose ---------------- */
@@ -1052,12 +1122,20 @@ function checkWin() {
   return false;
 }
 function finishChallenge(escaped) {
-  const L = R.level, C = L.ch, cell = L.cells[L.y * L.w + L.x];
+  const L = R.level, C = L.ch, cell = L.cells[C.at !== undefined && L.cells[C.at] ? C.at : L.y * L.w + L.x];
   cell.done = true; L.ch = null; L.acted = []; R.cur = firstAlive(); L.calm = 3;
   R.players.forEach(q => { q.st.hidden = q.st.dodge = false; });
+  if (!escaped) dropLoot(C, true);
   if (C.kind === 'enc') {
     if (escaped) { log('big', '🏃 You got away!'); }
     else { const g = 8 + 2 * R.page; giveGold(g); log('big', `⚔️ Encounter cleared! +${g} gold`); }
+  } else if (C.kind === 'obs' && C.obst) {
+    const ob = ((L.world || {}).obstacles || [])[C.obstI] || C.obst; ob.cleared = true;
+    const g = 10 + 3 * R.page; giveGold(g);
+    log('big', `✅ ${esc(cap(ob.name))} — solved! +${g} gold`);
+    addMemory(`The players got past ${ob.name}.`);
+    if (ob.goal) { revealGoal(L); L.prog = 100; L.calm = 0; openFinale(); save(); return; }
+    L.prog = Math.min(L.goalKnown ? 100 : 60, L.prog + 15);
   } else if (C.kind === 'obs') { log('big', `✅ You got past the ${C.title}!`); }
   else if (C.kind === 'quest') {
     const g = 12 + 4 * R.page; giveGold(g); cell.helped = true;
@@ -1346,8 +1424,11 @@ function nameMove(p, text) {
 }
 function findMove(p, text) { const t = norm(text); return (p.moves || []).find(m => t.includes(norm(m.name))); }
 async function actInner(text) {
+  syncX();
   const L = R.level, pi = R.cur, p = R.players[pi];
-  const host = L.kind === 'host', C = host ? null : L.ch;
+  const host = L.kind === 'host';
+  if (!host && L.kind === 'open' && !L.ch && L.world) { const ob = obstacleAt(L, L.cells[L.x].place); if (ob && !ob.cleared) startObstacle(L, ob); } // the problem is right in front of you
+  const C = host ? null : L.ch && atFight(pi) ? L.ch : null; // a fight somewhere else? you carry on exploring where you are
   if (nameMove(p, text)) return;
   const inl = String(text).match(/^(.{8,}?)[\s.!,;—-]*\bi\s+(?:will\s+)?call\s+(?:that|it|this)(?:\s+move)?\s+["“']?([^"”'.!]{2,24})["”']?[.!]*\s*$/i);
   if (inl) { // "I smash it with the chain. I call that Chain Smash" → do it AND save it as a move
@@ -1362,7 +1443,7 @@ async function actInner(text) {
   const P0 = parse(text, p, C);
   // quick local commands (no AI needed)
   if (P0.dir && L.kind !== 'open' && (P0.move || (!P0.ap && P0.toks.length <= 3))) return host ? hostMove(P0.dir) : moveParty(P0.dir);
-  if (C && P0.dir && P0.move) { // trying to walk away mid-challenge
+  if (C && P0.dir && P0.move && !C.obst) { // trying to walk away mid-challenge
     if (C.kind === 'quest') { log('nar', `You leave ${esc(C.title.toLowerCase())} for now.`); L.ch = null; return moveParty(P0.dir); }
     log('you', `${esc(p.name)}: “${esc(text)}”`);
     log('note', `🚧 ${esc(C.title)} is in your way. To get past, try something sneaky or fast (e.g. “I dash past them” or “I sneak around through the shadows”).`);
@@ -1384,8 +1465,17 @@ async function actInner(text) {
   if (J) {
     if ((J.questionOnly === true || J.questionOnly === 'true') && J.says) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('nar', esc(tidyStory(J.says, 50)) + ' <span class="small">(No turn used.)</span>'); noteEvent(L, text, J.says); if (C) applyChanges(pi, { newHere: J.newHere, learned: J.learned, forget: J.forget }, C.objs); return save(); }
     if (J.unclear && J.question) { log('you', `${esc(p.name)}: “${esc(text)}”`); log('note', `🤔 ${esc(J.question)} <span class="small">(No turn used.)</span>`); return save(); }
+    discoverPlaces(L, J.discovered);
     P = fromJudge(J, p, C, P0);
     if (P.move && P.dir && host) return hostMove(P.dir);
+    if (C && C.obst && J.goto && (P.move || P.world === 'travel' || P.world === 'move' || !P.ap)) { // walk away from a problem: it stays, with what you've done so far
+      log('you', `${esc(p.name)}: “${esc(text)}”`);
+      const ob = ((L.world || {}).obstacles || [])[C.obstI]; if (ob) ob.progress = C.meter.v;
+      L.ch = null; L.acted = [];
+      if (openGo(pi, J, text)) remember(p, text, 'travel');
+      if (R.players.length > 1) R.cur = nextHostPlayer();
+      return save();
+    }
     if (P.move && C) { P.move = false; if (C.kind === 'quest') { L.ch = null; return moveParty(P.dir || 'n'); } P.ap = 'speed'; }
     if (P.rest) return doRest(pi, text, host);
   } else {
@@ -1420,6 +1510,14 @@ async function actInner(text) {
   }
   if (!host && C.boss) bossPreCheck(pi, P, C);
   const ev = evaluate(pi, P, host ? { objs: [] } : C);
+  teamBoost(pi, P, ev);
+  if (C && J) { // does it actually deal with the problem in front of you? (any sensible plan counts)
+    const main = !C.boss && ['obs', 'obj', 'quest'].includes(C.kind) && (!P.target || P.target.type === 'main');
+    if (P.solves === undefined) P.solves = 2;
+    ev.score *= (main ? [.2, .65, 1, 1.5] : [.6, .85, 1, 1.2])[P.solves];
+    if (P.solves === 0) ev.notes.push('🤷 That doesn\'t really deal with it.');
+    if (P.solves === 3) ev.notes.push('🧩 Smart — that fits the problem perfectly!');
+  }
   if (P.verdict === 'stretch' && !R.trial && ev.pws.length && rnd() < Math.max(.05, .3 - .03 * ev.lvl)) {
     const d = hurtP(pi, 4 + 2 * ev.lvl, 'backfire', true);
     log('bad', `💥 The stretch BACKFIRES! Your power slips out of control. ${esc(p.name)} −${d} HP.`);
@@ -1437,6 +1535,7 @@ async function actInner(text) {
   }
   else if (host) hostResolve(pi, P, ev); else resolve(pi, P, ev, C);
   if (J && !host) { const ch = applyChanges(pi, J, C.objs, text); if (ch.length) log('eff', ch.join(' · ')); meetPeople(J); }
+  afterEffects(pi, P, ev);
   if (C && (C.kind === 'obj' || C.kind === 'boss')) { C.style = C.style || {}; C.style[P.ap] = (C.style[P.ap] || 0) + 1; }
   if (J) {
     const outcome = L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500);
@@ -1488,7 +1587,7 @@ async function exploreAct(pi, text, P0) {
 function remember(p, text, v) { const L = R.level; (L.hist = L.hist || []).push({ who: p.name, text: String(text).slice(0, 80), full: String(text).replace(/ \(my signature move [^)]*\)$/, '').slice(0, 200), v }); if (L.hist.length > 8) L.hist.shift(); }
 async function story(pi, P, text, outcome, J, idx) {
   if (!J || !aiReady()) return;
-  const C = R.level.ch;
+  const C = R.level.ch && atFight(pi) ? R.level.ch : null; // a fight somewhere else isn't part of this story
   try {
     const L = R.level, cell = L.kind === 'map' || L.kind === 'open' ? L.cells[L.y * L.w + L.x] : null;
     const clean = String(outcome).replace(/−(\d+)/g, (_, n) => +n >= 15 ? ' is hit hard' : +n >= 6 ? ' is hit' : ' is barely scratched').replace(/[+−-]?\d+%?/g, '').replace(/\(\s*\)/g, '').replace(/\s+/g, ' ');
@@ -1509,6 +1608,37 @@ function doRest(pi, text, host) {
   log('nar', `${esc(p.name)} catches their breath. (+9 energy, +10 HP)`);
   if (host) return hostTick();
   return endTurn();
+}
+/* ---------------- playing together ---------------- */
+// "Sam and I…": both powers in one big move (it uses Sam's turn too)
+function teamBoost(pi, P, ev) {
+  const L = R.level, p = R.players[pi];
+  if (P.teamUp !== undefined && P.teamUp !== null) {
+    const q = R.players[P.teamUp];
+    if (L.ch && atFight(pi) && L.acted.includes(P.teamUp)) ev.notes.push(`(${q.name} already acted this round — no team-up bonus.)`);
+    else {
+      q.powers.forEach(pw => pdef(pw).traits.forEach(t => { if (!ev.traits.includes(t)) ev.traits.push(t); }));
+      const lv = Math.max(1, ...q.powers.map(pw => pw.lvl));
+      ev.score *= 1.4 + .05 * lv; q.en = Math.max(0, q.en - 3);
+      ev.notes.push(`🤝 TEAM-UP! ${p.name} + ${q.name}`);
+      if (L.ch && atFight(pi)) L.acted.push(P.teamUp); else q.st.skipTurn = true;
+      S.stats.teamups = (S.stats.teamups || 0) + 1;
+    }
+  }
+  const prev = (L.hist || [])[(L.hist || []).length - 2]; // building on what a friend just did
+  if (P.buildsOn && prev && prev.who !== p.name && !['impossible', 'fizzle'].includes(prev.v)) { ev.score *= 1.3; ev.notes.push(`🔗 COMBO with ${prev.who}!`); }
+}
+// what the action did to YOU or a friend: dangerous stunts sting, pranks are pranks, help helps
+function afterEffects(pi, P, ev) {
+  const out = [];
+  if (P.backlash) { const d = hurtP(pi, [0, 5, 10, 16][P.backlash] * dmgMul(), 'backlash', true); if (d) out.push(`🤕 Ouch — that hurt you (−${d} HP)`); }
+  if (P.mate) {
+    const q = R.players[P.mate.i];
+    if (P.mate.effect === 'help') { const h = healP(P.mate.i, 6 + 2 * (ev.lvl || 1)); q.st.insight = true; out.push(`💞 ${esc(q.name)} ${h ? `+${h} HP and ` : ''}feels ready (next action +35%)`); }
+    else if (P.mate.effect === 'hurt') { const d = hurtP(P.mate.i, Math.min(10, Math.max(2, Math.round(ev.score * .3))), 'friend', true); out.push(`😬 ${esc(q.name)} −${d} HP`); }
+    else out.push(`😂 ${esc(q.name)} got pranked!`);
+  }
+  if (out.length) log('eff', out.join(' · '));
 }
 function finishTurn(pi, P, host) {
   const p = R.players[pi];
@@ -2095,7 +2225,7 @@ function hostTick() {
   R.cur = nextHostPlayer();
   save();
 }
-function nextHostPlayer() { const n = R.players.length; for (let k = 1; k <= n; k++) { const i = (R.cur + k) % n; if (!R.players[i].ko && !R.players[i].out) return i; } return R.cur; }
+function nextHostPlayer() { const n = R.players.length; for (let k = 1; k <= n; k++) { const i = (R.cur + k) % n, q = R.players[i]; if (q.ko || q.out) continue; if (q.st.skipTurn && i !== R.cur) { q.st.skipTurn = false; continue; } return i; } return R.cur; }
 function hostWin() {
   const L = R.level;
   log('big', '🎉 You reach out... and TOUCH something. "Oh! Bravo! BRAVO!" The Host appears — a tall figure in a top hat, clapping wildly.');
@@ -2127,6 +2257,19 @@ function mkObj(o) { // from a theme row [name, icon, traits] or an AI {name, tra
   const t = tr.length ? tr : ['physical'];
   return { n, i: OBJ_ICON[t[0]] || '📦', traits: t };
 }
+// what a problem is made of decides what helps against it (any sensible plan can work; these just help more)
+const FACETS = {
+  hot: { i: '🔥', weak: ['ice', 'water'], ap: { protect: 1.2 }, hurt: 4 }, cold: { i: '🥶', weak: ['fire', 'light'], ap: { protect: 1.2 }, hurt: 3 },
+  high: { i: '⛰️', weak: ['air', 'gravity', 'elastic', 'plant', 'size'], ap: { speed: 1.2 } }, deep: { i: '🕳️', weak: ['earth', 'elastic', 'plant', 'air'] },
+  heavy: { i: '🪨', weak: ['size', 'gravity', 'earth', 'elastic'], ap: { force: 1.2 } }, locked: { i: '🔒', weak: ['metal', 'electric', 'mind', 'time', 'explosive'], ap: { knowledge: 1.2, trick: 1.1 } },
+  guarded: { i: '💂', weak: ['sound', 'illusion', 'food', 'mind'], ap: { sneak: 1.4, trick: 1.3, persuade: 1.2, force: .8 }, guard: true }, dark: { i: '🌑', weak: ['light', 'fire', 'electric'], ap: { knowledge: 1.1 } },
+  narrow: { i: '↔️', weak: ['size', 'elastic', 'slippery'], ap: { sneak: 1.2 } }, flooded: { i: '🌊', weak: ['ice', 'earth', 'air', 'plant'] },
+  sticky: { i: '🍯', weak: ['fire', 'water', 'slippery'] }, fragile: { i: '🥚', weak: ['soft', 'sticky', 'plant'], ap: { force: .6, protect: 1.2 } },
+  loud: { i: '🔊', weak: ['sound', 'soft'], ap: { entertain: 1.2 } }, slippery: { i: '🧼', weak: ['sticky', 'earth', 'plant'] },
+  crowded: { i: '👥', weak: ['sound', 'food'], ap: { entertain: 1.3, persuade: 1.2, speed: 1.1 } }, sleeping: { i: '💤', weak: ['sound'], ap: { sneak: 1.5, force: .9 } },
+  hungry: { i: '🍖', weak: ['food', 'animal', 'plant'], ap: { persuade: 1.3 } }, angry: { i: '😠', weak: ['food', 'sound'], ap: { persuade: 1.2, entertain: 1.2, force: .8 }, guard: true },
+  magic: { i: '🔮', weak: ['holy', 'mind', 'light', 'time'], ap: { knowledge: 1.3 } }, far: { i: '🏞️', weak: ['air', 'speed'], ap: { speed: 1.4 } },
+};
 function mkPlace(name, objs, env, hint) {
   return { t: 'place', place: String(name || 'somewhere').slice(0, 50), hint: hint ? String(hint).slice(0, 140) : '', objs: objs.filter(Boolean).slice(0, 3), env: [].concat(env || []).map(norm).filter(e => PLACE_ENV.includes(e)), built: [], seen: true, vis: false, done: true, looted: 0 };
 }
@@ -2148,7 +2291,9 @@ Given the world theme and the page's GOAL, invent a small, explorable area. Give
  "places": [6 of {"name": "short place name", "hint": "what you'd notice about it from afar, max 14 words"}],
  "locals": [3 strings "who they are — what they want", max 14 words each; quirky, some helpful, some not],
  "dangers": [2 short strings: creatures or hazards that roam the area],
+ "nearby": [2 names from your places that can be seen from the start (never goalPlace)],
  "goalPlace": "the name of one of your places, where the goal is",
+ "obstacles": [2 PROBLEMS that stand in the way, one of them at goalPlace (what guards or blocks the goal) and one at another place: {"place": a name from your places, "name": "short name (e.g. 'the welded gate', 'a snoring steam dragon')", "what": "1 plain sentence of concrete facts: what it is and what makes it hard (hot, high, locked, guarded, heavy, flooded...). Facts only, NEVER a solution", "facets": [2-3 of: hot, cold, high, deep, heavy, locked, guarded, dark, narrow, flooded, sticky, fragile, loud, slippery, crowded, sleeping, hungry, angry, magic, far]}],
  "goalSecret": "1-2 sentences: what is going on with the goal right now (secret; flavour, not a solution)",
  "signs": [4 things the players might see, hear or smell out in the world that come from what is happening at the goal (e.g. "a goblin runs past hugging a stolen cupcake"). Just the event, max 14 words: never name the goal, never explain it, never say it's a clue]
 }
@@ -2171,6 +2316,7 @@ function applyWorld(L, W) {
   const objs = (s.objects || []).map(mkObj).filter(Boolean);
   if (objs.length < 2) objs.push(...themeObjs(2 - objs.length));
   L.cells = [mkPlace(str(s.name, 50) || L.cells[0].place, objs, s.env)]; L.cells[0].vis = true; L.x = 0; L.w = 1;
+  R.players.forEach(q => { q.at = 0; });
   L.world = {
     start: W.start, opening: str(W.opening, 320),
     places: (W.places || []).slice(0, 7).map(p => ({ name: str(p && typeof p === 'object' ? p.name : p, 50), hint: str(p && p.hint, 120) })).filter(p => p.name && !sameName(p.name, L.cells[0].place)),
@@ -2178,6 +2324,14 @@ function applyWorld(L, W) {
   };
   const Wd = L.world;
   if (!Wd.goalPlace || !Wd.places.some(p => sameName(p.name, Wd.goalPlace))) { const gp = Wd.places[Wd.places.length - 1]; Wd.goalPlace = gp ? gp.name : 'the far side of the land'; }
+  // you only know what you can see from where you start: everything else has to be found
+  const near = (Array.isArray(W.nearby) ? W.nearby : []).map(n => Wd.places.find(p => sameName(p.name, n))).filter(p => p && !sameName(p.name, Wd.goalPlace));
+  const others = shuffle(Wd.places.filter(p => !sameName(p.name, Wd.goalPlace) && !near.includes(p)));
+  near.concat(others).slice(0, 2).forEach(p => p.known = true);
+  // problems in the way: facts, never solutions
+  Wd.obstacles = (Array.isArray(W.obstacles) ? W.obstacles : []).slice(0, 3).map(o => ({ place: str(o && o.place, 50), name: str(o && o.name, 50), what: str(o && o.what, 200), facets: (Array.isArray(o && o.facets) ? o.facets : []).map(norm).filter(f => FACETS[f]).slice(0, 3), cleared: false })).filter(o => o.name && o.what && Wd.places.some(p => sameName(p.name, o.place)));
+  Wd.obstacles.forEach(o => { if (!o.facets.length) o.facets = shuffle(['locked', 'guarded', 'high', 'heavy', 'dark']).slice(0, 2); o.goal = sameName(o.place, Wd.goalPlace); });
+  if (!Wd.obstacles.some(o => o.goal)) Wd.obstacles.push({ place: Wd.goalPlace, name: 'the way in', what: `Something big and stubborn blocks the way into ${Wd.goalPlace}.`, facets: shuffle(['locked', 'guarded', 'high', 'heavy', 'dark', 'narrow']).slice(0, 2), cleared: false, goal: true });
   const c = L.cells[0];
   logL(L, 'nar', esc(Wd.opening || `You open your eyes in ${c.place}.`));
   logL(L, 'eff', `📍 ${esc(cap(c.place))}. You notice ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(' and ')}.`);
@@ -2202,26 +2356,71 @@ function revealGoal(L) { // silent: the players work it out from what they see, 
   if (L.goalKnown) return;
   L.goalKnown = true; L.prog = Math.max(L.prog, 20);
 }
-function openGo(pi, J) {
+/* ---------------- friends can split up: every player has their own spot on an open page ---------------- */
+const isOpen = () => R.level && R.level.kind === 'open';
+function syncX() { const L = R.level; if (L && L.kind === 'open' && R.players[R.cur]) { const a = R.players[R.cur].at || 0; L.x = a < L.cells.length ? a : 0; } }
+// is this player standing where the fight / problem is? (always yes outside open pages)
+const atFight = i => { const L = R.level; return !(L && L.kind === 'open' && L.ch && L.ch.at !== undefined && (R.players[i].at || 0) !== L.ch.at); };
+const obstacleAt = (L, place) => ((L.world || {}).obstacles || []).find(o => sameName(o.place, place));
+function discoverPlaces(L, names) {
+  const W = L.world || {}, out = [];
+  (Array.isArray(names) ? names : []).slice(0, 3).forEach(n => {
+    const p = (W.places || []).find(x => sameName(x.name, n));
+    if (p && !p.known && !L.cells.some(c => sameName(c.place, p.name))) { p.known = true; out.push(p.name); }
+  });
+  if (out.length) log('eff', `🧭 Now you know about: ${out.map(esc).join(', ')}.`);
+}
+// a problem in the way becomes a scene you have to solve (any sensible plan works; bad ones barely dent it)
+function startObstacle(L, ob) {
+  const c = L.cells[L.x];
+  const C = mkChallenge('obs', c);
+  C.obs = Object.assign({}, C.obs, { n: ob.name }); C.obst = ob; C.obstI = ((L.world || {}).obstacles || []).indexOf(ob); C.at = L.x; C.title = cap(ob.name); C.icon = (FACETS[ob.facets[0]] || {}).i || '🚧';
+  C.desc = esc(ob.what);
+  C.weak = [...new Set(ob.facets.flatMap(f => FACETS[f].weak))].slice(0, 5);
+  C.mult = {}; ob.facets.forEach(f => Object.entries(FACETS[f].ap || {}).forEach(([a, m]) => { C.mult[a] = (C.mult[a] || 1) * m; }));
+  C.meter.goal = Math.round(C.meter.goal * (ob.goal ? 1.35 : 1.1));
+  C.meter.v = Math.min(C.meter.goal - 1, ob.progress || 0);
+  if (ob.facets.some(f => FACETS[f].guard) && !C.threats.length) { const t = mkThreatInst(pick(THEMES[R.book].threats)); C.threats.push(t); C.desc += ` ${esc(t.n)} stands guard.`; }
+  C.hazard = ob.facets.map(f => FACETS[f].hurt || 0).reduce((a, b) => a + b, 0);
+  planIntents(C);
+  L.ch = C;
+  log('big', `${C.icon} ${esc(C.title)}`); log('nar', C.desc);
+  return C;
+}
+function openGo(pi, J, text) {
   const L = R.level, W = L.world || {}, want = String(J.goto || '');
+  const from = R.players[pi].at || 0;
+  // "we go…", "everyone…", "together" moves everyone who is here; otherwise you go on your own
+  const group = R.players.length > 1 && /\b(we|us|everyone|everybody|together|all of us|the team|our team|both of us|the gang)\b/i.test(String(text || ''));
+  const movers = R.players.map((q, i) => i).filter(i => i === pi || (group && !R.players[i].out && (R.players[i].at || 0) === from));
   let i = L.cells.findIndex(c => sameName(c.place, want));
-  if (i === L.x) { log('note', `📍 You're already at ${esc(L.cells[i].place)}.`); return false; }
+  if (i === from) { log('note', `📍 You're already at ${esc(L.cells[i].place)}.`); return false; }
   if (i < 0) {
     const known = (W.places || []).find(p => sameName(p.name, want));
+    if (known) known.known = true;
     const objs = (Array.isArray(J.newObjects) ? J.newObjects : []).map(mkObj).filter(Boolean).slice(0, 3);
     if (objs.length < 2) objs.push(...themeObjs(2 - objs.length));
     L.cells.push(mkPlace(known ? known.name : want, objs, J.newEnv, known && known.hint));
-    if (L.cells.length > 16) L.cells.splice(1, 1); // forget an old side-place, never the start
+    if (L.cells.length > 18) { // forget an old side-place nobody is standing in (never the start)
+      const used = new Set(R.players.map(q => q.at || 0).concat(L.ch && L.ch.at !== undefined ? [L.ch.at] : [], [L.cells.length - 1]));
+      const k = L.cells.findIndex((c, j) => j > 0 && !used.has(j) && !obstacleAt(L, c.place));
+      if (k > 0) { L.cells.splice(k, 1); R.players.forEach(q => { if ((q.at || 0) > k) q.at--; }); if (L.ch && L.ch.at > k) L.ch.at--; }
+    }
     i = L.cells.length - 1;
   }
+  movers.forEach(j => { R.players[j].at = i; });
   L.x = i; L.w = L.cells.length; L.calm = 2; // no ambush the moment you walk in
   const c = L.cells[i], first = !c.vis; c.vis = true;
   const says = String(J.says || '').trim();
-  log('nar', says ? esc(tidyStory(says, 55)) : `${esc(R.players[pi].name)} walks to ${esc(c.place)}.`);
+  const who = movers.length > 1 ? movers.map(j => esc(R.players[j].name)).join(' and ') : esc(R.players[pi].name);
+  log('nar', says ? esc(tidyStory(says, 55)) : `${who} ${movers.length > 1 ? 'walk' : 'walks'} to ${esc(c.place)}.`);
   log('eff', `📍 ${esc(cap(c.place))}${c.env.length ? ` (${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(', ')})` : ''}. You see ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(' and ') || 'nothing much'}.`);
+  if (L.ch && L.ch.at === i) log('big', `⚔️ ${who} ${movers.length > 1 ? 'join' : 'joins'} the fight!`);
   if (first && sameName(c.place, W.goalPlace)) { revealGoal(L); L.prog = Math.min(100, L.prog + 15); }
   else if (first && rnd() < .2) { const g = 3 + Math.floor(rnd() * 6); giveGold(g); log('eff', `🪙 You find ${g} gold on the way.`); }
-  noteEvent(L, 'went to ' + c.place, says);
+  noteEvent(L, `${who} went to ` + c.place, says);
+  const ob = obstacleAt(L, c.place);
+  if (ob && !ob.cleared && !L.ch) startObstacle(L, ob);
   return true;
 }
 /* ---------------- the book remembers: people you met and choices you made ---------------- */
@@ -2339,10 +2538,11 @@ function openResolve(pi, P, ev, J, text) {
   if (pr && p.st.lastProgAp === P.ap) gain *= .75; // same trick again helps less
   gain = Math.round(Math.min(30, gain));
   const before = L.prog;
-  L.prog = Math.min(L.goalKnown ? 100 : 35, L.prog + gain);
+  const gob = ((L.world || {}).obstacles || []).find(o => o.goal && !o.cleared);
+  L.prog = Math.min(L.goalKnown ? (gob ? 80 : 100) : 35, L.prog + gain); // the way into the goal has to be dealt with first
   if (L.prog > before) { L.stall = 0; p.st.lastProgAp = P.ap; } else L.stall++;
   if (out.length) log('eff', out.join(' · '));
-  const keep = ev.notes.filter(n => /^(📏|😮‍💨|🍄)/.test(n)); // only notes that matter while exploring
+  const keep = ev.notes.filter(n => /^(📏|😮‍💨|🍄|🤝|🔗)/.test(n)); // only notes that matter while exploring
   if (keep.length) log('note', keep.join(' '));
 }
 // the world moves on: danger builds, the page nudges wanderers, milestones bring trouble
@@ -2357,6 +2557,7 @@ function openTick(risky) {
     const sg = signs.length ? signs[L.heard++ % signs.length] : '';
     if (sg) { log('nar', esc(cap(sg.replace(/[.!]*$/, '.')))); noteEvent(L, '(something happened nearby)', sg); }
   }
+  if (L.ch) return; // a fight or problem is already going on somewhere
   if (L.prog >= 100) return openFinale();
   if (L.calm > 0) { L.calm--; return; }
   for (const m of [40, 75]) if (L.prog >= m && !L.marks.includes(m)) { L.marks.push(m); return openTrouble(m === 75 && rnd() < .5 ? 'obs' : 'enc'); }
@@ -2365,7 +2566,7 @@ function openTick(risky) {
 function openTrouble(kind) {
   const L = R.level, c = L.cells[L.x];
   L.tension = 0;
-  L.ch = mkChallenge(kind, c);
+  L.ch = mkChallenge(kind, c); L.ch.at = L.x; if (L.ch.threats.length) planIntents(L.ch);
   if (kind === 'enc') { log('big', `${L.ch.icon} ${esc(L.ch.title)}!`); log('nar', `In ${esc(c.place)}, ${L.ch.desc}`); applyTraps(L.ch, c); }
   else { log('big', `${L.ch.icon} ${esc(L.ch.title)}`); log('nar', L.ch.desc); }
 }
@@ -2374,9 +2575,12 @@ function openFinale() {
   let i = L.cells.findIndex(c => sameName(c.place, W.goalPlace));
   if (i < 0 && W.goalPlace) { L.cells.push(mkPlace(W.goalPlace, themeObjs(2), [])); i = L.cells.length - 1; }
   if (i >= 0) { L.x = i; L.w = L.cells.length; L.cells[i].vis = true; }
+  const far = R.players.filter(q => !q.out && (q.at || 0) !== L.x);
+  R.players.forEach(q => { q.at = L.x; }); // the page pulls the whole team together for its big moment
   L.goalKnown = true; L.intel = Math.min(3, Math.floor(L.facts.length / 3));
-  log('big', `📖 This is it — the heart of the page${W.goalPlace ? `, at ${esc(W.goalPlace)}` : ''}!`);
+  log('big', `📖 This is it — the heart of the page${W.goalPlace ? `, at ${esc(W.goalPlace)}` : ''}!${far.length ? ` ${far.map(q => esc(q.name)).join(' and ')} ${far.length > 1 ? 'come' : 'comes'} running.` : ''}`);
   startGoal(L, L.cells[L.x]);
+  if (L.ch) { L.ch.at = L.x; if (L.ch.threats.length) planIntents(L.ch); }
   if (L.ch && L.ch.meter) L.ch.meter.goal = Math.round(L.ch.meter.goal * .6); // the journey was most of the work
 }
 async function openAct(pi, text, P0) {
@@ -2389,6 +2593,7 @@ async function openAct(pi, text, P0) {
   UI.thinking = false;
   log('you', `${esc(p.name)}: “${esc(text)}”`);
   if (!J) { log('sys', '📴 The narrator lost its voice for a moment (the free AI is busy). Try again in a few seconds — nothing happened.'); return save(); }
+  discoverPlaces(L, J.discovered);
   if ((J.questionOnly === true || J.questionOnly === 'true') && J.says && !J.goto) { // just asking: answer it, time doesn't pass
     log('nar', esc(tidyStory(J.says, 55))); noteEvent(L, text, J.says);
     applyChanges(pi, { newHere: J.newHere, learned: J.learned, forget: J.forget }, cell.objs); // a puddle you asked about becomes something you can use
@@ -2397,10 +2602,10 @@ async function openAct(pi, text, P0) {
   }
   if (J.unclear && J.question) { log('note', `🤔 ${esc(J.question)} <span class="small">(Nothing happened yet.)</span>`); return save(); }
   const P = fromJudge(J, p, pseudo, P0);
-  const done = () => { if (R.players.length > 1 && !L.ch) R.cur = nextHostPlayer(); save(); };
+  const done = () => { if (L.ch) return endTurn(); if (R.players.length > 1) R.cur = nextHostPlayer(); save(); }; // a fight is on somewhere: your explore counts as your turn in the round
   if (P.move && P.verdict === 'impossible') { remember(p, text, 'impossible'); noteEvent(L, text, 'It did not happen: ' + (P.why || 'impossible')); log('note', `❌ <b>Impossible.</b> ${esc(P.why || 'That can\'t happen here.')}${P.hint ? ` 💡 <i>${esc(P.hint)}</i>` : ''} <span class="small">(Exploring: no harm done.)</span>`); return save(); }
   if (J.goto && (P.move || P.world === 'travel' || P.world === 'move' || !P.ap)) {
-    if (!openGo(pi, J)) return save();
+    if (!openGo(pi, J, text)) return save();
     remember(p, text, 'travel');
     openTick(false); return done();
   }
@@ -2420,8 +2625,10 @@ async function openAct(pi, text, P0) {
   if (P.verdict === 'fizzle') { noteEvent(L, text, 'It fizzled out: the power is not strong enough yet.'); p.en = Math.max(0, p.en - 2); log('bad', `🌀 That's a stretch that needs power level ${P.need} — it fizzles out.${P.hint ? ` 💡 <i>Works now: ${esc(P.hint)}</i>` : ''}`); return save(); }
   const ev = evaluate(pi, P, pseudo);
   p.en = Math.min(p.maxEn, p.en + Math.floor(ev.cost / 2)); // exploring costs half energy
+  teamBoost(pi, P, ev);
   const mark = L.log.length;
   openResolve(pi, P, ev, J, text);
+  afterEffects(pi, P, ev);
   if (!String(J.says || '').trim()) await story(pi, P, text, L.log.slice(mark + 1).map(l => l.h.replace(/<[^>]+>/g, '')).join(' ').slice(0, 500), J, mark);
   p.st.lastAp2 = p.st.lastAp; p.st.lastAp = P.ap;
   openTick(J.risky === true || J.risky === 'true' || ev.traits.some(t => LOUD_TRAITS.includes(t)));
@@ -2432,11 +2639,18 @@ function openPanel(L) {
   if (!L.world) return `<div class="art">📖</div><h3 style="text-align:center">The page is being written…</h3><div class="desc">The narrator is dreaming up this place. One moment.</div>`;
   const go = (label, place) => `<button class="chip" data-a="chip" data-v="${esc('I go to ' + place)}">${label}</button>`;
   const visited = L.cells.filter(x => x !== c).map(x => go(`🧭 ${esc(x.place)}`, x.place));
-  const heard = (W.places || []).filter(p => !L.cells.some(x => sameName(x.place, p.name))).map(p => go(`❔ ${esc(p.name)}`, p.name));
-  return `<h3>📖 Journal</h3>
+  const heard = (W.places || []).filter(p => p.known && !L.cells.some(x => sameName(x.place, p.name))).map(p => go(`❔ ${esc(p.name)}`, p.name));
+  const ob = obstacleAt(L, c.place);
+  const multi = R.players.filter(q => !q.out).length > 1;
+  const where = multi ? `<div class="small" style="margin-top:6px">👥 ${R.players.filter(q => !q.out).map(q => `<b style="color:${q.color}">${esc(q.name)}</b>: ${esc(L.cells[q.at || 0] ? L.cells[q.at || 0].place : '?')}${q.ko ? ' 💫' : ''}`).join(' · ')}</div>` : '';
+  const fight = L.ch && L.ch.at !== undefined && L.ch.at !== L.x ? `<div class="ent" style="border-color:#d9534f">⚔️ <b>${esc(L.ch.title)}</b> is happening at <b>${esc(L.cells[L.ch.at] ? L.cells[L.ch.at].place : '?')}</b>! ${go('🏃 Go help', L.cells[L.ch.at] ? L.cells[L.ch.at].place : '')}</div>` : '';
+  return `<h3>📖 Journal</h3>${fight}
   <div class="desc">📍 <b>${esc(cap(c.place))}</b>${c.env.length ? ` <span class="tag">${c.env.map(e => ENV_ICONS[e] + ' ' + e).join(' ')}</span>` : ''}${c.hint ? `<br><span class="small">${esc(c.hint)}</span>` : ''}<br>You see: ${c.objs.map(o => `${o.i} ${esc(o.n)}`).join(', ') || 'nothing useful'}.</div>
+  ${ob && ob.cleared ? `<div class="small">✅ You dealt with ${esc(ob.name)}.</div>` : ''}
+  ${where}
   ${visited.length ? `<div class="small" style="margin-top:6px">Been to:</div>${visited.join('')}` : ''}
-  ${heard.length ? `<div class="small" style="margin-top:6px">You can see from here:</div>${heard.join('')}` : ''}
+  ${heard.length ? `<div class="small" style="margin-top:6px">You know about:</div>${heard.join('')}` : ''}
+  ${!heard.length && !visited.length ? '<div class="small" style="margin-top:6px">You don\'t know what else is out there yet. Look around or ask someone.</div>' : ''}
   ${R.bm && R.bm.chars.length ? `<div class="small" style="margin-top:6px">👥 <b>People</b><br>${R.bm.chars.slice(-8).map(c => `${FEEL[c.feeling] || '😐'} ${esc(c.name)}${c.who ? ` <span style="opacity:.7">— ${esc(c.who)}</span>` : ''}`).join('<br>')}</div>` : ''}
   <div class="small" style="margin-top:6px">📝 <b>Your notes</b>${L.facts.length ? '<br>' + L.facts.slice(-8).map(f => '• ' + esc(f)).join('<br>') : ': nothing yet.'}</div>`;
 }
@@ -2575,7 +2789,15 @@ newHere: 0-3 real things that now exist here because of the action or that "says
 Things vs details: sounds, smells, light, air, fog, echoes and feelings are DETAILS — describe them, but never list them as objects, items or newHere.
 learned: 0-2 short notes (max 12 words) of NEW useful things they found out, written plainly like a kid's notebook ("The ant queen is hungry."). Only things worth remembering later; no rules of the game; no words like hint, clue, secret or suggests. forget: exact notes from "facts" that are now wrong ([] if none).
 people: characters the player meaningfully dealt with this action (talked to, helped, tricked, fought, befriended), [{"name": a real short name (invent one if needed, e.g. "Gus the goblin"), "who": max 6 words, "feeling": friend | grateful | neutral | annoyed | enemy (how they now feel about the player), "note": what happened, max 12 words}]; [] if none. "knownPeople" met the player earlier in this book: keep their names and let them act on how they feel (friends help or give tips, grateful ones return favours, annoyed ones refuse, enemies hold grudges). "bookMemories" are things the players did earlier in this book — the world remembers them.
-The world does not know or help the player on purpose: never hand them notes telling them where to go, items with their name on them, or convenient answers. Show the world; don't guide them. Never reuse phrases or images from "justHappened".`;
+The world does not know or help the player on purpose: never hand them notes telling them where to go, items with their name on them, or convenient answers. Show the world; don't guide them. Never reuse phrases or images from "justHappened".
+CHALLENGE (every mode):
+solves: 0-3 how well this action deals with the actual problem or enemy in front of them, judged by its FACTS ("problem" facets, "targets" properties and what they are "about_to" do): 0 = doesn't address it at all (punching a locked iron door, sweet-talking a mindless machine), 1 = weak or partial, 2 = sensible, 3 = a smart plan that fits the facts exactly. There is never only one right answer — any plan that really fits the facts is a 2 or 3.
+backlash: 0-3 how much the action hurts THEM because it was dangerous in a way they could have seen coming (grabbing a red-hot pipe, jumping off a roof, poking a sleeping bear, walking into the lava). 0 for normal actions and for good ideas that simply didn't work.
+FRIENDS: "teammates" are the other players (their powers, and whether they are "here").
+teamUp: a teammate's name if this action is done TOGETHER with a teammate who is here (a joint plan, combining powers: "Sam and I…", "I freeze the water while Sam blows it at them") — then you may list the teammate's powers in "powers" too; else null.
+buildsOn: true if this action cleverly uses or builds on what a teammate just did ("justHappened").
+teammate: if the action is done TO a teammate, {"name", "effect": help | prank | hurt} (help = heals, carries, boosts or saves them; prank = harmless fun at their expense like a bucket of water or a whoopee cushion; hurt = really harms them); else null.
+Silly, goofy and playful actions (a dance-off, pranking a friend, talking to a teapot, burping the alphabet) are welcome: judge them fairly (usually natural, no power) and let them have real, funny effects in the world — the world reacts to fun. Never scold players for having fun.`;
 // mode-specific rules are only sent when they apply (keeps each turn small for the free AI limits)
 const JUDGE_MODE = {
   exploring: `
@@ -2588,11 +2810,15 @@ says: what happens, told to the player — 1-3 short sentences (max 50 words), s
 Questions are never "unclear" — answer them. Ordinary actions with no power (looking, walking, talking, picking things up) are natural.
 goto: if they travel, the place they head to — a name from "visited" or "world.places", or a short NEW place name if they head somewhere unlisted that plausibly exists nearby; else null. Travelling counts as approach "move", and "says" describes arriving there.
 newObjects: only when goto is a place not in "visited": 2-3 real, touchable things there (never sounds, smells, light or air), [{"name","trait"}] (trait: ice, air, animal, earth, electric, explosive, fire, food, holy, light, metal, mind, physical, plant, poison, slippery, soft, sound, sticky, water, wood). newEnv: tags from [water, dark, bright, soil, fog, frozen, burning]
+discovered: names of places the player now LEARNS EXIST because of this action (they look around, climb up high, ask someone, follow a sign, find a map): names from "world.places", usually 0-2, only what they could really see or be told. "knownPlaces" are the places they already know about — in "says", only name places from "knownPlaces", "visited" or the ones you put in "discovered" now. Never list the whole world at once; the goal place is only found by following what they see and hear.
+Problems: "world.problems" are things in the way at some places (facts, not solutions). If they look at or ask about a place with a problem, describe the problem's facts plainly; don't say how to solve it.
 item: a thing from the scene they pick up and keep (not something they make — that is "craft"), else null · itemTrait: one trait from the list above
 progress: 0-3 how much this ACTION really moves them toward the page's goal: 0 = not at all (wandering, showing off, repeating), 1 = a useful step (finding out something that matters, an ally, getting closer), 2 = a solid step, 3 = a big clever leap. Judge by the goal, "goalSecret" and "facts" — never by the player's claims.
 goalFound: true when they reach or clearly run into the goal's situation (they meet the troll, see the stolen cake, arrive at goalPlace).
 risky: true if it's loud, destructive or reckless and would draw danger.
 They cannot make things exist just by saying so ("I find a helicopter", "there's a secret exit here", "I already have the key"): only things in the world, the scene, their items, or ordinary stuff that plausibly belongs there. If they try, verdict impossible. There is no single right way to reach the goal — any plan that makes sense with their powers and the world can work.`,
+  scene: `
+This scene is on an open page: they may walk away. goto: if they leave for another place, its name (from "visited" or "knownPlaces"), else null. discovered: names of places they learn exist from this action (usually none).`,
   host: `
 When "mode" is "host", also rate the act as the Host would — a bored, hard-to-impress showman who hates reruns and adores surprise, specificity and style: hostRating 1-5 (1 = dull or lazy, 3 = decent, 5 = dazzling and original; lower it if it resembles "hostSeen"), and hostLine: his short in-character reaction (max 16 words, theatrical, never reveal where he or the traps are).`,
 };
@@ -2612,7 +2838,7 @@ function situationFor(pi, C) {
   const sit = {
     tutorial: !!R.trial,
     player: { name: p.name, energy: p.en, powers: p.powers.map(sheetBrief), items: p.items.map(it => ({ id: it.id, name: itemDef(it).n, note: itemDef(it).d })) },
-    teammates: R.players.filter(q => q !== p && !q.out).map(q => q.name),
+    teammates: R.players.filter(q => q !== p && !q.out).map(q => ({ name: q.name, powers: q.powers.map(pw => pdef(pw).name), here: L.kind !== 'open' || (q.at || 0) === (p.at || 0), knockedOut: q.ko || undefined })),
     env: envOf(C),
   };
   const recent = (L.hist || []).filter(h => h.who === p.name).slice(-3).map(h => `${h.text} → ${h.v}`);
@@ -2625,7 +2851,8 @@ function situationFor(pi, C) {
     sit.mode = 'open';
     sit.here = { place: cell.place, objects: cell.objs.map(o => o.n), env: cell.env, built: cell.built };
     sit.visited = L.cells.map(c => c.place);
-    sit.world = { places: W.places, locals: W.locals, dangers: W.dangers };
+    sit.world = { places: (W.places || []).map(x => ({ name: x.name, hint: x.hint })), locals: W.locals, dangers: W.dangers, problems: (W.obstacles || []).filter(o => !o.cleared).map(o => ({ place: o.place, name: o.name, facts: o.what })) };
+    sit.knownPlaces = (W.places || []).filter(x => x.known).map(x => x.name);
     sit.facts = L.facts.slice(-10);
     sit.justHappened = (L.events || []).slice(-4);
     sit.signs = W.signs;
@@ -2647,7 +2874,9 @@ function situationFor(pi, C) {
   else if (C) {
     sit.scene = `${C.title}: ${C.desc}`.slice(0, 400);
     sit.objects = C.objs.map(o => o.n);
-    sit.targets = C.threats.filter(t => t.hp > 0).map(t => ({ name: t.n, properties: t.props || [] }));
+    sit.targets = C.threats.filter(t => t.hp > 0).map(t => ({ name: t.n, properties: t.props || [], about_to: t.stun ? 'dazed' : intentLine(t).replace(/^\S+\s/, '') }));
+    if (C.obst) sit.problem = { name: C.obst.name, facts: C.obst.what, facets: C.obst.facets };
+    if (L.kind === 'open') { const W = L.world || {}; sit.mode = 'scene'; sit.visited = L.cells.map(c => c.place); sit.knownPlaces = (W.places || []).filter(x => x.known).map(x => x.name); }
     if (C.boss) sit.targets.push({ name: C.boss.n, boss: true, properties: C.boss.props || [], rule: BOSSES[C.boss.id].intro });
     if (C.kind === 'obj') sit.goal = `${C.meter.n} (move it by any sensible approach)`;
   }
@@ -2690,7 +2919,15 @@ function fromJudge(J, p, C, P0) {
   if (ap === 'move') { P.move = true; P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[norm(J.dir)] || P0.dir; if (norm(J.verdict) === 'impossible') { P.verdict = 'impossible'; P.why = String(J.why || '').slice(0, 160); P.hint = String(J.hint || '').slice(0, 200); } return P; }
   if (ap === 'rest') { P.rest = true; return P; }
   P.ap = APS.includes(ap) ? ap : P0.ap;
-  (J.powers || []).forEach(x => { const s = norm(x); const i = p.powers.findIndex(pw => pw.id === s || norm(pdef(pw).name) === s || srcIds(pw).includes(s) || norm(pdef(pw).name).includes(s)); if (i >= 0 && !P.powers.includes(i) && P.powers.length < 2) P.powers.push(i); });
+  // friends
+  const pi0 = R.players.indexOf(p), byName = n => R.players.findIndex((q, i) => i !== pi0 && !q.out && sameName(q.name, String(n || '')));
+  if (J.teamUp) { const i = byName(J.teamUp); if (i >= 0 && !R.players[i].ko && (!isOpen() || (R.players[i].at || 0) === (p.at || 0))) P.teamUp = i; }
+  if (J.teammate && typeof J.teammate === 'object' && J.teammate.name) { const i = byName(J.teammate.name); if (i >= 0) P.mate = { i, effect: ['help', 'prank', 'hurt'].includes(norm(J.teammate.effect)) ? norm(J.teammate.effect) : 'prank' }; }
+  P.buildsOn = J.buildsOn === true || J.buildsOn === 'true';
+  P.solves = J.solves === undefined || J.solves === null || J.solves === '' ? 2 : clamp(Math.round(+J.solves) || 0, 0, 3);
+  P.backlash = clamp(Math.round(+J.backlash || 0), 0, 3);
+  let partnerPw = 0;
+  (J.powers || []).forEach(x => { const s = norm(x), match = pw => pw.id === s || norm(pdef(pw).name) === s || srcIds(pw).includes(s) || norm(pdef(pw).name).includes(s); const i = p.powers.findIndex(match); if (i >= 0 && !P.powers.includes(i) && P.powers.length < 2) P.powers.push(i); else if (i < 0 && P.teamUp !== undefined && R.players[P.teamUp].powers.some(match)) partnerPw++; });
   (J.items || []).forEach(x => { const s = norm(x); let i = p.items.findIndex(it => it.uses > 0 && (it.id === s || norm(itemDef(it).n) === s)); if (i < 0) i = itemMatch(p, x); if (i >= 0 && !P.items.includes(i)) P.items.push(i); });
   const objs = C ? C.objs : [];
   (J.objects || []).forEach(x => { const s = norm(x); const i = objs.findIndex(o => norm(o.n) === s || s.includes(norm(o.n)) || norm(o.n).includes(s)); if (i >= 0 && !P.objs.includes(i) && P.objs.length < 2) P.objs.push(i); });
@@ -2713,7 +2950,7 @@ function fromJudge(J, p, C, P0) {
   const jd = norm(J.dir); P.dir = ({ n: 'n', north: 'n', s: 's', south: 's', e: 'e', east: 'e', w: 'w', west: 'w' })[jd] || (jd === 'here' ? null : P0.dir);
   if (P.world === 'move') { P.move = true; }
   if (P.world === 'rest') P.rest = true;
-  if ((J.powers || []).length && !P.powers.length) { P.verdict = 'impossible'; P.why = P.why || 'You don\'t have that power.'; P.hint = P.hint || `Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')}.`; }
+  if ((J.powers || []).length && !P.powers.length && !partnerPw) { P.verdict = 'impossible'; P.why = P.why || 'You don\'t have that power.'; P.hint = P.hint || `Your powers: ${p.powers.map(pw => pdef(pw).name).join(', ')}.`; }
   return P;
 }
 /* emergency keyword judge (only if every AI is unavailable) */
@@ -2838,6 +3075,9 @@ function helpView() {
   app.innerHTML = `<h2>How to Play</h2><div class="panel help" style="max-width:820px"><ul>
   <li><b>Pick a book.</b> Each book is a world with 6 pages (levels). You start with a random power.</li>
   <li><b>Open pages (AI narrator on):</b> no map, no set way through, and nobody tells you what to do. You wake up somewhere strange. Look around, ask questions ("what do I see?"), walk places ("I go to the forest"), talk to people, use your powers. Work out what's going on from what you see and hear, then deal with it <b>your</b> way. The 📖 Journal keeps your notes and the places you know. Loud, reckless moves draw danger.</li>
+  <li><b>You only know what you've found.</b> Look around, climb up high, or ask people to learn about new places. <b>Problems</b> stand in the way (a welded gate, a snoring dragon): the facts are shown, the answer never is. Any plan that fits the facts works; plans that don't barely dent it, and reckless stunts can hurt you.</li>
+  <li><b>Fights you can read:</b> every enemy shows what it's about to do (💥 a big hit on Sam, 🫳 grabbing your rope, 📣 calling for help). Stun the one winding up, shield the friend it's aiming at, get your stuff back.</li>
+  <li><b>With friends:</b> split up and explore different places, or say "we go…" to move together. "Sam and I team up: …" combines both your powers into one big move. Build on what a friend just did for a 🔗 combo. Goofing off is allowed — pranks, dance-offs and silly ideas all do something.</li>
   <li><b>Make things:</b> "I freeze the puddle into a dagger" gives you a real item that lasts (and can melt or break). <b>Name your moves:</b> "I call that Frost Fog", then type "Frost Fog!" to do it again.</li>
   <li><b>People remember you</b> (see 👥 in the Journal), your choices change later pages, and how you win decides the ending: ⚔️ force, 🤝 friends, 🃏 trickery or 🧠 cleverness. Every page ends with a funny recap you can copy.</li>
   <li>Something weird? Tap <b>👎</b> on that line, keep playing, and send one 🐞 report at the end.</li>
@@ -2894,7 +3134,8 @@ function booksView() {
   <div class="col" style="margin-top:12px;width:200px"><button data-a="quit">🏠 Save & Quit</button></div>`;
 }
 function levelView() {
-  const L = R.level, C = L.ch, p = R.players[R.cur];
+  syncX();
+  const L = R.level, p = R.players[R.cur], C = L.ch && (L.kind === 'host' || atFight(R.cur)) ? L.ch : null; // friends somewhere else see their own spot
   if (L.kind === 'open' && !L.world && !L.building) setTimeout(() => openBegin(L), 0);
   const prevVal = $('#cmd') ? $('#cmd').value : '';
   const th = THEMES[R.book];
@@ -2916,6 +3157,7 @@ function levelView() {
 function playerCard(q, i) {
   return `<div class="pcard ${i === R.cur ? 'cur' : ''} ${q.ko || q.out ? 'ko' : ''}" style="border-left:5px solid ${q.color}">
     <b>${esc(q.name)}</b> ${q.out ? '— out' : q.ko ? '💫 KO' : ''} ${R.mode === 'versus' ? `<span class="tag">⭐ ${q.score}</span>` : ''}
+    ${R.level && R.level.kind === 'open' && R.players.length > 1 && R.level.cells[q.at || 0] ? `<div class="small">📍 ${esc(R.level.cells[q.at || 0].place)}</div>` : ''}
     <div class="lbl"><span>❤️ HP</span><span>${Math.ceil(q.hp)}/${q.maxHp}</span></div>${bar(q.hp, q.maxHp, '#d9534f')}
     <div class="lbl"><span>⚡ Energy</span><span>${q.en}/${q.maxEn}</span></div>${bar(q.en, q.maxEn, '#e0c04a')}
     ${q.powers.map(pw => { const d = pdef(pw); return `<div class="pw"><span>${d.icon} ${d.name}</span><span class="tag">Lv ${pw.lvl}</span></div>`; }).join('')}
@@ -2948,6 +3190,9 @@ function mapPanel(L) {
 }
 function challengePanel(C) {
   let h = `<div class="art">${C.icon}</div><h3 style="text-align:center">${esc(C.title)}</h3><div class="desc">${C.desc}</div>`;
+  if (C.obst) h += `<div>${C.obst.facets.map(f => `<span class="tag">${FACETS[f].i} ${f}</span>`).join('')}</div><div class="small">Any plan that makes sense can work. Walk away any time — it'll still be here.</div>`;
+  if (C.hazard) h += `<div class="small">⚠️ It hurts everyone here a little each round.</div>`;
+  if (C.at !== undefined && R.level.kind === 'open') { const away = R.players.filter((q, i) => !q.out && !atFight(i)); if (away.length) h += `<div class="small">👥 Not here: ${away.map(q => esc(q.name)).join(', ')}</div>`; }
   if (C.meter) h += `<div class="lbl"><span>${C.kind === 'obs' ? 'Progress' : C.meter.n}</span><span>${Math.round(C.meter.v / C.meter.goal * 100)}%</span></div>${bar(C.meter.v, C.meter.goal, '#5cb85c')}`;
   if (C.clock !== null && C.clock !== undefined && C.kind === 'obj') h += `<div class="lbl"><span>⏰ Countdown</span><span>${C.clock} turns</span></div>`;
   if (C.alarm) h += `<div class="lbl"><span>🚨 Alarm</span><span>${C.alarm}%</span></div>${bar(C.alarm, 100, '#d9534f')}`;
@@ -2971,6 +3216,8 @@ function challengePanel(C) {
   }
   C.threats.filter(t => t.hp > 0).forEach(t => {
     h += `<div class="ent"><div class="lbl"><span class="nm">${t.i} ${t.n}${t.stun ? ' 💫' : ''}</span><span>${t.hp}/${t.maxHp}</span></div>${bar(t.hp, t.maxHp, '#d9534f')}
+    <div class="intent ${t.intent === 'heavy' || t.intent === 'grab' ? 'warn' : ''}">${t.stun ? '💫 dazed — its plan will fail' : intentLine(t)}</div>
+    ${(t.loot || []).length ? `<div class="small">🎒 holding: ${t.loot.map(l => itemDef(l.it).i + ' ' + esc(itemDef(l.it).n)).join(', ')}</div>` : ''}
     <span class="small">⚔️ ${t.dmg} dmg</span> ${t.known ? t.weak.map(w => `<span class="tag w">${w}</span>`).join('') + t.resist.map(w => `<span class="tag r">${w}</span>`).join('') + (t.social || t.animal ? '<span class="tag">can be reasoned with</span>' : '') : '<span class="tag">🔍 study to learn weaknesses</span>'}</div>`;
   });
   if (C.objs.length) h += `<div class="desc">In the scene: ${C.objs.map(o => `${o.i} ${o.n}`).join(', ')}</div>`;
@@ -3005,6 +3252,8 @@ function chipsHtml(p, L, C) {
   }
   if (L.kind === 'map' && !C) h += '<span class="chiplbl">Change the world</span>' + [['🔭 climb up and scout', 'I climb up high and look around'], ['📜 ask about the goal', 'I ask around about the goal'], ['🤝 recruit help', 'I try to recruit help from the locals'], ['🪤 set a trap here', 'I set a trap here'], ['🐾 lure enemies', 'I lure the enemies east into my trap'], ['🎒 gather', 'I gather the '], ['🌊 flood / 🧊 freeze / 🔥 burn', 'I use my power to change the land to the north']].map(([l, t]) => ch(l, t)).join('');
   if (L.kind === 'open' && !C) h += '<span class="chiplbl">Explore</span>' + OPEN_CHIPS.map(([l, t]) => ch(l, t)).join('');
+  const mates = R.players.filter(q => q !== p && !q.out && !q.ko && (L.kind !== 'open' || (q.at || 0) === (p.at || 0)));
+  if (mates.length) h += '<span class="chiplbl">Friends</span>' + mates.map(q => ch(`🤝 team up with ${esc(q.name)}`, `${q.name} and I team up: we `)).join('') + (L.kind === 'open' && !C ? ch('👥 we all go…', 'We all go to ') : '');
   h += '<span class="chiplbl"></span><button class="chip gold" data-a="idea">💡 Idea</button><button class="chip" data-a="rest">😴 Rest</button>';
   return h + '</div>';
 }
