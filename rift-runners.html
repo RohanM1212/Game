@@ -128,6 +128,56 @@ p{line-height:1.5}
 .tbsmall button{font-size:13px;padding:6px 10px}
 button.spready{border-color:#b48cff;box-shadow:0 0 14px #b48cff88}
 @media (max-width:700px){.tbside{grid-template-columns:repeat(2,96px)}.tbu{height:120px}.tbu .ui1{font-size:28px}.tbfield{gap:4px}}
+.pbw{width:100%;max-width:900px;display:flex;flex-direction:column;gap:8px;border-radius:18px;padding:12px;background:linear-gradient(180deg,#9fd5ff 0%,#cdeec0 55%,#8fcf74 100%);box-shadow:0 10px 40px #0008;color:#111}
+.pbw.z-canyon{background:linear-gradient(180deg,#ffb27a,#e8a060 55%,#b8703f)}.pbw.z-frost{background:linear-gradient(180deg,#cfe6ff,#f2f7fc 55%,#c8dcee)}.pbw.z-isles{background:linear-gradient(180deg,#7fd0ff,#bfeaff 50%,#f0dca0)}
+.pbw.z-woods{background:linear-gradient(180deg,#27364f,#3d5540 55%,#27351f);color:#eee}.pbw.z-core{background:linear-gradient(180deg,#1a1036,#3b2470 55%,#241548);color:#eee}.pbw.z-tower{background:linear-gradient(180deg,#2a2f55,#4a4f86 55%,#303466);color:#eee}
+.pbtop{display:flex;gap:6px;align-items:center;font-weight:bold;font-size:14px}.pbtop .sp{flex:1}.pball{color:#e33}.pball.me{color:#29f}.pball.out{opacity:.25}.pbspeed{padding:3px 8px;font-size:12px}
+.pbfield{position:relative;height:300px}
+.pbrow{position:absolute;left:0;right:0;display:flex;align-items:flex-end;justify-content:space-between}
+.pbrow.foe{top:0}.pbrow.me{bottom:0}
+.pbinfo{background:#fffe;color:#111;border:2px solid #333;border-radius:12px;padding:6px 12px;min-width:250px;box-shadow:0 3px 0 #0003}
+.pbrow.foe .pbinfo{margin-top:4px}
+.pbname{font-weight:800;font-size:16px}.pblv{font-weight:700;font-size:13px;color:#444}
+.pbst{font-size:11px;padding:1px 5px;border-radius:5px;color:#fff}.pbst.burn{background:#e0531a}.pbst.poison{background:#9b4dca}.pbst.stun{background:#d9b300}.pbst.freeze{background:#3aa0e0}
+.pbhp{display:flex;align-items:center;gap:6px;font-size:12px}.pbbar{flex:1;height:9px;background:#333;border-radius:5px;overflow:hidden;position:relative}.pbbar i{position:absolute;left:0;top:0;bottom:0;transition:width .45s ease,background .45s}.pbbar s{position:absolute;left:0;top:0;height:3px;background:#7fe3ff}
+.pbhpn{text-align:right;font-weight:700;font-size:14px}.pbxp{height:5px;background:#0003;border-radius:3px;overflow:hidden;margin-top:3px}.pbxp i{display:block;height:100%;background:#3a8fff;transition:width .6s}
+.pbspr{position:relative;width:190px;height:150px;display:flex;align-items:center;justify-content:center}
+.pbspr::after{content:'';position:absolute;bottom:8px;left:20px;right:20px;height:26px;border-radius:50%;background:#0003;z-index:0}
+.pbemo{font-size:96px;line-height:1;position:relative;z-index:1;filter:drop-shadow(0 4px 2px #0004)}
+.pbrow.me .pbemo{transform:scaleX(-1)}
+.pbspr.r4 .pbemo{filter:drop-shadow(0 0 14px #ffc23a)}.pbspr.r3 .pbemo{filter:drop-shadow(0 0 10px #c07cff)}
+.pbspr.shiny .pbemo{animation:shinyA 1.2s infinite alternate}@keyframes shinyA{to{filter:drop-shadow(0 0 14px #fff) hue-rotate(60deg) brightness(1.2)}}
+.pbspr.boss .pbemo{font-size:116px}
+.pbspr.hit .pbemo{animation:pbhit .4s}@keyframes pbhit{20%{transform:translateX(-10px);filter:brightness(3)}50%{transform:translateX(8px);opacity:.5}80%{transform:translateX(-4px)}}
+.pbrow.me .pbspr.hit .pbemo{animation:pbhitm .4s}@keyframes pbhitm{20%{transform:scaleX(-1) translateX(-10px);filter:brightness(3)}50%{transform:scaleX(-1) translateX(8px);opacity:.5}}
+.pbspr.atk .pbemo{animation:pbatk .35s}@keyframes pbatk{50%{transform:translate(30px,-10px) scale(1.1)}}
+.pbrow.me .pbspr.atk .pbemo{animation:pbatkm .35s}@keyframes pbatkm{50%{transform:scaleX(-1) translate(-30px,-10px) scale(1.1)}}
+.pbspr.faint .pbemo,.pbspr.down .pbemo{opacity:0;transform:translateY(40px);transition:all .5s}
+.pbspr.enter .pbemo{animation:pbenter .5s}@keyframes pbenter{from{transform:scale(0);opacity:0}}
+.pbspr.healfx .pbemo{animation:pbheal .6s}@keyframes pbheal{50%{filter:drop-shadow(0 0 20px #5ee08a) brightness(1.3)}}
+.pbspr.bufffx .pbemo{animation:pbbuff .5s}@keyframes pbbuff{50%{transform:translateY(-12px);filter:drop-shadow(0 0 16px #ffd24a)}}
+.pbspr.statfx .pbemo{animation:pbhit .4s}
+.pbdmg{position:absolute;top:10px;right:10px;font-weight:900;font-size:26px;color:#fff;text-shadow:0 2px 3px #000;animation:tbfl 1s forwards;z-index:2}.pbdmg.crit{color:#ffd24a;font-size:34px}
+.pborb{font-size:54px;position:relative;z-index:1}.pborb.wob{animation:wob .6s}@keyframes wob{25%{transform:rotate(-25deg)}75%{transform:rotate(25deg)}}.pborb.gotcha{filter:drop-shadow(0 0 16px #ffd24a)}
+.pbbox{background:#101522ee;color:#eee;border:3px solid #333;border-radius:14px;padding:10px 12px;min-height:120px;display:flex;flex-direction:column;gap:8px}
+.pbmsg{font-size:19px;min-height:30px;cursor:pointer}
+.pbgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pbbtn{font-size:18px;padding:12px}.pbbtn.fight{border-color:#ff6070}
+.pbmove{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:1px;padding:8px 36px 8px 12px;border-width:2px}
+.pbmove small{font-size:12px;opacity:.85}.pbmove .md{opacity:.6}.pbmove .sup{color:#5ee08a;font-weight:bold}.pbmove .nve{color:#ff8a8a}
+.el-fire{border-color:#ff8a3c}.el-frost{border-color:#8fe8ff}.el-storm{border-color:#fff27a}.el-blade{border-color:#dfe8ff}.el-arcane{border-color:#c9a8ff}.el-normal{border-color:#999}
+.pbparty{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.pbpm{text-align:left;padding:6px 10px}
+.pchip{display:inline-flex;flex-direction:column;align-items:center;border:2px solid #555;border-radius:10px;padding:3px 7px;background:#161b2b}.pchip span{font-size:26px}.pchip.boss{box-shadow:0 0 10px #ff4060}
+.sbar{display:grid;grid-template-columns:92px 1fr 34px;gap:6px;align-items:center;font-size:12px;margin:2px 0}.sbar div{height:7px;background:#0005;border-radius:4px;overflow:hidden}.sbar i{display:block;height:100%;background:linear-gradient(90deg,#5cb8ff,#5ee08a)}.sbar b{text-align:right}
+.petinfo .pihead{display:flex;gap:12px;align-items:center}.pibig{font-size:56px}.picols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0}
+.mvrow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.mvchip{font-size:13px;padding:4px 9px;border-width:2px;opacity:.75}.mvchip.on{opacity:1;background:var(--panel2)}
+.tile .thp{position:absolute;left:8px;right:8px;bottom:4px;height:3px;background:#0006}.tile .thp i{display:block;height:100%;background:#ff6070}.tile{position:relative}.tile .ti sup{font-size:12px}
+.wsay{background:#101522f2;border:2px solid var(--line);border-radius:14px;padding:16px 22px;font-size:18px;max-width:640px;text-align:center;margin-bottom:10px}
+.evo{text-align:center}.evostage{position:relative;height:200px;width:220px;margin:10px auto}.evostage span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px}
+.evoa{animation:evoA 2.6s forwards}.evob{opacity:0;animation:evoB 2.6s forwards}
+@keyframes evoA{0%,20%{opacity:1;filter:none}30%,50%,70%{opacity:1;filter:brightness(0) invert(1)}40%,60%,80%{opacity:0}100%{opacity:0}}
+@keyframes evoB{0%,70%{opacity:0;filter:brightness(0) invert(1)}40%,60%{opacity:.6}85%{opacity:1;filter:brightness(0) invert(1);transform:scale(1.2)}100%{opacity:1;filter:none;transform:scale(1)}}
+@media (max-width:700px){.pbinfo{min-width:170px}.pbemo{font-size:64px}.pbspr{width:120px;height:110px}.pbparty{grid-template-columns:1fr 1fr}.picols{grid-template-columns:1fr}}
 .colgrid{display:grid;grid-template-columns:repeat(auto-fill,104px);gap:8px;justify-content:center;max-width:900px;width:100%;margin:6px auto}
 .tile.locked{opacity:.35;filter:grayscale(1)}
 .card.pack{width:180px;gap:5px;padding:12px 10px}.card.pack button{width:100%}
@@ -389,7 +439,7 @@ const ACHIEVEMENTS = [
 const SAVE_KEY = 'riftRunnersSave_v1';
 function defaultSave() {
   return { v: 2, shards: 0, meta: {}, chars: { knight: true, ranger: true }, maxHeat: 0, heat: 0, ach: {}, daily: {}, run: null, lastChar: ['knight', 'ranger'], seenHelp: false,
-    gems: 250, col: { rat: { n: 1 }, snail: { n: 1 }, candle: { n: 1 }, duck: { n: 1 }, frog: { n: 1 } }, team: ['snail', 'rat', 'candle', 'frog'], buddies: ['rat', 'duck'], pity: { e: 0, l: 0 }, freePull: '', tower: { best: 0 }, tbAuto: false, tbSpeed: 1,
+    gems: 250, col: { rat: { n: 1, lv: 5 }, snail: { n: 1, lv: 5 }, candle: { n: 1, lv: 5 } }, team: [], party: [], buddies: ['rat', 'duck'], pity: { e: 0, l: 0 }, freePull: '', tower: { best: 0 }, tbAuto: false, tbSpeed: 1,
     opt: { vol: .7, music: true, shake: true },
     stats: { runs: 0, kills: 0, bosses: 0, wins: 0, coopWins: 0, bestAct: 1, elites: 0, gold: 0, playTime: 0, shardsEarned: 0, deaths: 0, evolutions: 0, noHit: 0, dailies: 0, heat10: 0, bestLevel: 0, revives: 0, ults: 0, set4: 0, objectives: 0 } };
 }
@@ -403,6 +453,7 @@ function migrate(s) { // v1 saves (single runner + node map) → v2
   if (s.run && s.run.doors) s.run.doors.forEach(d => { if (d.t === 'casino' || d.t === 'squad') d.t = 'packs'; });
   if (s.run && s.run.cur && s.run.cur.t === 'squad') s.run.cur = null;
   if (Array.isArray(s.team) && s.team.length === 6) { const o = s.team; s.team = [o[1] || o[0], o[0] || o[2], o[4] || o[3], o[3] || o[5]].map((x, i, arr) => arr.indexOf(x) === i ? x : null); }
+  if (s.col) Object.values(s.col).forEach(c => { if (!c.lv || c.lv < 5) c.lv = 5; });
   s.v = 2; return s;
 }
 function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return migrate(merge(defaultSave(), JSON.parse(raw))); } catch (e) {} return defaultSave(); }
@@ -680,7 +731,7 @@ function roomDone(msg) {
 /* ================= UI HELPERS ================= */
 let inputLock = 0, keyHook = null;
 function screen(html, actions = [], cls = 'menu', hook = null) {
-  if (cls === 'menu' && run && (mode === 'fight' || mode === 'dead')) cls = 'menu dim'; // menus over the arena get a dark backdrop
+  if (cls === 'menu' && ((run && (mode === 'fight' || mode === 'dead')) || mode === 'world')) cls = 'menu dim'; // menus over the arena get a dark backdrop
   ui.className = cls; ui.innerHTML = html; keyHook = hook; ui.scrollTop = 0;
   ui.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { if (performance.now() < inputLock) return; audioOn(); sfx('click'); const f = actions[+b.dataset.a]; if (f) f(); });
   const first = ui.querySelector('button.opt:not([disabled])') || ui.querySelector('button:not([disabled])');
@@ -715,6 +766,7 @@ function statusBar() {
 
 /* ================= SCREENS ================= */
 function showTitle() {
+  if (PB) { clearTimeout(PB.timer); PB = null; } WS = null;
   mode = 'menu'; run = null; G = null; PL = [];
   checkUnlocks();
   const hasRun = !!S.run, d = S.daily[todayStr()];
@@ -725,8 +777,9 @@ function showTitle() {
   items.push(['👥 2-Player Co-op <span class="tag">same keyboard</span>', () => hasRun ? confirmAbandon(() => showCharSelect({ players: 2 })) : showCharSelect({ players: 2 })]);
   items.push(['🌐 Online Co-op <span class="tag">experimental</span>', showOnline]);
   items.push([`📅 Daily Challenge ${d ? `<span class="tag">best: ${d} rooms</span>` : ''}`, () => hasRun ? confirmAbandon(() => showCharSelect({ players: 1, daily: true })) : showCharSelect({ players: 1, daily: true })]);
-  items.push([`🃏 Squad &amp; Packs <span class="tag">💎 ${S.gems} · ${Object.keys(col()).length}/${Object.keys(ROSTER).length}</span>${S.freePull !== todayStr() ? ' <span class="tag" style="color:var(--gold)">🎁 free pull!</span>' : ''}`, () => showSquadHub('packs', showTitle)]);
-  items.push([`🗼 Rift Tower <span class="tag">turn-based squad battles · floor ${(S.tower || {}).best || 0}</span>`, () => showTower()]);
+  items.push([`🃏 Pets &amp; Packs <span class="tag">💎 ${S.gems} · ${Object.keys(col()).length}/${Object.keys(ROSTER).length}</span>${S.freePull !== todayStr() ? ' <span class="tag" style="color:var(--gold)">🎁 free pull!</span>' : ''}`, () => showSquadHub('packs', showTitle)]);
+  items.push([`🌍 Rift World <span class="tag">catch &amp; battle pets · 🏅 ${(S.world || {}).badges || 0}/${ZONES.length}</span>`, enterWorld]);
+  items.push([`🗼 Rift Tower <span class="tag">pet battles · floor ${(S.tower || {}).best || 0}</span>`, () => showTower()]);
   items.push([`💠 Upgrades <span class="tag">${S.shards} shards</span>`, showUpgrades]);
   items.push([`🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span>`, showAchievements]);
   items.push(['📊 Stats, Options &amp; Save Backup', showStats]);
@@ -754,9 +807,10 @@ function showHelp() {
     <li><b>Level up</b> to pick weapons, upgrades and passives. <b>Evolve</b> a level-5 weapon by owning its matching passive: ${Object.values(WEAPONS).map(w => `${w.icon}+${PASSIVES[w.evo].icon}`).join(' ')}</li>
     <li><b>Element sets:</b> weapons have elements. Own 2 (or 4) of one element for a set bonus: ${Object.values(ELEMENTS).map(e => `${e.icon} ${e.name}`).join(' · ')}.</li>
     <li><b>Arenas</b> have pillars (enemy shots can't pass), 🛢️ barrels (shoot them to explode), a ⛲ healing shrine, and a biome hazard (bushes, lava, ice, darkness, storms).</li>
-    <li><b>🃏 Squad &amp; Packs:</b> open packs with 💎 gems (you earn them every run) or 🪙 gold (shop and 🎁 doors) to collect 42 members in 5 rarities: <span style="color:#b8c0d0">Common</span>, <span style="color:#5ee08a">Uncommon</span>, <span style="color:#5cb8ff">Rare</span>, <span style="color:#c07cff">Epic</span>, <span style="color:#ffc23a">Legendary</span>. Duplicates give stars (★1–★5).</li>
-    <li><b>🗼 Rift Tower</b> (title screen): turn-based squad battles with your team of 4. Pick Attack, Special or Guard for each member, use the element wheel 🔥&gt;🗡️&gt;✨&gt;⚡&gt;❄️&gt;🔥, and climb floors for gems, packs and <b>blessings that make every run stronger</b>. Your members level up as they fight.</li>
-    <li><b>🐾 Buddy:</b> each player takes one member into action rooms. It fights beside you and uses a skill every 9 seconds.</li>
+    <li><b>🌍 Rift World</b> (title screen): pick a starter pet and explore. Wild pets hide in the tall grass: weaken one, then throw a 🔮 Rift Orb to catch it. Trainers challenge you when they see you; beat each zone's <b>Warden</b> for a badge to open the next zone. ⛲ heals your pets, 🏪 sells orbs and potions. P = party, B = bag, Esc = menu.</li>
+    <li><b>⚔️ Pet battles:</b> 1 vs 1, like Pokémon. Pick one of your pet's 4 moves, switch pets, use an item, or run. Every pet has ❤️ HP, ⚔️ Attack, 🛡️ Defence and 💨 Speed (faster goes first), an ability, and levels up to evolve. Element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (super effective ×1.5).</li>
+    <li><b>🃏 Pets &amp; Packs:</b> packs (💎 gems) and catching both add pets. Duplicates add ★ stars (a bit more of every stat). Rarer pets have bigger stat totals, but levels matter just as much. Equip moves in the Party screen.</li>
+    <li><b>🗼 Rift Tower:</b> trainer battles floor by floor (fully healed each time) for gems, packs and blessings that make your runs stronger. <b>🐾 Buddy:</b> each player takes one pet into action runs — its level and stats decide how hard it hits, and it earns XP from runs.</li>
     <li><b>Co-op:</b> share gold, XP and relics; each player has their own runner, weapons and level-up picks. If your partner goes down, <b>stand next to them</b> to revive them.</li>
     <li><b>Shards</b> 💠 are earned every run, win or lose. Spend them on permanent upgrades. New runners unlock as you play.</li>
   </ul></div>${keysHelp()}
@@ -1177,17 +1231,6 @@ const starOf = n => n >= 16 ? 5 : n >= 8 ? 4 : n >= 4 ? 3 : n >= 2 ? 2 : 1;
 const starMul = s => 1 + .25 * (s - 1);
 function col() { return S.col = S.col || {}; }
 const ownStar = id => col()[id] ? starOf(col()[id].n) : 0;
-const lvOf = id => (col()[id] && col()[id].lv) || 1;
-const lvCap = id => 10 + 5 * Math.max(1, ownStar(id));
-const lvMul = lv => 1 + .04 * (lv - 1);
-const sqXpNeed = lv => 15 + lv * 10;
-function unitPower(id, star, lv) { const d = UD(id), m = RAR[d.rar].mul * starMul(star) * lvMul(lv || 1); return { hp: d.hp * m, atk: d.atk * m }; }
-function giveXp(id, amt) { // returns levels gained
-  const c = col()[id]; if (!c) return 0; c.lv = c.lv || 1; c.xp = (c.xp || 0) + amt; let n = 0;
-  while (c.lv < lvCap(id) && c.xp >= sqXpNeed(c.lv)) { c.xp -= sqXpNeed(c.lv); c.lv++; n++; }
-  if (c.lv >= lvCap(id)) c.xp = Math.min(c.xp, sqXpNeed(c.lv));
-  return n;
-}
 
 /* ----- packs & pulls ----- */
 const PACKS = {
@@ -1209,12 +1252,12 @@ function pullOne(pack, forceMin = 0) {
   if (pity.l >= 60) r = 4; else if (pity.e >= 10 && r < 3) r = 3;
   r = Math.max(r, forceMin);
   if (r >= 3) pity.e = 0; if (r === 4) pity.l = 0;
-  let ids = Object.keys(ROSTER).filter(k => ROSTER[k][2] === r && (!pack.el || ROSTER[k][3] === pack.el));
-  if (!ids.length) ids = Object.keys(ROSTER).filter(k => ROSTER[k][2] === r);
+  let ids = Object.keys(ROSTER).filter(k => ROSTER[k][2] === r && !EVO_ONLY.has(k) && (!pack.el || ROSTER[k][3] === pack.el));
+  if (!ids.length) ids = Object.keys(ROSTER).filter(k => ROSTER[k][2] === r && !EVO_ONLY.has(k));
   const id = ids[Math.floor(Math.random() * ids.length)];
   const c = col(), before = c[id] ? c[id].n : 0;
   let gems = 0;
-  if (before >= 16) { gems = [5, 10, 20, 40, 100][r]; S.gems += gems; } else { c[id] = c[id] || { n: 0, lv: 1, xp: 0 }; c[id].n++; }
+  if (before >= 16) { gems = [5, 10, 20, 40, 100][r]; S.gems += gems; } else { c[id] = c[id] || { n: 0, lv: 5, xp: 0 }; c[id].n++; dexMark(id, true); }
   S.stats.pulls = (S.stats.pulls || 0) + 1; if (r === 4) S.stats.legendaries = (S.stats.legendaries || 0) + 1;
   return { id, r, isNew: before === 0, starUp: before > 0 && starOf(before + 1) > starOf(before), star: starOf(Math.min(16, before + 1)), gems };
 }
@@ -1276,262 +1319,832 @@ function pullFx(r) {
     for (let k = 0; k < n; k++) { const s = document.createElement('div'); s.className = 'spark'; s.textContent = rpick(r === 4 ? ['✨', '⭐', '💛', '🌟', '👑'] : ['💜', '✨', '🔮']); s.style.left = (30 + Math.random() * 40) + 'vw'; s.style.top = (35 + Math.random() * 20) + 'vh'; s.style.setProperty('--dx', (Math.random() - .5) * 90 + 'vw'); s.style.setProperty('--dy', (Math.random() - .7) * 80 + 'vh'); document.body.appendChild(s); setTimeout(() => s.remove(), 1600); } }
 }
 
-/* ----- team (4 slots: 0,1 front · 2,3 back) ----- */
-function team() {
-  if (!Array.isArray(S.team) || S.team.length !== 4) { const old = (Array.isArray(S.team) ? S.team : []).filter(Boolean); S.team = [old[0] || null, old[1] || null, old[2] || null, old[3] || null]; }
-  S.team = S.team.map(id => id && col()[id] ? id : null); return S.team;
+/* =====================================================================
+   🌍 PETS 2.0 — Pokémon-style stats, moves, abilities and evolution.
+   Every pet has a stat spread (❤️ HP, ⚔️ Attack, 🛡️ Defence, 💨 Speed)
+   from its class and its own personality. Rarer pets have a bigger total,
+   but level and stars matter just as much, so any pet you love can win.
+   ===================================================================== */
+// evolved forms (you get these by levelling up, or rarely in the wild)
+Object.assign(ROSTER, {
+  rooster:    ['Blaze Rooster',  '🐓', 1, 'fire',   'brawler',  'melee',  120, 13, 115, 3, 'burst',     'Flame Peck: a blazing peck that burns.'],
+  croc:       ['Bog Croc',       '🐊', 1, 'frost',  'brawler',  'melee',  140, 13,  85, 3, 'bloodfin',  'Death Roll: a huge bite, double on hurt foes.'],
+  swan:       ['Frost Swan',     '🦢', 1, 'frost',  'mystic',   'ranged', 110, 12, 110, 3, 'slide',     'Glacial Glide: hits hard and slows.'],
+  hare:       ['Thunder Hare',   '🐇', 1, 'storm',  'ranger',   'ranged', 100, 12, 140, 3, 'banana',    'Bolt Kick: a lightning-fast kick that can stun.'],
+  lobster:    ['Iron Lobster',   '🦞', 1, 'frost',  'guardian', 'melee',  170, 11,  70, 4, 'froze',     'Iron Shell: a huge shield that bites back.'],
+  shellt:     ['Shell Titan',    '🐚', 1, 'arcane', 'guardian', 'melee',  185,  9,  50, 4, 'wall',      'Titan Shell: a giant shield.'],
+  lantern:    ['Lantern Wraith', '🏮', 1, 'fire',   'mystic',   'ranged', 100, 14, 105, 3, 'fireball',  'Wisp Blast: a big burning blast.'],
+  badger:     ['Brawl Badger',   '🦡', 1, 'blade',  'brawler',  'melee',  135, 14, 105, 3, 'frenzy',    'Fury Swipes: rapid claws.'],
+  hive:       ['Honey Hive',     '🍯', 1, 'storm',  'summoner', 'ranged', 120, 11,  95, 3, 'sting3',    'Swarm Call: the hive stings again and again.'],
+  treant:     ['Elder Treant',   '🌳', 2, 'arcane', 'support',  'melee',  190, 11,  55, 4, 'sanctuary', 'Deep Roots: heals a lot and cures.'],
+  direwolf:   ['Dire Wolf',      '🐕', 2, 'blade',  'summoner', 'melee',  150, 15, 120, 3, 'pup',       'Pack Howl: a wolf pack piles on.'],
+  seraph:     ['Storm Seraph',   '👼', 2, 'storm',  'support',  'ranged', 130, 12, 125, 3, 'massheal',  'Halo Rain: heals and cures.'],
+  isleturtle: ['Island Turtle',  '🏝️', 2, 'frost',  'guardian', 'melee',  260, 10,  40, 4, 'tidal',     'Island Crash: a tidal slam.'],
+  moonsage:   ['Moon Sage',      '🌙', 2, 'arcane', 'mystic',   'ranged', 120, 15, 105, 3, 'dazzle',    'Moonbeam Glare: blinds and weakens.'],
+});
+const EVO = { chick: ['rooster', 14], frog: ['croc', 16], duck: ['swan', 16], bunny: ['hare', 14], crab: ['lobster', 18], snail: ['shellt', 18], candle: ['lantern', 16], rat: ['badger', 15], bees: ['hive', 16],
+  shroom: ['treant', 22], wolves: ['direwolf', 24], pixie: ['seraph', 26], tortoise: ['isleturtle', 28], owl: ['moonsage', 26], newt: ['drake', 32], drake: ['dragon', 42], bat: ['vlord', 34] };
+const EVO_FROM = {}; Object.entries(EVO).forEach(([a, [b]]) => { EVO_FROM[b] = a; });
+const EVO_ONLY = new Set(['rooster', 'croc', 'swan', 'hare', 'lobster', 'shellt', 'lantern', 'badger', 'hive', 'treant', 'direwolf', 'seraph', 'isleturtle', 'moonsage']);
+const STARTERS = ['chick', 'frog', 'bunny'];
+
+/* ----- stats ----- */
+const STATS = [['hp', '❤️', 'HP'], ['atk', '⚔️', 'Attack'], ['def', '🛡️', 'Defence'], ['spd', '💨', 'Speed']];
+// how each class spreads its points: [hp, atk, def, spd]
+const ARCH = { guardian: [.31, .18, .33, .18], brawler: [.29, .32, .22, .17], ranger: [.23, .31, .18, .28], mystic: [.25, .33, .18, .24], assassin: [.21, .33, .15, .31], support: [.32, .2, .26, .22], summoner: [.27, .28, .22, .23] };
+const BST = [300, 322, 346, 374, 408]; // total base stats by rarity: rarer is stronger, but not overwhelmingly
+const BASE = {}, RAVG = {};
+function baseStats(id) {
+  if (BASE[id]) return BASE[id];
+  const r = ROSTER[id], rar = r[2], a = ARCH[r[4]];
+  if (!RAVG[rar]) { const l = Object.values(ROSTER).filter(x => x[2] === rar); RAVG[rar] = [6, 7].map(k => l.reduce((s, x) => s + x[k], 0) / l.length); }
+  // personality from the old numbers: tanky ones stay tanky, fast ones stay fast
+  const w = [a[0] * Math.sqrt(r[6] / RAVG[rar][0]), a[1] * Math.sqrt(r[7] / RAVG[rar][1]), a[2] * (r[5] === 'melee' ? 1.08 : .92), a[3] * Math.pow(r[8] / 100, .7)];
+  const s = w.reduce((x, y) => x + y, 0), tot = BST[rar] + (EVO_FROM[id] ? 8 : 0);
+  return (BASE[id] = { hp: Math.round(w[0] / s * tot), atk: Math.round(w[1] / s * tot), def: Math.round(w[2] / s * tot), spd: Math.round(w[3] / s * tot) });
 }
-const teamUnits = () => team().filter(Boolean);
-function synergy(list) {
-  const e = { fire: 0, frost: 0, storm: 0, blade: 0, arcane: 0 }, c = {}; const seen = new Set();
-  for (const id of list) { if (!id || seen.has(id) || !ROSTER[id]) continue; seen.add(id); const d = UD(id); e[d.el]++; c[d.cls] = (c[d.cls] || 0) + 1; }
-  return { e, c };
+const bstOf = id => { const b = baseStats(id); return b.hp + b.atk + b.def + b.spd; };
+// Pokémon-style formula; stars (duplicates) and shininess add a little to every stat
+function petStats(id, lv, star = 1, shiny = false) {
+  const b = baseStats(id), iv = 4 * (star - 1) + (shiny ? 6 : 0), f = x => Math.floor(2 * (x + iv) * lv / 100) + 5;
+  return { hp: Math.floor(2 * (b.hp + iv) * lv / 100) + lv + 10, atk: f(b.atk), def: f(b.def), spd: f(b.spd) };
 }
-const eLv = n => n >= 3 ? 3 : n >= 2 ? 2 : 0;
-function synHTML2(list) {
-  const { e, c } = synergy(list);
-  const E = Object.keys(ESYN).map(el => { const L = eLv(e[el]); return `<span class="ico ${L ? 'on' : ''}" title="${esc(ELEMENTS[el].name + ': (2) ' + ESYN[el][2] + ' (3) ' + ESYN[el][3])}" style="${L ? 'border-color:' + ELEMENTS[el].color : ''}">${ELEMENTS[el].icon} ${e[el]}${L ? ` <b>${L === 3 ? 'II' : 'I'}</b>` : ''}</span>`; }).join('');
-  const C = Object.keys(CLASSES).map(k => { const n = c[k] || 0; return `<span class="ico ${n >= 2 ? 'on' : ''}" title="${esc(CLASSES[k].name + ': (2) ' + CLASSES[k].b2)}">${CLASSES[k].icon} ${n}${n >= 2 ? ' <b>✓</b>' : ''}</span>`; }).join('');
-  const act = [...Object.keys(ESYN).filter(el => eLv(e[el])).map(el => `${ELEMENTS[el].icon} ${ESYN[el][eLv(e[el])]}`), ...Object.keys(CLASSES).filter(k => (c[k] || 0) >= 2).map(k => `${CLASSES[k].icon} ${CLASSES[k].b2}`)];
-  return `<div class="syn">${E}</div><div class="syn">${C}</div><div class="keys">${act.length ? '<b>Active:</b> ' + act.join(' · ') : 'Put 2 of the same element or class together for a bonus.'}<br>Element wheel: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (+40% damage)</div>`;
+const MAX_LV = 60;
+const xpNeedLv = lv => (lv + 1) ** 3 - lv ** 3; // "medium" growth
+const petOf = id => col()[id];
+const lvOf = id => (col()[id] && col()[id].lv) || 1;
+const lvCap = () => MAX_LV;
+function statsOf(id) { const c = col()[id] || {}; return petStats(id, lvOf(id), ownStar(id) || 1, !!c.shiny); }
+function petPower(id) { const s = statsOf(id); return s.atk + s.def * .5 + s.spd * .3 + s.hp / 4; }
+
+/* ----- abilities: every class has one, every legendary has its own ----- */
+const CLASS_AB = {
+  guardian: ['sturdy', '🛡️ Sturdy', 'Survives one hit that would knock it out from full HP.'],
+  brawler:  ['guts', '💪 Guts', '+30% attack when hurt below a third or when it has a status.'],
+  ranger:   ['keen', '🎯 Keen Eye', 'Its moves never miss.'],
+  mystic:   ['overflow', '🔮 Overflow', 'Moves with a cooldown hit 20% harder.'],
+  assassin: ['sniper', '🗡️ Sniper', 'More critical hits, and they do double damage.'],
+  support:  ['regen', '💚 Regenerator', 'Heals 30% when it switches out.'],
+  summoner: ['pack', '🥚 Pack Tactics', 'Multi-hit moves hit one extra time.'],
+};
+const LEG_AB = {
+  dragon: ['rebirth', '🔥 Rebirth', 'Comes back once at half HP.'], paladin: ['holy', '✨ Holy Guard', 'Takes 15% less damage.'], thor: ['thunder', '🌩️ Chain Lightning', 'Its attacks can zap again for bonus damage.'],
+  void: ['phase', '🌌 Phase', '20% chance to dodge attacks.'], whale: ['tide', '🌊 Tides', 'Heals a little every turn.'], ninetail: ['foxfire', '🦊 Foxfire', 'Its hits can burn.'],
+  luckycat: ['lucky', '🍀 Lucky', 'More critical hits, and more coins after battles.'], sun: ['sunlit', '🌞 Sunlit', 'Heals a little every turn.'], chrono: ['first', '⏳ Time Skip', 'Always moves first.'],
+  kong: ['titan', '🦍 Titan', 'Double damage to stunned or frozen foes.'], reaper: ['harvest', '💀 Harvest', 'Heals 30% when it knocks out a foe.'],
+};
+const abilityOf = id => (LEG_AB[id] || CLASS_AB[ROSTER[id][4]]);
+
+/* ----- moves ----- */
+// {n: name, el: element or 'normal', p: power, acc, cd: cooldown turns, pri: goes first, crit: high crit, hits: [min,max],
+//  me: {atk, def, spd, heal, shield, cleanse}, foe: {burn, poison, stun, freeze, blind, atk, def, spd}, ch: effect chance %, drain, recoil, execute, sure, d: description}
+const MOVES = {
+  tackle:      { n: 'Tackle', el: 'normal', p: 40, acc: 100, d: 'A simple hit.' },
+  quickstrike: { n: 'Quick Strike', el: 'normal', p: 35, acc: 100, pri: 1, d: 'Always goes first.' },
+  guardup:     { n: 'Guard Up', el: 'normal', me: { def: 1, shield: .15 }, cd: 2, d: 'Raises Defence and adds a small shield.' },
+  bodyslam:    { n: 'Body Slam', el: 'normal', p: 75, acc: 95, cd: 1, recoil: .15, d: 'A heavy slam that hurts you a little too.' },
+  volley:      { n: 'Volley', el: 'pet', p: 20, acc: 95, hits: [2, 3], d: 'Hits 2-3 times.' },
+  focus:       { n: 'Focus', el: 'normal', me: { atk: 1, spd: 1 }, cd: 3, d: 'Raises Attack and Speed.' },
+  shadowstep:  { n: 'Shadow Step', el: 'pet', p: 45, acc: 100, pri: 1, crit: 1, cd: 1, d: 'Strikes first, often a critical hit.' },
+  healpulse:   { n: 'Heal Pulse', el: 'normal', me: { heal: .35 }, cd: 3, d: 'Heals 35% HP.' },
+  packcall:    { n: 'Pack Call', el: 'pet', p: 25, acc: 90, hits: [2, 3], d: 'Calls friends to pile on, 2-3 hits.' },
+  // 🔥
+  ember:       { n: 'Ember', el: 'fire', p: 40, acc: 100, foe: { burn: 1 }, ch: 10, d: 'May burn.' },
+  heatup:      { n: 'Heat Up', el: 'fire', me: { atk: 2 }, cd: 3, d: 'Sharply raises Attack.' },
+  flameburst:  { n: 'Flame Burst', el: 'fire', p: 65, acc: 100, cd: 1, foe: { burn: 1 }, ch: 20, d: 'May burn.' },
+  inferno:     { n: 'Inferno', el: 'fire', p: 95, acc: 85, cd: 2, foe: { burn: 1 }, ch: 35, d: 'Huge fire. Often burns.' },
+  // ❄️
+  frostbite:   { n: 'Frostbite', el: 'frost', p: 40, acc: 100, foe: { spd: -1 }, ch: 25, d: 'May lower Speed.' },
+  icewall:     { n: 'Ice Wall', el: 'frost', me: { shield: .3 }, cd: 3, d: 'A shield worth 30% HP.' },
+  icebeam:     { n: 'Ice Beam', el: 'frost', p: 65, acc: 100, cd: 1, foe: { freeze: 1 }, ch: 12, d: 'May freeze.' },
+  blizzard:    { n: 'Blizzard', el: 'frost', p: 95, acc: 80, cd: 2, foe: { freeze: 1 }, ch: 25, d: 'Huge cold. May freeze.' },
+  // ⚡
+  zap:         { n: 'Zap', el: 'storm', p: 40, acc: 100, foe: { stun: 1 }, ch: 10, d: 'May stun.' },
+  charge:      { n: 'Charge Up', el: 'storm', me: { spd: 2 }, cd: 3, d: 'Sharply raises Speed.' },
+  thunderbolt: { n: 'Thunderbolt', el: 'storm', p: 65, acc: 100, cd: 1, foe: { stun: 1 }, ch: 15, d: 'May stun.' },
+  thunderstorm:{ n: 'Thunderstorm', el: 'storm', p: 95, acc: 80, cd: 2, foe: { stun: 1 }, ch: 25, d: 'Huge lightning. May stun.' },
+  // 🗡️
+  slash:       { n: 'Slash', el: 'blade', p: 40, acc: 100, crit: 1, d: 'Often a critical hit.' },
+  sharpen:     { n: 'Sharpen', el: 'blade', me: { atk: 2 }, cd: 3, d: 'Sharply raises Attack.' },
+  nightcut:    { n: 'Night Cut', el: 'blade', p: 65, acc: 100, cd: 1, crit: 1, foe: { def: -1 }, ch: 25, d: 'Often a critical hit. May lower Defence.' },
+  guillotine:  { n: 'Guillotine', el: 'blade', p: 95, acc: 85, cd: 2, crit: 1, d: 'A huge slash, often critical.' },
+  // ✨
+  spark:       { n: 'Arcane Spark', el: 'arcane', p: 40, acc: 100, sure: 1, d: 'Never misses.' },
+  mend:        { n: 'Mend', el: 'arcane', me: { heal: .4 }, cd: 3, d: 'Heals 40% HP.' },
+  mindbeam:    { n: 'Mind Beam', el: 'arcane', p: 65, acc: 100, cd: 1, foe: { atk: -1 }, ch: 25, d: 'May lower Attack.' },
+  starfall:    { n: 'Starfall', el: 'arcane', p: 95, acc: 90, cd: 2, d: 'Stars rain down.' },
+};
+const EL_MOVES = { fire: ['ember', 'heatup', 'flameburst', 'inferno'], frost: ['frostbite', 'icewall', 'icebeam', 'blizzard'], storm: ['zap', 'charge', 'thunderbolt', 'thunderstorm'], blade: ['slash', 'sharpen', 'nightcut', 'guillotine'], arcane: ['spark', 'mend', 'mindbeam', 'starfall'] };
+const CLASS_MOVE = { guardian: 'guardup', brawler: 'bodyslam', ranger: 'volley', mystic: 'focus', assassin: 'shadowstep', support: 'healpulse', summoner: 'packcall' };
+const beaterOf = el => Object.keys(BEATS).find(k => BEATS[k] === el);
+// each pet's signature move, from its special
+const SIG = {
+  frenzy: { p: 22, hits: [3, 3] }, pull: { p: 60, foe: { def: -1 }, ch: 100 }, sting3: { p: 18, hits: [3, 4], foe: { poison: 1 }, ch: 30 }, spikes: { me: { def: 1, thorns: 3 } },
+  hide: { me: { shield: .5 } }, fireball: { p: 85, foe: { burn: 1 }, ch: 40 }, knock: { p: 70, foe: { spd: -1 }, ch: 100 }, spores: { foe: { poison: 1 }, ch: 100, sure: 1 },
+  double: { p: 36, hits: [2, 2] }, stun1: { p: 55, foe: { stun: 1 }, ch: 50 }, carrot: { me: { heal: .5 } }, ember: { p: 60, foe: { burn: 1 }, ch: 40 },
+  steal: { p: 60, foe: { atk: -1 }, ch: 100 }, blink: { p: 70, pri: 1, crit: 1 }, pup: { p: 28, hits: [2, 3] }, drain: { p: 65, drain: .5 },
+  taunt: { me: { def: 2 } }, heal1: { me: { heal: .6 } }, venom: { p: 40, foe: { poison: 1 }, ch: 100 }, insight: { me: { atk: 2, spd: 1 } },
+  chain4: { p: 80, sure: 1 }, sweep: { p: 75, foe: { def: -1 }, ch: 50 }, banana: { p: 55, foe: { stun: 1 }, ch: 60 }, slide: { p: 70, foe: { spd: -1 }, ch: 100 },
+  nap: { me: { heal: .5, def: 1 } }, squawk: { p: 45, foe: { blind: 1 }, ch: 100 }, roar: { me: { atk: 2 } }, massheal: { me: { heal: .5, cleanse: 1 } },
+  execute: { p: 60, execute: 1 }, froze: { me: { shield: .4, thorns: 3 } }, clap: { p: 75, foe: { stun: 1 }, ch: 35 }, ink: { p: 50, foe: { blind: 1 }, ch: 100 },
+  burst: { p: 80, foe: { burn: 1 }, ch: 35 }, overcharge: { me: { shield: .35, spd: 1 } }, bloodfin: { p: 70, execute: 1 }, trample: { p: 95, recoil: .15, foe: { stun: 1 }, ch: 30 },
+  dazzle: { p: 30, foe: { blind: 1, atk: -1 }, ch: 100 }, pounce: { p: 85, crit: 1 }, inferno: { p: 100, foe: { burn: 1 }, ch: 50 }, revive: { me: { heal: .7, cleanse: 1 } },
+  feast: { p: 80, drain: .5 }, wall: { me: { shield: .6 } }, stomp: { p: 95, foe: { stun: 1 }, ch: 35 }, blizzard: { p: 100, foe: { freeze: 1 }, ch: 35 },
+  pumpkins: { p: 30, hits: [3, 3] }, sanctuary: { me: { heal: .6, cleanse: 1, def: 1 } }, tentacles: { p: 24, hits: [4, 4], foe: { atk: -1 }, ch: 50 }, iaido: { p: 100, pri: 1, crit: 1 },
+  wish: { me: { atk: 1, spd: 1, heal: .3 } }, dragonfire: { p: 120, foe: { burn: 1 }, ch: 50 }, aegis: { me: { shield: .8, cleanse: 1 } }, judgment: { p: 30, hits: [4, 4], foe: { stun: 1 }, ch: 20 },
+  riftswap: { p: 90, foe: { def: -2 }, ch: 100 }, tidal: { p: 110, foe: { spd: -1 }, ch: 100 }, foxfire: { p: 24, hits: [5, 5], foe: { burn: 1 }, ch: 30 }, fortune: { fortune: 1 },
+  sunrise: { me: { heal: 1, cleanse: 1 } }, timewarp: { me: { spd: 2, atk: 1 }, pri: 1 }, kongsmash: { p: 130, recoil: .2 }, reap: { p: 80, execute: 1 },
+};
+function getMove(mid) {
+  if (!mid) return null;
+  if (mid.startsWith('sig_')) {
+    const id = mid.slice(4), r = ROSTER[id]; if (!r) return MOVES.tackle;
+    const s = SIG[r[10]] || { p: 70 }, strong = s.p ? Math.round(s.p * (1 + .05 * r[2])) : 0;
+    return Object.assign({ acc: 95 }, s, { n: r[11].split(':')[0], el: r[3], p: strong, cd: s.p ? 2 : 3, d: r[11].split(':').slice(1).join(':').trim(), sig: true });
+  }
+  return MOVES[mid];
+}
+const moveEl = (m, pet) => m.el === 'pet' ? pet.el || pet.d.el : m.el;
+function learnset(id) {
+  const d = UD(id), E = EL_MOVES[d.el], cov = EL_MOVES[beaterOf(beaterOf(d.el))];
+  return [[1, 'tackle'], [1, E[0]], [5, CLASS_MOVE[d.cls]], [9, E[1]], [14, E[2]], [20, 'sig_' + id], [28, E[3]], [36, cov[2]]];
+}
+const learned = (id, lv) => learnset(id).filter(([l]) => l <= lv).map(([, m]) => m);
+function movesOf(id) { // the 4 equipped moves
+  const c = col()[id], can = learned(id, lvOf(id));
+  let mv = c && Array.isArray(c.mv) ? c.mv.filter(m => can.includes(m)) : [];
+  if (!mv.length) mv = autoMoves(id, lvOf(id));
+  else if (mv.length < 4) autoMoves(id, lvOf(id)).concat(can.slice().reverse()).forEach(m => { if (mv.length < 4 && !mv.includes(m)) mv.push(m); });
+  if (c) c.mv = mv;
+  return mv;
+}
+function autoMoves(id, lv) { // strongest set: signature + best attacks + one helper
+  const can = learned(id, lv), val = m => { const x = getMove(m); return (x.p || 45) * (x.hits ? (x.hits[0] + x.hits[1]) / 2 : 1) + (x.sig ? 60 : 0) + (x.el === UD(id).el ? 10 : 0); };
+  const atk = can.filter(m => getMove(m).p).sort((a, b) => val(b) - val(a)), sup = can.filter(m => !getMove(m).p);
+  return atk.slice(0, sup.length ? 3 : 4).concat(sup.slice(-1)).slice(0, 4);
+}
+const typeMul = (el, def) => !el || el === 'normal' ? 1 : BEATS[el] === def ? 1.5 : BEATS[def] === el ? .67 : 1;
+const stageMul = s => s >= 0 ? (2 + s) / 2 : 2 / (2 - s);
+
+/* ----- your pets: levels, XP, moves, evolution ----- */
+function giveXp(id, amt, out) { // returns levels gained; out collects messages
+  const c = col()[id]; if (!c) return 0; c.lv = c.lv || 1; c.xp = (c.xp || 0) + Math.round(amt); let n = 0;
+  while (c.lv < MAX_LV && c.xp >= xpNeedLv(c.lv)) {
+    c.xp -= xpNeedLv(c.lv); c.lv++; n++;
+    const nm = learnset(id).filter(([l]) => l === c.lv).map(([, m]) => m);
+    nm.forEach(m => { const mv = movesOf(id); if (mv.includes(m)) return; if (mv.length < 4) mv.push(m); else { const weakest = mv.slice().sort((a, b) => ((getMove(a).p || 50) + (getMove(a).sig ? 99 : 0)) - ((getMove(b).p || 50) + (getMove(b).sig ? 99 : 0)))[0]; if ((getMove(m).p || 50) + (getMove(m).sig ? 99 : 0) >= (getMove(weakest).p || 50)) { mv[mv.indexOf(weakest)] = m; if (out) out.push(`📘 ${UD(id).name} forgot ${getMove(weakest).n} and learned <b>${getMove(m).n}</b>!`); return; } } if (out) out.push(`📘 ${UD(id).name} learned <b>${getMove(m).n}</b>!`); });
+  }
+  if (c.lv >= MAX_LV) c.xp = 0;
+  return n;
+}
+function readyToEvolve(id) { const e = EVO[id]; return e && col()[id] && lvOf(id) >= e[1] ? e[0] : null; }
+function evolvePet(id) { // the pet becomes its evolved form: same level, stars, moves carry over
+  const to = readyToEvolve(id); if (!to) return null;
+  const c = col()[id], had = col()[to];
+  col()[to] = had ? Object.assign(had, { n: had.n + c.n, lv: Math.max(had.lv || 1, c.lv), xp: c.xp }) : Object.assign({}, c, { mv: (c.mv || []).map(m => m === 'sig_' + id ? 'sig_' + to : m) });
+  delete col()[id];
+  const swap = a => (a || []).map(x => x === id ? to : x);
+  S.party = swap(S.party); S.buddies = swap(S.buddies); S.team = swap(S.team);
+  dexMark(to, true); S.stats.evolved = (S.stats.evolved || 0) + 1;
+  return to;
+}
+function dex() { return S.dex = S.dex || { seen: {}, caught: {} }; }
+function dexMark(id, caught) { const d = dex(); d.seen[id] = true; if (caught) d.caught[id] = true; }
+function party() {
+  if (!Array.isArray(S.party)) S.party = [];
+  S.party = [...new Set(S.party)].filter(id => id && col()[id]).slice(0, 6);
+  if (!S.party.length) S.party = (Array.isArray(S.team) ? S.team : []).filter(id => id && col()[id]).slice(0, 6);
+  if (!S.party.length) S.party = Object.keys(col()).sort((a, b) => lvOf(b) - lvOf(a)).slice(0, 3);
+  return S.party;
+}
+const hpOf = id => { const c = col()[id], mx = statsOf(id).hp; return c && c.hp != null ? clamp(c.hp, 0, mx) : mx; };
+function healParty() { Object.values(col()).forEach(c => { c.hp = null; }); }
+function addPet(id, lv, shiny) { // catching or a starter: a new pet, or a duplicate that powers up the one you have
+  const c = col(), had = c[id];
+  if (!had) c[id] = { n: 1, lv, xp: 0, hp: null, shiny: !!shiny };
+  else { had.n = Math.min(16, had.n + 1); if (lv > (had.lv || 1)) { had.lv = lv; had.xp = 0; } if (shiny) had.shiny = true; }
+  dexMark(id, true);
+  if (party().length < 6 && !party().includes(id)) S.party.push(id);
+  return !had;
 }
 
 /* =====================================================================
-   ⚔️ TURN-BASED BATTLE ENGINE
+   ⚔️ PET BATTLES — 1 vs 1 with switching, like Pokémon.
+   Pick a move, swap pets, use an item, throw an orb, or run.
+   Elements: 🔥 beats 🗡️ beats ✨ beats ⚡ beats ❄️ beats 🔥 (×1.5 "super effective").
    ===================================================================== */
-const FX_KEYS = ['blind', 'taunt', 'weak', 'rage', 'slow', 'reflect', 'inv', 'frostHide'];
-function tbUnit(id, star, lv, side, slot, mul, syn, extra = {}) {
-  const s = SUMMONS[id];
-  const d = s ? { id, name: s[0], icon: s[1], rar: 0, el: s[2], cls: s[3], range: s[4], hp: s[5], atk: s[6], spd: s[7], cdT: 99, ab: null, txt: '' } : UD(id);
-  const m = (s ? 1 : RAR[d.rar].mul * starMul(star) * lvMul(lv)) * mul;
-  const u = { id, d, star, lv, side, slot, hp: d.hp * m, maxHp: d.hp * m, atk: d.atk * m, spd: d.spd * (.95 + Math.random() * .1), cd: 1, shield: 0, stun: 0, burn: 0, burnD: 0, poison: 0, poisonD: 0, crit: 0, guard: 0, alive: true, reborn: false, summon: !!s, boss: !!extra.boss, fx: {} };
-  for (const k of FX_KEYS) u.fx[k] = 0;
-  if (u.boss) { u.hp = u.maxHp = u.maxHp * 1.7; u.atk *= 1.1; }
-  const C = syn.c, E = syn.e;
-  if (d.cls === 'brawler' && (C.brawler || 0) >= 2) { u.maxHp *= 1.25; u.hp = u.maxHp; }
-  if (d.cls === 'guardian' && (C.guardian || 0) >= 2) u.shield += u.maxHp * .3;
-  if (d.cls === 'ranger' && (C.ranger || 0) >= 2) u.spd *= 1.25;
-  if ((C.mystic || 0) >= 2) u.cd = 0;
-  const A = eLv(E.arcane); u.shield += u.maxHp * (A === 3 ? .3 : A ? .15 : 0);
-  if (id === 'chrono') { u.cd = 0; u.spd = 999; }
-  return u;
-}
-function tbSide(ids, stars, lvs, side, mul, bossSlot) {
-  const syn = synergy(ids), out = [];
-  ids.forEach((id, slot) => { if (id) { const u = tbUnit(id, stars[slot], lvs[slot], side, slot, mul, syn, { boss: slot === bossSlot }); u.syn = syn; out.push(u); } });
-  return out;
-}
-function tbNew(my, foe) {
-  const B = { round: 0, queue: [], ev: [], hits: [], log: [], done: null, auto: false, speed: 1, mode: 'wait', cur: null };
-  B.u = tbSide(my.ids, my.stars, my.lvs, 0, 1).concat(tbSide(foe.ids, foe.stars, foe.lvs, 1, foe.mul, foe.bossSlot));
-  return B;
-}
-const tbFoes = (B, u) => B.u.filter(x => x.alive && x.side !== u.side);
-const tbFriends = (B, u) => B.u.filter(x => x.alive && x.side === u.side);
-const tbHas = (B, side, id) => B.u.some(x => x.alive && x.side === side && x.id === id);
-function tbValid(B, u, ignoreRows) {
-  let f = tbFoes(B, u); if (!f.length) return [];
-  const t = f.filter(x => x.fx.taunt > 0); if (t.length) return t;
-  if (!ignoreRows && u.d.range === 'melee' && u.d.cls !== 'assassin') { const fr = f.filter(x => x.slot < 2); if (fr.length) return fr; }
-  return f;
-}
-const tbRow = (B, side, front) => B.u.filter(x => x.alive && x.side === side && (x.slot < 2) === front);
-function tbText(B, u, s, c) { B.ev.push({ u, s, c }); }
-function tbHeal(B, from, to, amt) {
-  if (!to || !to.alive) return;
-  if ((from.syn.c.support || 0) >= 2) amt *= 1.4;
-  const h = Math.min(to.maxHp - to.hp, amt); to.hp += h; if (h > .5) tbText(B, to, '+' + Math.round(h), '#5ee08a');
-}
-function tbDmg(B, a, t, mult, kind = 'hit', o = {}) {
-  if (!t || !t.alive) return 0;
-  if (t.fx.inv > 0) { tbText(B, t, 'immune', '#ffe680'); return 0; }
-  if (kind !== 'dot' && t.id === 'void' && Math.random() < .3) { tbText(B, t, 'dodge!', '#c9a8ff'); return 0; }
-  if (kind === 'hit' && a.fx.blind > 0 && Math.random() < .5) { tbText(B, t, 'miss', '#aaa'); return 0; }
-  let dmg = a.atk * mult;
-  if (BEATS[a.d.el] === t.d.el) dmg *= 1.4; else if (BEATS[t.d.el] === a.d.el) dmg *= .75;
-  if (a.fx.rage > 0) dmg *= 1.4;
-  if (a.fx.weak > 0) dmg *= .7;
-  if (a.id === 'kong' && t.stun > 0) dmg *= 2;
-  const E = a.syn.e, C = a.syn.c;
-  let crit = false;
-  if (kind !== 'dot') {
-    const cc = .08 + (eLv(E.blade) === 3 ? .3 : eLv(E.blade) ? .15 : 0) + (a.d.cls === 'assassin' && (C.assassin || 0) >= 2 ? .25 : 0) + (tbHas(B, a.side, 'luckycat') ? .2 : 0) + (a.id === 'reaper' ? .25 : 0);
-    if (o.crit || a.crit > 0 || Math.random() < cc) { crit = true; if (!o.crit && a.crit > 0) a.crit--; dmg *= 1.8; }
-    if (eLv(E.fire) === 3) dmg *= 1.15;
-  }
-  if (t.guard) dmg *= .5;
-  if (tbHas(B, t.side, 'paladin')) dmg *= .85;
-  const sh = Math.min(t.shield, dmg); t.shield -= sh; dmg -= sh;
-  t.hp -= dmg;
-  if (dmg < .5 && sh > 0) tbText(B, t, 'blocked', '#7fe3ff'); else tbText(B, t, Math.round(dmg) + (crit ? '!' : ''), crit ? '#ffd24a' : kind === 'dot' ? '#ff9a50' : BEATS[a.d.el] === t.d.el ? '#ff8a8a' : '#fff');
-  if (kind !== 'dot') {
-    B.hits.push({ a, t, c: ELEMENTS[a.d.el].color });
-    if (eLv(E.fire) || a.id === 'ninetail') { t.burn = Math.max(t.burn, 2); t.burnD = Math.max(t.burnD, a.atk * (eLv(E.fire) === 3 || a.id === 'ninetail' ? .3 : .18)); }
-    if (a.d.range === 'melee') { if (t.fx.reflect > 0) { a.hp -= dmg * .5; tbText(B, a, '-' + Math.round(dmg * .5), '#dfe8ff'); } if (t.fx.frostHide > 0) { a.stun = Math.max(a.stun, 1); tbText(B, a, 'frozen!', '#9fe8ff'); } }
-  }
-  if (kind === 'hit') {
-    const fr = eLv(E.frost); if (fr && t.hp > 0 && Math.random() < (fr === 3 ? .3 : .15)) { t.stun = Math.max(t.stun, 1); tbText(B, t, 'frozen!', '#9fe8ff'); }
-    const st = eLv(E.storm); let chains = st && Math.random() < (st === 3 ? .45 : .25) ? (st === 3 ? 2 : 1) : 0; if (a.id === 'thor') chains = Math.max(chains, 1);
-    let last = t; while (chains-- > 0) { const c = tbFoes(B, a).find(y => y !== last); if (!c) break; tbDmg(B, a, c, .5, 'chain'); last = c; }
-  }
-  if (t.hp <= 0) tbKill(B, t, a);
-  if (a.hp <= 0 && a.alive) tbKill(B, a, t);
-  return dmg;
-}
-function tbKill(B, t, by) {
-  if (t.id === 'dragon' && !t.reborn) { t.reborn = true; t.hp = t.maxHp * .5; t.burn = 0; t.poison = 0; tbText(B, t, '🔥 REBORN!', '#ff8a3c'); return; }
-  t.alive = false; t.hp = 0; t.stun = 0;
-  B.log.push(`💥 ${t.d.icon} ${t.d.name} fainted`);
-  if (by && by.id === 'reaper' && by.alive) { by.cd = 0; tbText(B, by, 'soul harvested', '#c9a8ff'); }
-}
-function tbEmpty(B, side) { for (const s of [0, 1, 2, 3]) if (!B.u.some(y => y.alive && y.side === side && y.slot === s)) return s; return -1; }
-function tbSummon(B, x, id) {
-  const s = tbEmpty(B, x.side); if (s < 0) { tbFriends(B, x).forEach(y => y.fx.rage = Math.max(y.fx.rage, 1)); tbText(B, x, 'no room — rage!', '#ffd24a'); return; }
-  B.u = B.u.filter(y => !(y.side === x.side && y.slot === s && !y.alive));
-  const boost = ((x.syn.c.summoner || 0) >= 2 ? 1.6 : 1) * RAR[x.d.rar].mul * starMul(x.star) * lvMul(x.lv);
-  const f = tbUnit(id, 1, 1, x.side, s, boost, x.syn); f.syn = x.syn; f.cd = 99; B.u.push(f); tbText(B, f, 'summoned!', '#8fe08a');
-  B.queue.push(f);
-}
-function tbMoveRow(B, t, toBack) { const want = toBack ? t.slot % 2 + 2 : t.slot % 2; if (want === t.slot) return; const other = B.u.find(y => y.alive && y.side === t.side && y.slot === want); if (other) other.slot = t.slot; t.slot = want; }
-const tbHurtAlly = (B, u) => tbFriends(B, u).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp)[0];
-const tbRand = l => l[Math.floor(Math.random() * l.length)];
-const tbRowTargets = (B, u, front) => { const r = tbRow(B, 1 - u.side, front); return r.length ? r : tbRow(B, 1 - u.side, !front); };
-// specials: t = 'enemy' needs a target (rows ignored), 'none' = no target, heal = only worth using when someone is hurt
-const AB = {
-  frenzy:   { t: 'enemy', fn(B, x, t) { for (let k = 0; k < 3; k++) tbDmg(B, x, t.alive ? t : tbRand(tbValid(B, x)), .65, 'ab'); } },
-  pull:     { t: 'enemy', fn(B, x, t) { tbMoveRow(B, t, false); tbText(B, t, 'pulled!', '#8fe'); tbDmg(B, x, t, 1.4, 'ab'); } },
-  sting3:   { t: 'none', fn(B, x) { for (let k = 0; k < 3; k++) { const f = tbFoes(B, x); if (f.length) tbDmg(B, x, tbRand(f), .85, 'ab'); } } },
-  spikes:   { t: 'none', fn(B, x) { x.fx.taunt = 2; x.fx.reflect = 2; tbText(B, x, 'SPIKES!', '#dfe8ff'); } },
-  hide:     { t: 'none', fn(B, x) { x.shield += x.maxHp * .5; tbText(B, x, 'shield', '#7fe3ff'); } },
-  fireball: { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.2, 'ab'); t.burn = 2; t.burnD = Math.max(t.burnD, x.atk * .35); } },
-  knock:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.9, 'ab'); if (t.alive) { tbMoveRow(B, t, true); tbText(B, t, 'knocked back!', '#9fe8ff'); } } },
-  spores:   { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.poison = 3; y.poisonD = Math.max(y.poisonD, x.atk * .4); tbDmg(B, x, y, .3, 'ab'); }); } },
-  double:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.1, 'ab'); tbDmg(B, x, t.alive ? t : tbRand(tbValid(B, x, true)), 1.1, 'ab'); } },
-  stun1:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); if (t.alive) { t.stun = Math.max(t.stun, 1); tbText(B, t, 'stunned', '#ffe680'); } } },
-  carrot:   { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, tbHurtAlly(B, x), x.atk * 4); } },
-  ember:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 1.1, 'ab'); y.burn = 2; y.burnD = Math.max(y.burnD, x.atk * .3); }); } },
-  steal:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.6, 'ab'); if (t.alive) { t.cd += 2; tbText(B, t, 'special delayed', '#c9a8ff'); } } },
-  blink:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.5, 'ab'); } },
-  pup:      { t: 'none', fn(B, x) { tbSummon(B, x, 'pup'); } },
-  drain:    { t: 'enemy', fn(B, x, t) { const d = tbDmg(B, x, t, 1.8, 'ab'); tbHeal(B, x, x, d * .8); } },
-  taunt:    { t: 'none', fn(B, x) { x.fx.taunt = 2; x.shield += x.maxHp * .25; tbText(B, x, 'TAUNT!', '#ffb84a'); } },
-  heal1:    { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, tbHurtAlly(B, x), x.atk * 5.5); } },
-  venom:    { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1, 'ab'); if (t.alive) { t.poison = 3; t.poisonD = Math.max(t.poisonD, x.atk * .8); tbText(B, t, 'poisoned', '#8fe08a'); } } },
-  insight:  { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => y.crit = Math.max(y.crit, 1)); x.crit = 2; tbText(B, x, 'INSIGHT', '#c9a8ff'); } },
-  chain4:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); tbFoes(B, x).filter(y => y !== t).forEach(y => tbDmg(B, x, y, .8, 'ab')); } },
-  sweep:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => tbDmg(B, x, y, 1.35, 'ab')); } },
-  banana:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 1.3, 'ab'); if (t.alive) { t.stun = Math.max(t.stun, 1); t.cd += 1; tbText(B, t, '🍌 slipped!', '#ffe066'); } } },
-  slide:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .85, 'ab'); y.fx.slow = 2; }); } },
-  nap:      { t: 'none', heal: true, fn(B, x) { tbHeal(B, x, x, x.maxHp * .4); x.fx.taunt = 2; tbText(B, x, 'zzz... TAUNT', '#ffb84a'); } },
-  squawk:   { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { y.fx.blind = 2; tbDmg(B, x, y, .7, 'ab'); tbText(B, y, 'blinded', '#aaa'); }); } },
-  roar:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => y.fx.rage = Math.max(y.fx.rage, 2)); tbText(B, x, 'ROAR!', '#ffd24a'); } },
-  massheal: { t: 'none', heal: true, fn(B, x) { tbFriends(B, x).forEach(y => tbHeal(B, x, y, x.atk * 2.6)); } },
-  execute:  { t: 'enemy', fn(B, x, t) { if (t.hp / t.maxHp < .35 && !t.boss) { t.hp = 0; tbText(B, t, 'EXECUTED', '#ff6070'); B.hits.push({ a: x, t, c: '#ff6070' }); tbKill(B, t, x); } else tbDmg(B, x, t, 2.6, 'ab'); } },
-  froze:    { t: 'none', fn(B, x) { x.shield += x.maxHp * .4; x.fx.frostHide = 2; x.fx.taunt = 1; tbText(B, x, 'frozen hide', '#9fe8ff'); } },
-  clap:     { t: 'none', fn(B, x) { tbRowTargets(B, x, false).forEach(y => { tbDmg(B, x, y, 1, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); } },
-  ink:      { t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { y.fx.blind = 2; tbDmg(B, x, y, .6, 'ab'); tbText(B, y, 'inked', '#888'); }); } },
-  burst:    { t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { tbDmg(B, x, y, 1.5, 'ab'); y.burn = 2; y.burnD = Math.max(y.burnD, x.atk * .35); }); } },
-  overcharge:{ t: 'none', fn(B, x) { x.shield += x.maxHp * .35; x.fx.reflect = 2; x.fx.taunt = 1; tbText(B, x, 'overcharge!', '#fff27a'); } },
-  bloodfin: { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, t.hp / t.maxHp < .5 ? 4.4 : 2.2, 'ab'); } },
-  trample:  { t: 'none', fn(B, x) { const r = tbRowTargets(B, x, true); r.forEach(y => tbDmg(B, x, y, 1.4, 'ab')); const s = tbRand(r.filter(y => y.alive)); if (s) { s.stun = 1; tbText(B, s, 'trampled', '#ffe680'); } } },
-  dazzle:   { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.fx.blind = Math.max(y.fx.blind, 1); y.fx.weak = 2; tbText(B, y, 'dazzled', '#c9a8ff'); }); } },
-  pounce:   { t: 'enemy', fn(B, x, t) { tbDmg(B, x, t, 2.1, 'ab'); const o = tbFoes(B, x).find(y => y !== t); if (o) tbDmg(B, x, o, 1.1, 'ab'); } },
-  inferno:  { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .9, 'ab'); y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .5); }); } },
-  revive:   { t: 'none', fn(B, x) { const dead = B.u.find(y => !y.alive && y.side === x.side && !y.summon && !y.revived && !B.u.some(z => z.alive && z.side === y.side && z.slot === y.slot)); if (dead) { dead.alive = true; dead.revived = true; dead.hp = dead.maxHp * .5; dead.burn = dead.poison = 0; tbText(B, dead, '🌈 REVIVED!', '#ffc2f0'); B.queue.push(dead); } else tbFriends(B, x).forEach(y => tbHeal(B, x, y, x.atk * 2)); } },
-  feast:    { t: 'none', fn(B, x) { let t = 0; tbFoes(B, x).forEach(y => t += tbDmg(B, x, y, 1, 'ab')); tbHeal(B, x, x, t * .6); } },
-  wall:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.shield += y.maxHp * .35; }); x.fx.taunt = 1; tbText(B, x, 'STONE WALL', '#7fe3ff'); } },
-  stomp:    { t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 1.3, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); } },
-  blizzard: { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { tbDmg(B, x, y, .8, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); tbText(B, x, 'BLIZZARD', '#9fe8ff'); } },
-  pumpkins: { t: 'none', fn(B, x) { tbSummon(B, x, 'pumpkinling'); tbSummon(B, x, 'pumpkinling'); } },
-  sanctuary:{ t: 'none', heal: true, fn(B, x) { tbFriends(B, x).forEach(y => { tbHeal(B, x, y, x.atk * 3); y.burn = y.poison = y.stun = 0; y.fx.weak = y.fx.blind = 0; }); tbText(B, x, 'SANCTUARY', '#fff'); } },
-  tentacles:{ t: 'none', fn(B, x) { for (let k = 0; k < 5; k++) { const f = tbFoes(B, x); if (!f.length) break; const y = tbRand(f); tbDmg(B, x, y, .75, 'ab'); y.fx.weak = 2; } } },
-  iaido:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => tbDmg(B, x, y, 1.5, 'ab', { crit: y.hp / y.maxHp < .5 })); } },
-  wish:     { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.fx.rage = Math.max(y.fx.rage, 2); if (y !== x) y.cd = Math.max(0, y.cd - 2); }); tbText(B, x, '✨ WISH GRANTED', '#fff27a'); } },
-  dragonfire:{ t: 'enemy', fn(B, x, t) { tbRow(B, t.side, t.slot < 2).forEach(y => { tbDmg(B, x, y, 2.4, 'ab'); y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .45); }); tbText(B, x, 'DRAGONFIRE', '#ff6030'); } },
-  aegis:    { t: 'none', fn(B, x) { tbFriends(B, x).forEach(y => { y.fx.inv = 1; tbHeal(B, x, y, y.maxHp * .2); }); tbText(B, x, 'HOLY AEGIS', '#ffe680'); } },
-  judgment: { t: 'none', fn(B, x) { for (let k = 0; k < 8; k++) { const f = tbFoes(B, x); if (!f.length) break; tbDmg(B, x, tbRand(f), .85, 'ab'); } tbText(B, x, 'JUDGMENT', '#fff27a'); } },
-  riftswap: { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { y.slot = y.slot < 2 ? y.slot + 2 : y.slot - 2; }); tbText(B, x, 'RIFT SWAP!', '#c9a8ff'); tbRowTargets(B, x, true).forEach(y => tbDmg(B, x, y, 1.9, 'ab')); } },
-  tidal:    { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => tbDmg(B, x, y, 1.4, 'ab')); tbRow(B, 1 - x.side, true).forEach(y => tbMoveRow(B, y, true)); tbText(B, x, 'TIDAL WAVE', '#5cb8ff'); } },
-  foxfire:  { t: 'none', fn(B, x) { for (let k = 0; k < 9; k++) { const f = tbFoes(B, x); if (!f.length) break; tbDmg(B, x, f.sort((a, b) => a.hp - b.hp)[0], .6, 'ab'); } } },
-  fortune:  { t: 'none', fn(B, x) { const r = Math.random();
-    if (r < .25) { tbFriends(B, x).forEach(y => tbHeal(B, x, y, y.maxHp * .3)); tbText(B, x, '🍀 heal!', '#5ee08a'); }
-    else if (r < .5) { tbFriends(B, x).forEach(y => y.fx.rage = 3); tbText(B, x, '🍀 rage!', '#ffd24a'); }
-    else if (r < .75) { tbFriends(B, x).forEach(y => y.shield += y.maxHp * .35); tbText(B, x, '🍀 shields!', '#7fe3ff'); }
-    else { const f = tbFoes(B, x); if (f.length) tbDmg(B, x, tbRand(f), 7, 'ab'); tbText(B, x, '🎰 JACKPOT!', '#ffd24a'); } } },
-  sunrise:  { t: 'none', fn(B, x) { B.u.filter(y => !y.alive && y.side === x.side && !y.summon && !B.u.some(z => z.alive && z.side === y.side && z.slot === y.slot)).forEach(y => { y.alive = true; y.hp = y.maxHp * .4; y.burn = y.poison = 0; tbText(B, y, '🌞 REVIVED!', '#ffd24a'); B.queue.push(y); }); tbFoes(B, x).forEach(y => { y.burn = 3; y.burnD = Math.max(y.burnD, x.atk * .5); }); tbText(B, x, 'SUNRISE', '#ffd24a'); } },
-  timewarp: { t: 'none', fn(B, x) { const al = tbFriends(B, x).filter(y => y !== x); al.forEach(y => { y.cd = 0; y.stun = 0; }); B.queue = al.concat(B.queue.filter(y => !al.includes(y))); tbText(B, x, '⏳ REWIND', '#c9a8ff'); } },
-  kongsmash:{ t: 'none', fn(B, x) { tbRowTargets(B, x, true).forEach(y => { tbDmg(B, x, y, 2.6, 'ab'); if (y.alive) y.stun = Math.max(y.stun, 1); }); tbText(B, x, 'KONG SMASH', '#fff27a'); } },
-  reap:     { t: 'none', fn(B, x) { tbFoes(B, x).forEach(y => { if (y.hp / y.maxHp < .35 && !y.boss) { y.hp = 0; tbText(B, y, 'REAPED', '#c9a8ff'); tbKill(B, y, x); } else tbDmg(B, x, y, 1.6, 'ab'); }); } },
+const ITEMS_W = {
+  orb:      { n: 'Rift Orb', i: '🔮', cost: 60, d: 'Catch a wild pet. Works better when it is weak.', catch: 1 },
+  greatorb: { n: 'Great Orb', i: '🟣', cost: 180, d: 'A stronger orb (×1.8).', catch: 1.8 },
+  ultraorb: { n: 'Ultra Orb', i: '🌟', cost: 450, d: 'The best orb (×3).', catch: 3 },
+  potion:   { n: 'Potion', i: '🧪', cost: 40, d: 'Heals 50% HP.', heal: .5 },
+  superpotion: { n: 'Super Potion', i: '💖', cost: 120, d: 'Heals all HP.', heal: 1 },
+  revive:   { n: 'Revive', i: '💫', cost: 250, d: 'Brings a fainted pet back at half HP.', revive: .5 },
+  cure:     { n: 'Cure Berry', i: '🫐', cost: 30, d: 'Cures burn, poison, stun and freeze.', cure: 1 },
+  candy:    { n: 'Rare Candy', i: '🍬', cost: 900, d: 'Instantly raises a pet one level (use it in the Party screen).', candy: 1 },
 };
-function tbNeedHeal(B, x) { return tbFriends(B, x).some(y => y.hp / y.maxHp < .65) || (x.d.ab === 'nap' && x.hp / x.maxHp < .7); }
-function tbAI(B, u) { // picks {act, t}
-  const ab = u.d.ab && AB[u.d.ab];
-  if (ab && u.cd <= 0 && (!ab.heal || tbNeedHeal(B, u)) && !(u.d.ab === 'revive' && !B.u.some(y => !y.alive && y.side === u.side && !y.summon) && !tbNeedHeal(B, u))) {
-    if (ab.t === 'enemy') { const f = tbFoes(B, u); return { act: 'sp', t: f.slice().sort((a, b) => tbScore(u, b) - tbScore(u, a))[0] }; }
-    return { act: 'sp' };
-  }
-  const v = tbValid(B, u); if (!v.length) return { act: 'guard' };
-  return { act: 'atk', t: v.slice().sort((a, b) => tbScore(u, b) - tbScore(u, a))[0] };
+const bag = () => ((S.world = S.world || {}).bag = S.world.bag || { orb: 5, potion: 3 });
+const coins = () => (S.world = S.world || {}).coins || 0;
+function addCoins(n) { S.world = S.world || {}; S.world.coins = Math.max(0, (S.world.coins || 0) + Math.round(n)); }
+function bpet(id, lv, o = {}) { // a pet inside a battle
+  const d = UD(id), st = petStats(id, lv, o.star || 1, o.shiny);
+  return { id, d, el: d.el, lv, star: o.star || 1, shiny: !!o.shiny, maxHp: st.hp, hp: o.hp == null ? st.hp : clamp(o.hp, 0, st.hp), s: st, stg: { atk: 0, def: 0, spd: 0 },
+    status: null, stT: 0, blind: 0, shield: 0, thorns: 0, cds: {}, moves: o.moves || autoMoves(id, lv), ab: abilityOf(id)[0], mine: !!o.mine, used: false, revived: false, sturdy: true, boss: !!o.boss };
 }
-function tbScore(u, t) { return (BEATS[u.d.el] === t.d.el ? .5 : BEATS[t.d.el] === u.d.el ? -.3 : 0) + (1 - t.hp / t.maxHp) + (t.hp < u.atk * 1.2 ? 1 : 0) + Math.random() * .15; }
-function tbStartRound(B) {
-  B.round++;
-  for (const x of B.u) if (x.alive && x.id === 'sun') tbFriends(B, x).forEach(y => tbHeal(B, x, y, y.maxHp * .06));
-  B.queue = B.u.filter(x => x.alive).sort((a, b) => b.spd * (b.fx.slow > 0 ? .5 : 1) - a.spd * (a.fx.slow > 0 ? .5 : 1));
+const myBpet = id => bpet(id, lvOf(id), { star: ownStar(id) || 1, shiny: !!(col()[id] || {}).shiny, hp: hpOf(id), moves: movesOf(id), mine: true });
+let PB = null;
+// kind: wild | trainer | warden | tower | anomaly · foe: [{id, lv, star, shiny, boss}] · opts: {trainer: {name, icon, line}, fullHeal, onEnd(result)}
+function pbStart(kind, foe, opts = {}) {
+  const ids = party().filter(id => opts.fullHeal || hpOf(id) > 0);
+  if (!ids.length) { toast('All your pets have fainted! Heal them first.'); if (opts.onEnd) opts.onEnd('lose', null); return; }
+  const my = ids.map(id => { const p = myBpet(id); if (opts.fullHeal) p.hp = p.maxHp; return p; });
+  PB = { kind, my, foe: foe.map(f => bpet(f.id, f.lv, f)), a: 0, b: 0, turn: 0, frames: [], fi: 0, mode: 'intro', opts, over: null, caught: null, xpLog: [], fled: false, speed: S.pbSpeed || 1 };
+  my[0].used = true;
+  PB.foe.forEach(f => dexMark(f.id, false));
+  const f0 = PB.foe[0], t = opts.trainer = opts.trainer || { name: 'Trainer', icon: '🧑', line: '' };
+  const intro = kind === 'wild' || kind === 'anomaly' ? `${f0.shiny ? '✨ A SHINY ' : f0.d.rar === 4 ? '🌟 A LEGENDARY ' : 'A wild '}${f0.d.icon} ${f0.d.name} appeared!` : `${t.icon} ${t.name} wants to battle!${t.line ? ` “${t.line}”` : ''}`;
+  PB.frames = [pbFrame(intro, { enter: 'foe' })];
+  if (kind !== 'wild' && kind !== 'anomaly') PB.frames.push(pbFrame(`${t.icon} ${t.name} sent out ${f0.d.icon} ${f0.d.name}!`, { enter: 'foe' }));
+  PB.frames.push(pbFrame(`Go, ${my[0].d.icon} ${my[0].d.name}!`, { enter: 'me' }));
+  sfx(f0.d.rar >= 3 || f0.shiny ? 'boss' : 'door');
+  pbPlay();
 }
-// start a unit's turn: damage over time, stun. Returns true if it can act.
-function tbBeginTurn(B, u) {
-  u.guard = 0;
-  if (u.id === 'whale') tbHeal(B, u, u, u.maxHp * .08);
-  if (u.burn > 0) { u.burn--; u.hp -= u.burnD; tbText(B, u, '🔥' + Math.round(u.burnD), '#ff9a50'); if (u.hp <= 0) tbKill(B, u); }
-  if (u.alive && u.poison > 0) { u.poison--; u.hp -= u.poisonD; tbText(B, u, '☠️' + Math.round(u.poisonD), '#8fe08a'); if (u.hp <= 0) tbKill(B, u); }
-  if (!u.alive) return false;
-  if (u.stun > 0) { u.stun--; tbText(B, u, '💫 skips turn', '#ffe680'); tbEndTurn(B, u, false); return false; }
+const pbA = () => PB.my[PB.a], pbB = () => PB.foe[PB.b];
+function pbSnap() { const s = p => p && { id: p.id, icon: p.d.icon, name: p.d.name, lv: p.lv, hp: Math.max(0, Math.round(p.hp)), max: p.maxHp, st: p.status, rar: p.d.rar, el: p.el, shiny: p.shiny, sh: Math.round(p.shield), boss: p.boss }; return { me: s(pbA()), foe: s(pbB()) }; }
+function pbFrame(msg, fx = {}) { return Object.assign({ msg, snap: pbSnap() }, fx); }
+const say = (msg, fx) => PB.frames.push(pbFrame(msg, fx));
+const pname = p => `${p.mine ? '' : PB.kind === 'wild' || PB.kind === 'anomaly' ? 'Wild ' : 'Foe '}${p.d.icon} ${p.d.name}`;
+function pbHurt(p, dmg) { dmg = Math.max(0, Math.round(dmg)); const sh = Math.min(p.shield, dmg); p.shield -= sh; dmg -= sh; p.hp -= dmg; return dmg; }
+function setStatus(p, st, src) {
+  if (p.status || p.hp <= 0) return false;
+  p.status = st; p.stT = st === 'burn' || st === 'poison' ? 4 : st === 'freeze' ? 2 : 1;
+  say(`${pname(p)} ${{ burn: 'was burned! 🔥', poison: 'was poisoned! ☠️', stun: 'is stunned! 💫', freeze: 'was frozen solid! 🧊' }[st]}`, { status: p.mine ? 'me' : 'foe' });
   return true;
 }
-function tbEndTurn(B, u, usedSp) {
-  for (const k of FX_KEYS) if (u.fx[k] > 0) u.fx[k]--;
-  if (!usedSp) u.cd = Math.max(0, u.cd - 1);
-  tbCheck(B);
+function stage(p, k, n) {
+  const was = p.stg[k]; p.stg[k] = clamp(was + n, -4, 4); if (p.stg[k] === was) { say(`${pname(p)}'s ${STATS.find(s => s[0] === k)[2]} won't go any ${n > 0 ? 'higher' : 'lower'}!`); return; }
+  say(`${pname(p)}'s ${STATS.find(s => s[0] === k)[2]} ${n > 0 ? (n > 1 ? 'rose sharply! ⬆️⬆️' : 'rose! ⬆️') : (n < -1 ? 'fell sharply! ⬇️⬇️' : 'fell! ⬇️')}`, { buff: p.mine ? 'me' : 'foe' });
 }
-function tbDo(B, u, act, t) {
-  B.hits = [];
-  if (!tbFoes(B, u).length) { tbCheck(B); return; }
-  let used = false;
-  if (act === 'sp' && u.d.ab && u.cd <= 0) {
-    const ab = AB[u.d.ab]; if (ab.t === 'enemy' && (!t || !t.alive)) t = tbRand(tbFoes(B, u));
-    ab.fn(B, u, t); u.cd = u.d.cdT; used = true;
-    B.log.push(`${u.d.icon} ${u.d.name} used ${u.d.txt.split(':')[0]}!`); B.flash = u;
-  } else if (act === 'guard') { u.guard = 1; u.cd = Math.max(0, u.cd - 1); tbText(B, u, '🛡️ guard', '#7fe3ff'); B.log.push(`${u.d.icon} ${u.d.name} guards.`); }
-  else { if (!t || !t.alive || !tbValid(B, u).includes(t)) t = tbValid(B, u)[0]; if (t) { tbDmg(B, u, t, 1, 'hit'); B.log.push(`${u.d.icon} ${u.d.name} attacks ${t.d.icon}`); } }
-  tbEndTurn(B, u, used);
+function calcDmg(A, D, m, crit) {
+  const el = moveEl(m, A);
+  const atk = A.s.atk * stageMul(A.stg.atk) * (A.ab === 'guts' && (A.status || A.hp < A.maxHp / 3) ? 1.3 : 1);
+  const def = D.s.def * stageMul(D.stg.def);
+  let dmg = (2 * A.lv / 5 + 2) * m.p * atk / def / 50 + 2;
+  if (el === A.el) dmg *= 1.25; // same-element bonus
+  const eff = typeMul(el, D.el); dmg *= eff;
+  if (crit) dmg *= A.ab === 'sniper' ? 2 : 1.5;
+  if (m.execute && D.hp < D.maxHp * .4) dmg *= 2;
+  if (A.ab === 'overflow' && m.cd) dmg *= 1.2;
+  if (A.ab === 'titan' && (D.status === 'stun' || D.status === 'freeze')) dmg *= 2;
+  if (D.ab === 'holy') dmg *= .85;
+  if (A.boss) dmg *= 1.15;
+  dmg *= .85 + Math.random() * .15;
+  return { dmg: Math.max(1, Math.round(dmg)), eff };
 }
-function tbCheck(B) {
-  if (B.done) return;
-  const alive = s => B.u.some(x => x.alive && x.side === s);
-  if (!alive(1)) B.done = 'win'; else if (!alive(0)) B.done = 'lose'; else if (B.round > 30) B.done = 'lose';
+function applyMe(A, me) {
+  if (!me) return;
+  ['atk', 'def', 'spd'].forEach(k => { if (me[k]) stage(A, k, me[k]); });
+  if (me.heal) { const h = Math.min(A.maxHp - A.hp, Math.round(A.maxHp * me.heal)); A.hp += h; say(h ? `${pname(A)} healed ${h} HP! 💚` : `${pname(A)} is already at full HP.`, { heal: A.mine ? 'me' : 'foe' }); }
+  if (me.shield) { A.shield += Math.round(A.maxHp * me.shield); say(`${pname(A)} is protected by a shield! 🛡️`, { buff: A.mine ? 'me' : 'foe' }); }
+  if (me.thorns) { A.thorns = me.thorns; say(`${pname(A)} bristles with spikes! 🌵`); }
+  if (me.cleanse && A.status) { A.status = null; say(`${pname(A)} is cured!`); }
 }
-// next unit that should act (starting new rounds as needed)
-function tbNextActor(B) {
-  for (let guard = 0; guard < 200 && !B.done; guard++) {
-    if (!B.queue.length) tbStartRound(B);
-    const u = B.queue.shift();
-    if (!u || !u.alive) continue;
-    return u;
+function useMove(A, D, mid) {
+  const m = getMove(mid); if (!m) return;
+  A.cds[mid] = (m.cd || 0) + 1;
+  say(`${pname(A)} used <b>${m.n}</b>!`, { atk: A.mine ? 'me' : 'foe' });
+  if (m.fortune) { const r = Math.random(); if (r < .3) applyMe(A, { heal: .4 }); else if (r < .6) applyMe(A, { atk: 2 }); else if (r < .8) applyMe(A, { shield: .5 }); else { say('🎰 JACKPOT!'); useMoveRaw(A, D, Object.assign({}, m, { p: 180, sure: 1 })); } return; }
+  useMoveRaw(A, D, m);
+}
+function useMoveRaw(A, D, m) {
+  if (!m.p) { applyMe(A, m.me); if (m.foe && D.hp > 0 && (m.sure || Math.random() * 100 < (m.acc || 100))) foeFx(A, D, m); return; }
+  const acc = (m.acc || 100) * (A.blind > 0 ? .6 : 1) * stageMul(0);
+  if (!(m.sure || A.ab === 'keen') && Math.random() * 100 > acc) { say(`${pname(A)}'s attack missed!`); return; }
+  if (D.ab === 'phase' && Math.random() < .2) { say(`${pname(D)} phased out of the way! 🌌`); return; }
+  let hits = m.hits ? m.hits[0] + Math.floor(Math.random() * (m.hits[1] - m.hits[0] + 1)) : 1; if (m.hits && A.ab === 'pack') hits++;
+  const wasFull = D.hp >= D.maxHp;
+  let total = 0, eff = 1, crits = 0, n = 0;
+  for (; n < hits && D.hp > 0; n++) {
+    const cc = (m.crit ? .25 : .0625) + (A.ab === 'sniper' ? .1 : 0) + (A.ab === 'lucky' ? .15 : 0), crit = Math.random() < cc;
+    const r = calcDmg(A, D, m, crit); eff = r.eff; if (crit) crits++;
+    let d = pbHurt(D, r.dmg);
+    if (D.hp <= 0 && wasFull && D.ab === 'sturdy' && D.sturdy && hits === 1) { D.hp = 1; D.sturdy = false; say(`${pname(D)} held on with Sturdy! 🛡️`); }
+    total += d;
+    PB.frames.push(pbFrame(hits > 1 ? `Hit ${n + 1}!` : '', { hit: D.mine ? 'me' : 'foe', dmg: d, crit }));
+    if (A.ab === 'thunder' && D.hp > 0 && Math.random() < .3) { const z = pbHurt(D, r.dmg * .3); total += z; say(`⚡ Chain lightning! (${z})`, { hit: D.mine ? 'me' : 'foe', dmg: z }); }
   }
-  return null;
+  if (eff > 1) say('It\'s super effective! 💥'); else if (eff < 1) say('It\'s not very effective…');
+  if (crits) say(crits > 1 ? `${crits} critical hits!` : 'A critical hit!');
+  if (hits > 1) say(`Hit ${n} times!`);
+  if (m.drain && total) { const h = Math.min(A.maxHp - A.hp, Math.round(total * m.drain)); if (h) { A.hp += h; say(`${pname(A)} drained ${h} HP!`, { heal: A.mine ? 'me' : 'foe' }); } }
+  if (m.recoil && total) { const r = Math.max(1, Math.round(total * m.recoil)); A.hp -= r; say(`${pname(A)} is hurt by the recoil! (${r})`, { hit: A.mine ? 'me' : 'foe', dmg: r }); }
+  if (D.thorns > 0 && total && A.hp > 0) { const r = Math.max(1, Math.round(total * .25)); A.hp -= r; say(`🌵 The spikes hurt ${pname(A)}! (${r})`, { hit: A.mine ? 'me' : 'foe', dmg: r }); }
+  if (A.ab === 'foxfire' && D.hp > 0 && Math.random() < .25) setStatus(D, 'burn');
+  if (D.hp > 0 && m.foe) foeFx(A, D, m);
+  if (m.me) applyMe(A, m.me);
 }
-function tbSimulate(my, foe) { // headless, both sides on auto
-  const B = tbNew(my, foe);
-  for (let n = 0; n < 600 && !B.done; n++) { const u = tbNextActor(B); if (!u) break; if (!tbBeginTurn(B, u)) { tbCheck(B); continue; } const a = tbAI(B, u); tbDo(B, u, a.act, a.t); B.ev = []; }
-  return B;
+function foeFx(A, D, m) {
+  if (Math.random() * 100 >= (m.ch == null ? 100 : m.ch)) return;
+  const f = m.foe;
+  ['burn', 'poison', 'stun', 'freeze'].forEach(k => { if (f[k]) setStatus(D, k); });
+  if (f.blind && D.hp > 0) { D.blind = 3; say(`${pname(D)} can't see well! 🌫️ (attacks may miss)`); }
+  ['atk', 'def', 'spd'].forEach(k => { if (f[k] && D.hp > 0) stage(D, k, f[k]); });
 }
-const myTeamSpec = () => { const t = team(); return { ids: t, stars: t.map(id => id ? ownStar(id) : 1), lvs: t.map(id => id ? lvOf(id) : 1) }; };
+// can this pet act this turn?
+function canAct(p) {
+  if (p.status === 'stun') { p.status = null; say(`${pname(p)} is stunned and can't move! 💫`); return false; }
+  if (p.status === 'freeze') { if (Math.random() < .35 || --p.stT <= 0) { p.status = null; say(`${pname(p)} thawed out!`); return true; } say(`${pname(p)} is frozen solid! 🧊`); return false; }
+  return true;
+}
+function effSpd(p) { return p.s.spd * stageMul(p.stg.spd) * (p.status === 'freeze' ? .5 : 1); }
+function aiMove(A, D) { // the foe picks a move: mostly the smartest, sometimes not
+  const opts = A.moves.filter(m => !(A.cds[m] > 0));
+  if (!opts.length) return 'tackle';
+  const score = mid => { const m = getMove(mid); let v = 0;
+    if (m.p) { const el = moveEl(m, A); v = m.p * (m.hits ? (m.hits[0] + m.hits[1]) / 2 : 1) * typeMul(el, D.el) * (el === A.el ? 1.25 : 1) * ((m.acc || 100) / 100); if (m.execute && D.hp < D.maxHp * .4) v *= 2; if (m.foe && !D.status && (m.foe.burn || m.foe.stun || m.foe.freeze || m.foe.poison)) v += 12; }
+    else { const me = m.me || {}; if (me.heal) v = A.hp < A.maxHp * .45 ? 150 : A.hp < A.maxHp * .7 ? 40 : 0; if (me.atk || me.spd) v = Math.max(v, PB.turn < 2 && A.stg.atk < 2 ? 70 : 10); if (me.def || me.shield) v = Math.max(v, A.hp > A.maxHp * .5 && PB.turn < 3 ? 55 : 15); if (m.foe && m.foe.poison && !D.status) v = 60; }
+    return v * (.8 + Math.random() * .4); };
+  const smart = PB.kind === 'wild' ? .6 : PB.kind === 'trainer' ? .8 : .95;
+  return Math.random() < smart ? opts.sort((a, b) => score(b) - score(a))[0] : pick(opts);
+}
+// one full turn: {t:'move', m} | {t:'switch', j} | {t:'item', id, target} | {t:'orb', id} | {t:'run'}
+function pbTurn(act) {
+  const B = PB; B.frames = []; B.fi = 0; B.turn++;
+  const A = pbA(), D = pbB();
+  let meFirst = null, myMove = null;
+  if (act.t === 'run') {
+    if (B.kind !== 'wild') { say("You can't run from this battle!"); return pbPlay(); }
+    const ok = Math.random() < .5 + .5 * effSpd(A) / (effSpd(A) + effSpd(D)) + .1 * (B.runTries || 0);
+    B.runTries = (B.runTries || 0) + 1;
+    if (ok) { say('You got away safely! 🏃'); B.over = 'ran'; return pbPlay(); }
+    say("Couldn't get away!");
+  } else if (act.t === 'switch') {
+    if (A.ab === 'regen' && A.hp > 0) { const h = Math.min(A.maxHp - A.hp, Math.round(A.maxHp * .3)); A.hp += h; }
+    A.stg = { atk: 0, def: 0, spd: 0 }; A.blind = 0;
+    say(`Come back, ${A.d.name}!`); B.a = act.j; pbA().used = true; say(`Go, ${pbA().d.icon} ${pbA().d.name}!`, { enter: 'me' });
+  } else if (act.t === 'item') {
+    const it = ITEMS_W[act.id], p = B.my[act.target != null ? act.target : B.a]; bag()[act.id]--;
+    if (it.heal) { const h = Math.min(p.maxHp - p.hp, Math.round(p.maxHp * it.heal)); p.hp += h; say(`You used a ${it.i} ${it.n}. ${p.d.name} healed ${h} HP!`, { heal: p === pbA() ? 'me' : null }); }
+    if (it.revive) { p.hp = Math.round(p.maxHp * it.revive); p.status = null; say(`You used a ${it.i} ${it.n}. ${p.d.name} is back on its feet!`); }
+    if (it.cure) { p.status = null; say(`You used a ${it.i} ${it.n}. ${p.d.name} feels fine!`); }
+  } else if (act.t === 'orb') {
+    const it = ITEMS_W[act.id]; bag()[act.id]--;
+    say(`You threw a ${it.i} ${it.n}!`, { orb: 1 });
+    const rate = [.9, .65, .45, .28, .14][D.d.rar] * it.catch * (1 - .72 * D.hp / D.maxHp) * (D.status === 'stun' || D.status === 'freeze' ? 1.8 : D.status ? 1.3 : 1) * (B.kind === 'anomaly' ? .7 : 1);
+    const p = clamp(rate, .02, .97), shake = Math.pow(p, 1 / 3);
+    let k = 0; while (k < 3 && Math.random() < shake) { k++; say(['…', '…!', '…!!'][k - 1], { shake: k }); }
+    if (k === 3) { say(`🎉 Gotcha! ${D.d.icon} ${D.d.name} was caught!`, { caught: 1 }); B.caught = D; B.over = 'caught'; return pbPlay(); }
+    say(['Oh no! It broke free!', 'Aww! It appeared to be caught!', 'Argh! So close!'][Math.min(2, k)], { broke: 1 });
+  } else if (act.t === 'move') myMove = act.m;
+  // the foe acts too
+  const foeMove = aiMove(D, pbA());
+  const order = [];
+  if (myMove) {
+    const pm = getMove(myMove), pf = getMove(foeMove), myPri = (pm.pri || 0) + (pbA().ab === 'first' ? 5 : 0), foPri = (pf.pri || 0) + (D.ab === 'first' ? 5 : 0);
+    meFirst = myPri !== foPri ? myPri > foPri : effSpd(pbA()) !== effSpd(D) ? effSpd(pbA()) > effSpd(D) : Math.random() < .5;
+    if (meFirst) order.push(['me', myMove], ['foe', foeMove]); else order.push(['foe', foeMove], ['me', myMove]);
+  } else order.push(['foe', foeMove]);
+  for (const [who, mid] of order) {
+    const X = who === 'me' ? pbA() : pbB(), Y = who === 'me' ? pbB() : pbA();
+    if (X.hp <= 0 || Y.hp <= 0 || B.over) continue;
+    if (!canAct(X)) continue;
+    useMove(X, Y, mid);
+    if (pbFaints()) break;
+  }
+  if (!B.over && !B.need) pbEndTurn();
+  pbPlay();
+}
+function pbEndTurn() {
+  const B = PB;
+  for (const p of [pbA(), pbB()]) {
+    if (!p || p.hp <= 0) continue;
+    if (p.status === 'burn' || p.status === 'poison') { const d = Math.max(1, Math.round(p.maxHp / (p.status === 'burn' ? 12 : 9))); p.hp -= d; say(`${pname(p)} is hurt by its ${p.status}! (${d})`, { hit: p.mine ? 'me' : 'foe', dmg: d }); if (--p.stT <= 0 && p.hp > 0) { const was = p.status; p.status = null; say(`${pname(p)} is no longer ${was === 'burn' ? 'burned' : 'poisoned'}.`); } }
+    if ((p.ab === 'tide' || p.ab === 'sunlit') && p.hp > 0 && p.hp < p.maxHp) { const h = Math.min(p.maxHp - p.hp, Math.round(p.maxHp / (p.ab === 'tide' ? 12 : 14))); p.hp += h; say(`${pname(p)} restored ${h} HP ${p.ab === 'tide' ? '🌊' : '🌞'}`, { heal: p.mine ? 'me' : 'foe' }); }
+    for (const k in p.cds) if (p.cds[k] > 0) p.cds[k]--;
+    if (p.blind > 0) p.blind--; if (p.thorns > 0) p.thorns--;
+  }
+  pbFaints();
+}
+// who fainted? XP, next foe, forced switch, win/lose
+function pbFaints() {
+  const B = PB, A = pbA(), D = pbB();
+  let changed = false;
+  if (D && D.hp <= 0) {
+    if (D.ab === 'rebirth' && !D.revived) { D.revived = true; D.hp = Math.round(D.maxHp / 2); say(`🔥 ${pname(D)} rises from its ashes!`, { heal: 'foe' }); }
+    else {
+      D.hp = 0; say(`${pname(D)} fainted!`, { faint: 'foe' }); changed = true;
+      if (A && A.hp > 0 && A.ab === 'harvest') { const h = Math.round(A.maxHp * .3); A.hp = Math.min(A.maxHp, A.hp + h); say(`💀 ${pname(A)} harvests ${h} HP.`); }
+      pbXp(D);
+      const next = B.foe.findIndex(f => f.hp > 0);
+      if (next < 0) { B.over = 'win'; return true; }
+      B.b = next; const t = B.opts.trainer; say(`${t ? t.icon + ' ' + t.name : 'The foe'} sent out ${pbB().d.icon} ${pbB().d.name}!`, { enter: 'foe' });
+    }
+  }
+  if (A && A.hp <= 0) {
+    if (A.ab === 'rebirth' && !A.revived) { A.revived = true; A.hp = Math.round(A.maxHp / 2); say(`🔥 ${pname(A)} rises from its ashes!`, { heal: 'me' }); return changed; }
+    A.hp = 0; say(`${pname(A)} fainted!`, { faint: 'me' }); changed = true;
+    if (!B.my.some(p => p.hp > 0)) { B.over = 'lose'; return true; }
+    B.need = 'switch';
+  }
+  return changed;
+}
+function pbXp(D) { // everyone who fought gets full XP; the rest of the party gets half (Exp Share)
+  const B = PB, base = [55, 70, 90, 115, 150][D.d.rar] * (D.boss ? 1.6 : 1) * (B.kind === 'wild' || B.kind === 'anomaly' ? 1 : 1.5);
+  const amt = base * D.lv / 5;
+  B.my.forEach(p => {
+    if (p.hp <= 0 || !p.mine) return;
+    const got = Math.round(amt * (p.used ? 1 : .5)), out = [], before = lvOf(p.id);
+    const n = giveXp(p.id, got, out);
+    if (p === pbA() || n) say(`${p.d.icon} ${p.d.name} gained ${got} XP!`, { xp: p === pbA() ? 'me' : null });
+    if (n) {
+      const old = p.maxHp; const st = petStats(p.id, lvOf(p.id), ownStar(p.id) || 1, !!(col()[p.id] || {}).shiny);
+      p.lv = lvOf(p.id); p.s = st; p.maxHp = st.hp; p.hp += st.hp - old; p.moves = movesOf(p.id);
+      say(`⬆️ ${p.d.icon} ${p.d.name} grew to level <b>${p.lv}</b>!`, { lvup: p === pbA() ? 'me' : null });
+      out.forEach(o => say(o));
+      if (readyToEvolve(p.id)) B.evolve = (B.evolve || []).concat(p.id);
+    }
+  });
+}
+function pbFinish() {
+  const B = PB; if (!B || B.done) return; B.done = true;
+  // your pets keep their HP after world battles (heal at a fountain); tower battles don't touch it
+  if (!B.opts.fullHeal) B.my.forEach(p => { if (col()[p.id]) col()[p.id].hp = p.hp >= p.maxHp ? null : Math.max(0, Math.round(p.hp)); });
+  let caughtNew = false;
+  if (B.over === 'caught') { const D = B.caught; caughtNew = addPet(D.id, D.lv, D.shiny); S.stats.caught = (S.stats.caught || 0) + 1; if (col()[D.id]) col()[D.id].hp = Math.max(1, Math.round(D.hp)); }
+  save(); checkAch();
+  const evo = [...new Set(B.evolve || [])];
+  const end = () => { PB = null; if (B.opts.onEnd) B.opts.onEnd(B.over, B, caughtNew); };
+  const runEvo = k => { if (k >= evo.length) return end(); if (!readyToEvolve(evo[k])) return runEvo(k + 1); showEvolution(evo[k], () => runEvo(k + 1)); };
+  runEvo(0);
+}
+function showEvolution(id, next) {
+  const to = EVO[id][0], a = UD(id), b = UD(to);
+  screen(`<div class="evo"><h2>What? ${a.icon} ${a.name} is evolving!</h2><div class="evostage"><span class="evoa">${a.icon}</span><span class="evob">${b.icon}</span></div><div class="sub" id="evotxt">…</div>
+    <div class="col"><button class="opt big" data-a="0" data-n="1" id="evobtn" disabled>…</button></div></div>`, [() => next()], 'menu');
+  sfx('level');
+  setTimeout(() => { evolvePet(id); sfx('ult'); setTimeout(() => sfx('win'), 300); pullFx(Math.max(3, b.rar)); const t = $('#evotxt'), bt = $('#evobtn'); if (t) t.innerHTML = `🎉 Congratulations! ${a.name} evolved into <b style="color:${RAR[b.rar].color}">${b.icon} ${b.name}</b>!`; if (bt) { bt.disabled = false; bt.textContent = 'Awesome! ➤'; bt.focus(); } save(); }, 2600);
+}
+
+/* ----- battle screen ----- */
+function pbPlay() { PB.fi = 0; PB.mode = 'play'; pbStep(); }
+function pbStep() {
+  const B = PB; if (!B) return;
+  if (B.fi >= B.frames.length) {
+    if (B.over) return pbFinish();
+    if (B.need === 'switch') { B.mode = 'forceswitch'; return pbDraw(); }
+    B.mode = 'menu'; return pbDraw();
+  }
+  const f = B.frames[B.fi++];
+  pbDraw(f);
+  if (f.hit) sfx(f.crit ? 'boom' : 'hit'); else if (f.heal || f.lvup) sfx('level'); else if (f.faint) sfx('lose'); else if (f.caught) { sfx('win'); pullFx(3); } else if (f.shake) sfx('click'); else if (f.buff) sfx('gem');
+  const my = B; clearTimeout(B.timer);
+  B.timer = setTimeout(() => { if (PB === my) pbStep(); }, (f.msg ? (f.caught ? 1600 : 900) : 380) / B.speed);
+}
+function spriteHTML(s, side, f) {
+  if (!s) return '';
+  const cls = [f && f.hit === side ? 'hit' : '', f && f.faint === side ? 'faint' : '', f && f.enter === side ? 'enter' : '', f && f.atk === side ? 'atk' : '', f && f.heal === side ? 'healfx' : '', f && f.buff === side ? 'bufffx' : '', f && f.status === side ? 'statfx' : '', s.shiny ? 'shiny' : '', s.hp <= 0 ? 'down' : '', 'r' + s.rar, s.boss ? 'boss' : ''].join(' ');
+  const orb = f && (f.orb || f.shake || f.broke || f.caught) && side === 'foe';
+  return `<div class="pbspr ${cls}">${orb ? `<span class="pborb ${f.shake ? 'wob' : ''} ${f.caught ? 'gotcha' : ''}">🔮</span>` : `<span class="pbemo">${s.icon}</span>`}${f && f.hit === side && f.dmg ? `<span class="pbdmg ${f.crit ? 'crit' : ''}">-${f.dmg}</span>` : ''}</div>`;
+}
+function infoHTML(s, side, me) {
+  if (!s) return '';
+  const pct = s.hp / s.max, col2 = pct > .5 ? '#5ee08a' : pct > .2 ? '#ffd24a' : '#ff6070', c = col()[s.id] || {};
+  const xpPct = me && c.lv ? clamp((c.xp || 0) / xpNeedLv(c.lv), 0, 1) : 0;
+  return `<div class="pbinfo ${side}"><div class="pbname">${s.shiny ? '✨' : ''}${esc(s.name)} <span style="color:${RAR[s.rar].color}">●</span> ${ELEMENTS[s.el].icon} <span class="pblv">Lv${s.lv}</span>${s.st ? ` <span class="pbst ${s.st}">${{ burn: 'BRN', poison: 'PSN', stun: 'STN', freeze: 'FRZ' }[s.st]}</span>` : ''}</div>
+    <div class="pbhp"><b>HP</b><div class="pbbar"><i style="width:${pct * 100}%;background:${col2}"></i>${s.sh ? `<s style="width:${Math.min(100, s.sh / s.max * 100)}%"></s>` : ''}</div></div>
+    ${me ? `<div class="pbhpn">${s.hp} / ${s.max}</div><div class="pbxp"><i style="width:${xpPct * 100}%"></i></div>` : ''}</div>`;
+}
+function pbDraw(f) {
+  const B = PB, snap = f ? f.snap : pbSnap();
+  const acts = [], A = fn => { acts.push(fn); return acts.length - 1; };
+  let box = '';
+  if (f) box = `<div class="pbmsg" data-a="${A(() => { clearTimeout(B.timer); pbStep(); })}">${f.msg || '&nbsp;'}</div>`;
+  else if (B.mode === 'menu') {
+    box = `<div class="pbmsg">What will ${pbA().d.icon} ${esc(pbA().d.name)} do?</div><div class="pbgrid">
+      <button class="opt pbbtn fight" data-a="${A(() => { B.mode = 'fight'; pbDraw(); })}" data-n="1">⚔️ Fight<kbd>1</kbd></button>
+      <button class="pbbtn" data-a="${A(() => { B.mode = 'pets'; pbDraw(); })}" data-n="2">🐾 Pets<kbd>2</kbd></button>
+      <button class="pbbtn" data-a="${A(() => { B.mode = 'bag'; pbDraw(); })}" data-n="3">🎒 Bag<kbd>3</kbd></button>
+      <button class="pbbtn" data-a="${A(() => pbTurn({ t: 'run' }))}" data-n="4" ${B.kind !== 'wild' ? 'disabled' : ''}>🏃 Run<kbd>4</kbd></button></div>`;
+  } else if (B.mode === 'fight') {
+    const P = pbA(), D = pbB();
+    box = `<div class="pbgrid">${P.moves.map((mid, i) => { const m = getMove(mid), el = moveEl(m, P), cd = P.cds[mid] || 0, eff = m.p ? typeMul(el, D.el) : 1;
+      return `<button class="pbmove el-${el}" data-a="${A(() => pbTurn({ t: 'move', m: mid }))}" data-n="${i + 1}" ${cd > 0 ? 'disabled' : ''} title="${esc(m.d || '')}"><b>${m.n}</b><small>${el === 'normal' ? '⚪' : ELEMENTS[el].icon} ${m.p ? 'Power ' + m.p * (m.hits ? 1 : 1) + (m.hits ? ` ×${m.hits[0]}-${m.hits[1]}` : '') : 'Status'}${m.p ? ` · ${eff > 1 ? '<span class="sup">▲ super</span>' : eff < 1 ? '<span class="nve">▼ weak</span>' : ''}` : ''}</small><small class="md">${cd > 0 ? `⏳ ready in ${cd}` : esc(m.d || '')}</small><kbd>${i + 1}</kbd></button>`; }).join('')}</div>
+      <div class="row"><button data-a="${A(() => { B.mode = 'menu'; pbDraw(); })}">← Back (Esc)</button></div>`;
+  } else if (B.mode === 'pets' || B.mode === 'forceswitch' || B.mode === 'itemtarget') {
+    const it = B.pendingItem && ITEMS_W[B.pendingItem];
+    box = `<div class="pbmsg">${B.mode === 'forceswitch' ? 'Choose your next pet!' : it ? `Use ${it.i} ${it.n} on which pet?` : 'Switch to which pet?'}</div><div class="pbparty">${B.my.map((p, j) => {
+      const ok = B.mode === 'itemtarget' ? (it.revive ? p.hp <= 0 : p.hp > 0 && (it.cure ? !!p.status : p.hp < p.maxHp)) : j !== B.a && p.hp > 0;
+      return `<button class="pbpm" data-a="${A(() => { if (B.mode === 'itemtarget') { const id = B.pendingItem; B.pendingItem = null; pbTurn({ t: 'item', id, target: j }); } else if (B.mode === 'forceswitch') { B.need = null; B.a = j; pbA().used = true; B.frames = [pbFrame(`Go, ${pbA().d.icon} ${pbA().d.name}!`, { enter: 'me' })]; pbPlay(); } else pbTurn({ t: 'switch', j }); })}" ${ok ? '' : 'disabled'}>${p.d.icon} <b>${esc(p.d.name)}</b> Lv${p.lv}<br><small>${p.hp <= 0 ? '💀 fainted' : `❤️ ${Math.round(p.hp)}/${p.maxHp}`} ${ELEMENTS[p.el].icon}${p.status ? ' ' + p.status : ''}</small></button>`; }).join('')}</div>
+      ${B.mode !== 'forceswitch' ? `<div class="row"><button data-a="${A(() => { B.mode = 'menu'; B.pendingItem = null; pbDraw(); })}">← Back (Esc)</button></div>` : ''}`;
+  } else if (B.mode === 'bag') {
+    const bg = bag(), wild = B.kind === 'wild' || B.kind === 'anomaly';
+    const list = Object.entries(ITEMS_W).filter(([k, it]) => (bg[k] || 0) > 0 && !it.candy && (!it.catch || wild));
+    box = `<div class="pbparty">${list.map(([k, it]) => `<button class="pbpm" data-a="${A(() => { if (it.catch) pbTurn({ t: 'orb', id: k }); else { B.pendingItem = k; B.mode = 'itemtarget'; pbDraw(); } })}">${it.i} <b>${it.n}</b> ×${bg[k]}<br><small>${it.d}</small></button>`).join('') || '<div class="sub">Your bag is empty.</div>'}</div>
+      ${!wild ? '<div class="keys">You can\'t catch a trainer\'s pet!</div>' : ''}<div class="row"><button data-a="${A(() => { B.mode = 'menu'; pbDraw(); })}">← Back (Esc)</button></div>`;
+  }
+  const zone = B.opts.zone != null ? ZONES[B.opts.zone] : null;
+  screen(`<div class="pbw ${zone ? 'z-' + zone.id : 'z-tower'}">
+    <div class="pbtop">${B.opts.trainer ? `<span>${B.opts.trainer.icon} ${esc(B.opts.trainer.name)}</span> ${B.foe.map(p => `<span class="pball ${p.hp > 0 ? '' : 'out'}">●</span>`).join('')}` : B.kind === 'wild' ? '🌿 Wild battle' : ''}<span class="sp"></span>${B.my.map(p => `<span class="pball me ${p.hp > 0 ? '' : 'out'}">●</span>`).join('')} <button class="pbspeed" data-a="${A(() => { B.speed = B.speed >= 3 ? 1 : B.speed + 1; S.pbSpeed = B.speed; })}">⏩ ${B.speed}×</button></div>
+    <div class="pbfield">
+      <div class="pbrow foe">${infoHTML(snap.foe, 'foe')}${spriteHTML(snap.foe, 'foe', f)}</div>
+      <div class="pbrow me">${spriteHTML(snap.me, 'me', f)}${infoHTML(snap.me, 'me', true)}</div>
+    </div>
+    <div class="pbbox">${box}</div></div>`, acts, 'menu', k => {
+    if (!PB) return false;
+    if (f && (k === ' ' || k === 'enter')) { clearTimeout(B.timer); pbStep(); return true; }
+    if (k === 'escape' && ['fight', 'pets', 'bag', 'itemtarget'].includes(B.mode) && !f) { B.mode = 'menu'; B.pendingItem = null; pbDraw(); return true; }
+  });
+}
 
 /* =====================================================================
-   🗼 RIFT TOWER — the side mode
+   🌍 RIFT WORLD — walk around, find pets in the tall grass, beat trainers
+   and the zone Wardens, earn badges, and catch 'em.
    ===================================================================== */
-const TOWER_TOP = 60;
+const ZONES = [
+  { id: 'meadow', name: 'Sunny Meadow', icon: '🌼', lv: [2, 6], els: ['storm', 'blade', 'frost', 'arcane', 'fire'], rar: [76, 21, 3, 0, 0], grass: '#5a9a44', grass2: '#528f3e', tall: '#2f6b27', path: '#d8c08a', water: '#3a86d6', tree: '🌳', deco: ['🌼', '🌷', '🍄', '🌻'],
+    trainers: [['Rift Kid Mo', '🧒', 'My pets are the BEST!'], ['Picnicker Lu', '👧', "Let's battle before lunch!"], ['Bug Fan Ty', '🧑', 'Buzz buzz!']], warden: { name: 'Warden Pip', icon: '🧑‍🌾', el: 'storm', line: 'The meadow has seen many runners. Show me yours!' } },
+  { id: 'canyon', name: 'Ember Canyon', icon: '🌋', lv: [7, 13], els: ['fire', 'fire', 'blade', 'storm'], rar: [60, 30, 9, 1, 0], grass: '#b87445', grass2: '#ad6b3f', tall: '#7a3e22', path: '#e2b77e', water: '#e0531a', tree: '🌵', deco: ['🪨', '🦴', '🔥'],
+    trainers: [['Hiker Bo', '🧔', "These rocks are HOT. So are my pets."], ['Firefan Jo', '👩', 'Feel the burn!'], ['Miner Ray', '👷', 'Dig this!']], warden: { name: 'Warden Blaze', icon: '🧑‍🚒', el: 'fire', line: 'Can your team take the heat?' } },
+  { id: 'frost', name: 'Frostpeak Pass', icon: '🏔️', lv: [13, 20], els: ['frost', 'frost', 'arcane', 'storm'], rar: [50, 32, 15, 3, 0], grass: '#e3ecf4', grass2: '#d7e3ee', tall: '#a7c3dc', path: '#bcc7d2', water: '#77b9ea', tree: '🌲', deco: ['⛄', '❄️', '🪨'],
+    trainers: [['Skier Kim', '⛷️', 'Wheee—BATTLE!'], ['Snow Kid Ali', '🧒', 'I built a snow fort AND a team!'], ['Climber Ivy', '🧗', 'Only the strong reach the top.']], warden: { name: 'Warden Yuki', icon: '🧝', el: 'frost', line: 'Cold hearts, cold claws. Let us begin.' } },
+  { id: 'isles', name: 'Storm Isles', icon: '🏝️', lv: [20, 27], els: ['storm', 'storm', 'frost', 'blade'], rar: [40, 35, 20, 5, .3], grass: '#86c46e', grass2: '#7cb965', tall: '#4f8f45', path: '#eedcaa', water: '#2f8fd6', tree: '🌴', deco: ['🐚', '🦀', '⚓'],
+    trainers: [['Sailor Mack', '🧑‍✈️', 'Ahoy! Prepare to be boarded!'], ['Surfer Zee', '🏄', 'Catch this wave!'], ['Pirate Pegg', '🏴‍☠️', 'Hand over yer treasure!']], warden: { name: 'Captain Volt', icon: '⚡', el: 'storm', line: 'Lightning never strikes twice. I strike ten times.' } },
+  { id: 'woods', name: 'Shadow Woods', icon: '🌑', lv: [27, 34], els: ['arcane', 'blade', 'arcane', 'fire'], rar: [30, 35, 25, 9, 1], grass: '#34472f', grass2: '#2f412a', tall: '#1c2a1b', path: '#6a5d48', water: '#23405f', tree: '🌲', deco: ['🕯️', '🍄', '🦴', '🕸️'],
+    trainers: [['Ghost Kid Ash', '👻', 'Boo! Did I scare you?'], ['Hunter Rook', '🏹', 'Nothing escapes my pets.'], ['Mystic Nia', '🔮', 'I foresaw this battle.']], warden: { name: 'Witch Morgana', icon: '🧙‍♀️', el: 'arcane', line: 'Hehehe. Your pets will make lovely potions.' } },
+  { id: 'core', name: 'Rift Core', icon: '🌀', lv: [34, 42], els: ['fire', 'frost', 'storm', 'blade', 'arcane'], rar: [20, 30, 30, 15, 5], grass: '#2e2350', grass2: '#281e47', tall: '#4a2f7c', path: '#7766aa', water: '#120c26', tree: '🔮', deco: ['✨', '💠', '🌀'],
+    trainers: [['Rift Knight Vex', '🛡️', 'None pass the Core.'], ['Star Mage Ori', '🧙', 'The stars chose me.'], ['Champion Rae', '🦸', 'Show me everything.']], warden: { name: 'The Rift Champion', icon: '👑', el: null, line: 'So you made it to the Core. Let us see if you are worthy.' } },
+];
+const WTILE = 44, WW = 46, WH = 30;
+function zoneRng(seed) { let s = hashStr(seed); return () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), s | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const WMAPS = {};
+// tiles: . grass  , tall grass  : path  T tree  ~ water  d flowers  H heal fountain  S shop  I sign  G gate onward  B gate back  * hidden item  A rift anomaly
+function zoneMap(z) {
+  if (WMAPS[z]) return WMAPS[z];
+  const R = zoneRng('rift-world-' + z), t = Array(WW * WH).fill('.'), at = (x, y) => t[y * WW + x], set = (x, y, c) => { if (x > 0 && y > 0 && x < WW - 1 && y < WH - 1) t[y * WW + x] = c; };
+  for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) if (x < 2 || y < 2 || x >= WW - 2 || y >= WH - 2) t[y * WW + x] = 'T';
+  // a winding path from west to east
+  let y = 14; const path = [];
+  for (let x = 2; x < WW - 2; x++) {
+    if (x > 12 && x % 5 === 0 && x < WW - 8) { const ny = clamp(y + Math.round((R() - .5) * 8), 5, WH - 7); while (y !== ny) { set(x, y, ':'); set(x, y + 1, ':'); path.push([x, y]); y += Math.sign(ny - y); } }
+    set(x, y, ':'); set(x, y + 1, ':'); path.push([x, y]);
+  }
+  const onPath = (x, y) => at(x, y) === ':';
+  const nearPath = (x, y, r) => { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (onPath(x + dx, y + dy)) return true; return false; };
+  const blob = (cx, cy, rx, ry, c, ok) => { for (let yy = cy - ry; yy <= cy + ry; yy++) for (let xx = cx - rx; xx <= cx + rx; xx++) if (((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2 <= 1 && ok(xx, yy)) set(xx, yy, c); };
+  // tall grass along the path (this is where wild pets live)
+  for (let k = 0; k < 11; k++) { const [px, py] = path[12 + Math.floor(R() * (path.length - 18))]; blob(px + Math.round((R() - .5) * 6), py + (R() < .5 ? -3 : 4), 2 + Math.floor(R() * 3), 1 + Math.floor(R() * 2), ',', (x, y) => at(x, y) === '.' && x > 10); }
+  for (let k = 0; k < 14; k++) blob(12 + Math.floor(R() * (WW - 16)), 3 + Math.floor(R() * (WH - 6)), 1 + Math.floor(R() * 2), 1 + Math.floor(R() * 2), 'T', (x, y) => at(x, y) === '.' && !nearPath(x, y, 1));
+  for (let k = 0; k < 2; k++) blob(14 + Math.floor(R() * (WW - 20)), 4 + Math.floor(R() * (WH - 8)), 2 + Math.floor(R() * 2), 1 + Math.floor(R() * 2), '~', (x, y) => at(x, y) === '.' && !nearPath(x, y, 2));
+  for (let k = 0; k < 30; k++) { const x = 3 + Math.floor(R() * (WW - 6)), yy = 3 + Math.floor(R() * (WH - 6)); if (at(x, yy) === '.') set(x, yy, 'd'); }
+  // town: heal fountain, shop and sign near the start
+  const sy = path[2][1];
+  for (let yy = sy - 4; yy <= sy + 5; yy++) for (let x = 2; x <= 9; x++) if (at(x, yy) !== ':') set(x, yy, '.');
+  const town = { heal: [4, sy - 2], shop: [7, sy - 2], sign: [9, sy + 3] };
+  set(...town.heal, 'H'); set(...town.shop, 'S'); set(...town.sign, 'I');
+  if (z < ZONES.length - 1) { set(WW - 3, path[path.length - 1][1], 'G'); set(WW - 3, path[path.length - 1][1] + 1, 'G'); }
+  if (z > 0) { set(2, sy, 'B'); set(2, sy + 1, 'B'); }
+  // trainers stand beside the path; the Warden blocks it near the end
+  const npcs = [];
+  [14, 23, 32].forEach((px, k) => { const p = path.find(q => q[0] === px) || path[k * 8 + 10]; const up = R() < .5, ny = up ? p[1] - 1 : p[1] + 2; set(p[0], ny, '.'); npcs.push({ k: 't' + k, x: p[0], y: ny, name: ZONES[z].trainers[k][0], icon: ZONES[z].trainers[k][1], line: ZONES[z].trainers[k][2], kind: 'trainer', face: up ? 1 : -1 }); });
+  const wp = path.find(q => q[0] === WW - 7) || path[path.length - 5];
+  npcs.push({ k: 'w', x: wp[0], y: wp[1], kind: 'warden', name: ZONES[z].warden.name, icon: ZONES[z].warden.icon, line: ZONES[z].warden.line });
+  npcs.push({ k: 'w2', x: wp[0], y: wp[1] + 1, kind: 'wall' }); // the Warden's post blocks both lanes of the path
+  // hidden items and a rift anomaly somewhere off the path
+  const spots = []; for (let k = 0; k < 400 && spots.length < 4; k++) { const x = 12 + Math.floor(R() * (WW - 16)), yy = 3 + Math.floor(R() * (WH - 6)); if (at(x, yy) === '.' && !nearPath(x, yy, 3) && !spots.some(s => Math.abs(s[0] - x) + Math.abs(s[1] - yy) < 6)) spots.push([x, yy]); }
+  spots.slice(0, 3).forEach(s => set(s[0], s[1], '*')); if (spots[3]) set(spots[3][0], spots[3][1], 'A');
+  // make sure everything can be reached: carve a little trail from anything cut off to the path
+  const reach = () => { const seen = new Uint8Array(WW * WH), q = [[3, sy]]; seen[sy * WW + 3] = 1; while (q.length) { const [x, yy] = q.pop(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = yy + dy, i = ny * WW + nx; if (nx < 0 || ny < 0 || nx >= WW || ny >= WH || seen[i] || 'T~'.includes(t[i])) continue; seen[i] = 1; q.push([nx, ny]); } } return seen; };
+  const seen = reach();
+  spots.forEach(([x, yy]) => { if (seen[yy * WW + x]) return; let cx = x, cy = yy; while (!onPath(cx, cy) && cy > 2 && cy < WH - 3) { cy += cy < 14 ? 1 : -1; if (at(cx, cy) === 'T' || at(cx, cy) === '~') set(cx, cy, '.'); } });
+  return (WMAPS[z] = { t, path, npcs, town, start: [3, sy] });
+}
+function wstate() { S.world = S.world || {}; const w = S.world; w.beat = w.beat || {}; w.got = w.got || {}; w.badges = w.badges || 0; if (w.z == null) w.z = 0; return w; }
+let WS = null; // what's happening on screen right now
+function enterWorld() {
+  const w = wstate();
+  if (!w.started) return chooseStarter();
+  const M = zoneMap(w.z);
+  if (w.x == null) { w.x = M.start[0]; w.y = M.start[1]; }
+  WS = { z: w.z, M, px: w.x, py: w.y, fx: w.x, fy: w.y, mv: null, dir: [1, 0], t: 0, flash: 0, trail: [[w.x - 1, w.y]], bubble: null, stepsSinceFight: 0 };
+  mode = 'world'; run = null; G = null; PL = []; hideUI();
+}
+function chooseStarter() {
+  const acts = [];
+  const cards = STARTERS.map((id, i) => { const d = UD(id), b = baseStats(id); acts.push(() => { addPet(id, 5, Math.random() < 1 / 64); S.party = [id].concat(party().filter(x => x !== id)).slice(0, 6); const w = wstate(); w.started = true; w.coins = (w.coins || 0) + 300; bag(); save(); sfx('win'); pullFx(2); enterWorld(); toast(`${d.icon} ${d.name} joined your team!`, '#ffd24a'); });
+    return `<button class="card opt" data-a="${i}" data-n="${i + 1}" style="border-color:${ELEMENTS[d.el].color}"><div class="ci">${d.icon}</div><div class="ct">${d.name}</div><div class="cs">${ELEMENTS[d.el].icon} ${ELEMENTS[d.el].name} · ${CLASSES[d.cls].name}</div>
+      <div class="cd">${statBars(b, true)}<br>Evolves into ${UD(EVO[id][0]).icon} ${UD(EVO[id][0]).name} at Lv ${EVO[id][1]}!</div><kbd>${i + 1}</kbd></button>`; }).join('');
+  screen(`<h1 style="font-size:40px">Welcome to the Rift World!</h1><div class="sub">Wild pets live in the tall grass. Weaken them and throw a 🔮 Rift Orb to catch them.<br>Beat the trainers, then each zone's <b>Warden</b> for a badge. Choose your first partner:</div>
+    <div class="row">${cards}</div><div class="col" style="margin-top:10px"><button data-a="3">← Back</button></div>`, acts.concat([showTitle]), 'menu', k => { if (k === 'escape') { showTitle(); return true; } });
+}
+function statBars(b, base) { const mx = base ? 150 : 250; return STATS.map(([k, i, n]) => `<div class="sbar"><span>${i} ${n}</span><div><i style="width:${Math.min(100, b[k] / mx * 100)}%"></i></div><b>${b[k]}</b></div>`).join(''); }
+const wTile = (x, y) => (x < 0 || y < 0 || x >= WW || y >= WH) ? 'T' : WS.M.t[y * WW + x];
+const wNpcAt = (x, y) => WS.M.npcs.find(n => n.x === x && n.y === y);
+const beatKey = (z, k) => z + '-' + k;
+function wSolid(x, y) {
+  const c = wTile(x, y); if ('T~HSIA'.includes(c)) return true;
+  const n = wNpcAt(x, y); if (!n) return false;
+  return n.kind === 'trainer' || !wstate().beat[beatKey(WS.z, 'w')]; // the Warden's post opens once you win
+}
+function worldUpdate(dt) {
+  if (!WS) return;
+  WS.t += dt; if (WS.flash > 0) WS.flash -= dt; if (WS.bubble) { WS.bubble.t -= dt; if (WS.bubble.t <= 0) { const f = WS.bubble.then; WS.bubble = null; if (f) f(); } }
+  if (ui.className !== 'hidden' || WS.bubble || WS.busy) return;
+  if (WS.mv) { // gliding to the next tile
+    WS.mv.p += dt / .15;
+    const p = Math.min(1, WS.mv.p); WS.fx = WS.mv.x0 + (WS.px - WS.mv.x0) * p; WS.fy = WS.mv.y0 + (WS.py - WS.mv.y0) * p;
+    if (p >= 1) { WS.mv = null; wArrive(); }
+    return;
+  }
+  const K = c => keys[c], dir = K('KeyW') || K('ArrowUp') ? [0, -1] : K('KeyS') || K('ArrowDown') ? [0, 1] : K('KeyA') || K('ArrowLeft') ? [-1, 0] : K('KeyD') || K('ArrowRight') ? [1, 0] : null;
+  const pad = [...(navigator.getGamepads ? navigator.getGamepads() : [])].filter(Boolean)[0];
+  let d = dir; if (!d && pad) { const ax = pad.axes[0] || 0, ay = pad.axes[1] || 0; if (Math.abs(ax) > .5) d = [Math.sign(ax), 0]; else if (Math.abs(ay) > .5) d = [0, Math.sign(ay)]; }
+  if (hit.Enter || hit.KeyE || hit.Space) return wInteract();
+  if (!d) return;
+  WS.dir = d;
+  const nx = WS.px + d[0], ny = WS.py + d[1];
+  let n = wNpcAt(nx, ny);
+  if (n && n.kind === 'wall') n = WS.M.npcs.find(q => q.k === 'w');
+  if (n && (n.kind === 'trainer' || !wstate().beat[beatKey(WS.z, 'w')])) return wTalk(n);
+  const c = wTile(nx, ny);
+  if (c === 'H') return wHeal();
+  if (c === 'S') return wShop();
+  if (c === 'I') return wSign();
+  if (c === 'A') return wAnomaly(nx, ny);
+  if (c === 'G') { if (wstate().badges > WS.z) return wZone(WS.z + 1, 'west'); return wSay('🚧 The rift gate is sealed. Beat this zone\'s Warden first!'); }
+  if (c === 'B') return wZone(WS.z - 1, 'east');
+  if (wSolid(nx, ny)) return;
+  WS.trail.unshift([WS.px, WS.py]); WS.trail.length = 3;
+  WS.mv = { x0: WS.px, y0: WS.py, p: 0 }; WS.px = nx; WS.py = ny;
+}
+function wArrive() {
+  const w = wstate(); w.x = WS.px; w.y = WS.py; WS.stepsSinceFight++;
+  const c = wTile(WS.px, WS.py);
+  if (c === '*') { const key = `${WS.z}-${WS.px}-${WS.py}`; if (!w.got[key]) { w.got[key] = true; const r = zoneRng(key)(), it = r < .35 ? 'greatorb' : r < .6 ? 'superpotion' : r < .8 ? 'revive' : r < .93 ? 'candy' : 'ultraorb'; bag()[it] = (bag()[it] || 0) + 1; sfx('gold'); wSay(`✨ You found a ${ITEMS_W[it].i} <b>${ITEMS_W[it].n}</b>!`); save(); return; } }
+  // trainers spot you if you walk in front of them
+  for (const n of WS.M.npcs) if (n.kind === 'trainer' && !w.beat[beatKey(WS.z, n.k)] && Math.abs(n.x - WS.px) + Math.abs(n.y - WS.py) <= 2) { WS.bubble = { n, t: .8, then: () => wTalk(n) }; sfx('alarm'); return; }
+  if (c === ',' && WS.stepsSinceFight > 2 && Math.random() < .12) { WS.stepsSinceFight = 0; return wWild(); }
+}
+function wInteract() { const nx = WS.px + WS.dir[0], ny = WS.py + WS.dir[1]; const n = wNpcAt(nx, ny); if (n && n.kind !== 'wall') return wTalk(n); const c = wTile(nx, ny); if (c === 'H') return wHeal(); if (c === 'S') return wShop(); if (c === 'I') return wSign(); if (c === 'A') return wAnomaly(nx, ny); }
+function wSay(html, then) { screen(`<div class="wsay">${html}</div><div class="col"><button class="opt" data-a="0" data-n="1">OK<kbd>1</kbd></button></div>`, [() => { hideUI(); if (then) then(); }], 'overlay', k => { if (k === 'escape' || k === ' ') { hideUI(); if (then) then(); return true; } }); inputLock = performance.now() + 250; }
+function wHeal() { healParty(); save(); sfx('revive'); const w = wstate(); w.heal = { z: WS.z, x: WS.px, y: WS.py }; wSay('⛲ The fountain sparkles. <b>Your pets are fully healed!</b>'); }
+function wSign() { const Z = ZONES[WS.z], w = wstate(); wSay(`🪧 <b>${Z.icon} ${Z.name}</b> — wild pets Lv ${Z.lv[0]}–${Z.lv[1]}.<br>Badges: ${'🏅'.repeat(w.badges)}${'▫️'.repeat(ZONES.length - w.badges)}<br><small>Tall grass hides wild pets. Trainers will challenge you if they see you. The Warden guards the way on.</small>`); }
+function wZone(z, from) {
+  const w = wstate(); w.z = z; const M = zoneMap(z);
+  const p = from === 'west' ? [3, M.start[1]] : [WW - 4, M.path[M.path.length - 1][1]];
+  w.x = p[0]; w.y = p[1]; save(); enterWorld(); WS.flash = .5; sfx('door');
+  toast(`${ZONES[z].icon} ${ZONES[z].name}`);
+}
+function pickWild(z, forceRar) {
+  const Z = ZONES[z];
+  let r = forceRar; if (r == null) { let roll = Math.random() * Z.rar.reduce((a, b) => a + b, 0); r = 0; for (let i = 0; i < 5; i++) { roll -= Z.rar[i]; if (roll < 0) { r = i; break; } } }
+  const el = pick(Z.els);
+  let pool = Object.keys(ROSTER).filter(id => ROSTER[id][2] === r && ROSTER[id][3] === el && (!EVO_ONLY.has(id) || z >= 3));
+  if (!pool.length) pool = Object.keys(ROSTER).filter(id => ROSTER[id][2] === r && !EVO_ONLY.has(id));
+  const id = pick(pool), lv = clamp(Z.lv[0] + Math.floor(Math.random() * (Z.lv[1] - Z.lv[0] + 1)) - (r >= 3 ? 0 : 0), 1, MAX_LV);
+  return { id, lv, shiny: Math.random() < 1 / 150 };
+}
+function wBattleEnd(res) {
+  if (res === 'lose') { // blackout: back to the last fountain
+    const w = wstate(), lost = Math.round(coins() * .15); addCoins(-lost); healParty(); const h = w.heal || { z: w.z, ...{ x: zoneMap(w.z).start[0], y: zoneMap(w.z).start[1] } };
+    w.z = h.z; w.x = h.x; w.y = h.y; save(); enterWorld(); wSay(`💫 All your pets fainted! You hurry back to the fountain.${lost ? ` (You dropped ${lost} 🪙.)` : ''} Your pets are healed.`);
+    return;
+  }
+  save(); mode = 'world'; hideUI(); WS.flash = .3;
+}
+function wWild() {
+  sfx('alarm'); WS.flash = .6; WS.busy = true;
+  const f = pickWild(WS.z);
+  setTimeout(() => { WS.busy = false; pbStart('wild', [f], { zone: WS.z, onEnd: (res, B, isNew) => { if (res === 'caught') { const d = B.caught.d; addCoins(10); wBattleEnd('caught'); wSay(`${isNew ? '📖 New pet! ' : ''}${d.icon} <b>${d.name}</b> ${isNew ? 'was added to your collection' : 'powered up your ' + d.name + ` (★${ownStar(d.id)})`}.${party().includes(d.id) ? ' It joined your party!' : ' It went to your collection (swap it into your party any time).'}`); } else { if (res === 'win') addCoins(4 + B.foe[0].lv * 2); wBattleEnd(res); } } }); }, 500);
+}
+function trainerTeam(z, k) { // the same team every time you meet them
+  const Z = ZONES[z], R = zoneRng('trainer-' + z + '-' + k), boss = k === 'w';
+  const n = boss ? Math.min(6, 3 + Math.floor(z / 2)) : Math.min(4, 1 + Math.floor(z / 2) + Math.floor(R() * 2));
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const el = boss && Z.warden.el ? (i === n - 1 || R() < .6 ? Z.warden.el : pick(Z.els)) : Z.els[Math.floor(R() * Z.els.length)];
+    let r = 0, roll = R() * 100; const rates = boss ? [20, 35, 30, 13, 2] : [55, 30, 13, 2, 0]; for (let q = 0; q < 5; q++) { roll -= rates[q]; if (roll < 0) { r = q; break; } }
+    if (boss && i === n - 1) r = z >= 5 ? 4 : z >= 2 ? 3 : 2; // the Warden's ace
+    let pool = Object.keys(ROSTER).filter(id => ROSTER[id][2] === r && ROSTER[id][3] === el); if (!pool.length) pool = Object.keys(ROSTER).filter(id => ROSTER[id][2] === r);
+    const id = pool[Math.floor(R() * pool.length)];
+    out.push({ id, lv: clamp(Z.lv[1] + (boss ? 1 + (i === n - 1 ? 2 : 0) : -1 + Math.floor(R() * 2)), 2, MAX_LV), star: boss ? 1 + Math.floor(z / 3) : 1, boss: boss && i === n - 1 });
+  }
+  return out;
+}
+function wTalk(n) {
+  const w = wstate(), key = beatKey(WS.z, n.k === 'w2' ? 'w' : n.k), beaten = w.beat[key];
+  if (beaten) return wSay(`${n.icon} <b>${n.name}:</b> “${n.kind === 'warden' ? 'You earned that badge. Go on, the rift gate is open!' : pick(['You and your pets are amazing!', 'I need to train more...', 'Good luck with the Warden!', 'Catch lots of pets, OK?'])}”`);
+  const team = trainerTeam(WS.z, n.k);
+  screen(`<div class="wsay">${n.icon} <b>${n.name}:</b> “${n.line}”<br><small>${team.length} pet${team.length > 1 ? 's' : ''} · up to Lv ${Math.max(...team.map(t => t.lv))}</small></div><div class="col"><button class="opt big" data-a="0" data-n="1">⚔️ Battle!<kbd>1</kbd></button>${n.kind === 'warden' ? '<button data-a="1" data-n="2">Not yet<kbd>2</kbd></button>' : ''}</div>`,
+    [() => wFight(n, team), () => hideUI()], 'overlay', k => { if (k === 'escape' && n.kind === 'warden') { hideUI(); return true; } });
+}
+function wFight(n, team) {
+  const w = wstate(), key = beatKey(WS.z, n.k), z = WS.z;
+  pbStart(n.kind === 'warden' ? 'warden' : 'trainer', team, { zone: z, trainer: { name: n.name, icon: n.icon, line: '' }, onEnd: res => {
+    if (res !== 'win') return wBattleEnd(res);
+    w.beat[key] = true;
+    const avg = team.reduce((a, t) => a + t.lv, 0) / team.length, c = Math.round((n.kind === 'warden' ? 60 : 24) * avg * (party().some(id => (LEG_AB[id] || [])[0] === 'lucky') ? 1.5 : 1));
+    addCoins(c);
+    if (n.kind === 'warden') {
+      w.badges = Math.max(w.badges, z + 1); const gems = 40 + 30 * z; S.gems += gems; bag().greatorb = (bag().greatorb || 0) + 3; if (z >= 2) bag().ultraorb = (bag().ultraorb || 0) + 1;
+      wBattleEnd('win');
+      sfx('win'); pullFx(4);
+      wSay(`🏅 <b>You beat ${n.name}!</b><br>You got the <b>${ZONES[z].icon} ${ZONES[z].name} Badge</b>, ${c} 🪙, ${gems} 💎 and 3 🟣 Great Orbs${z >= 2 ? ' and a 🌟 Ultra Orb' : ''}!<br>${z < ZONES.length - 1 ? 'The rift gate to the next zone is open!' : '👑 <b>You are the Rift Champion!</b>'}${' <br>Something strange is stirring in this zone… 🌀'}`);
+    } else { wBattleEnd('win'); wSay(`${n.icon} <b>${n.name}:</b> “Wow, you're good!” <br>You got ${c} 🪙.`); }
+    save(); checkAch();
+  } });
+}
+function wAnomaly(x, y) { // after the Warden falls, a rift opens with a rare, powerful pet
+  const w = wstate(); w.anom = w.anom || {};
+  if (w.badges <= WS.z) return wSay('🌀 A faint rift flickers here… it looks sealed. Maybe after you beat this zone\'s Warden?');
+  if (w.anom[WS.z]) return wSay('🌀 The rift here has closed.');
+  const Z = ZONES[WS.z], rar = WS.z >= 4 ? 4 : WS.z >= 2 ? 3 : 2, R = zoneRng('anom-' + WS.z);
+  const pool = Object.keys(ROSTER).filter(id => ROSTER[id][2] === rar && !EVO_ONLY.has(id) && (Z.warden.el ? ROSTER[id][3] === Z.warden.el : true));
+  const id = pool[Math.floor(R() * pool.length)] || 'dragon';
+  screen(`<div class="wsay">🌀 The rift tears open! A powerful ${UD(id).icon} <b>${UD(id).name}</b> steps out…<br><small>You only get one chance. Catch it or beat it.</small></div><div class="col"><button class="opt big" data-a="0" data-n="1">⚔️ Face it<kbd>1</kbd></button><button data-a="1" data-n="2">Not yet<kbd>2</kbd></button></div>`,
+    [() => pbStart('anomaly', [{ id, lv: Z.lv[1] + 3, star: 2, boss: true }], { zone: WS.z, onEnd: (res, B, isNew) => { if (res === 'caught' || res === 'win') w.anom[WS.z] = true; wBattleEnd(res === 'caught' ? 'win' : res); if (res === 'caught') wSay(`🌟 You caught ${UD(id).icon} <b>${UD(id).name}</b>!`); } }), () => hideUI()], 'overlay');
+}
+function wShop() {
+  const acts = [], A = f => { acts.push(f); return acts.length - 1; }, b = bag();
+  screen(`<h2>🏪 Rift Mart</h2><div class="sub">🪙 <b>${coins()}</b> coins — win battles to earn more.</div>
+    <div class="row">${Object.entries(ITEMS_W).map(([k, it]) => `<button class="card opt" style="min-height:0" data-a="${A(() => { if (coins() >= it.cost) { addCoins(-it.cost); b[k] = (b[k] || 0) + 1; sfx('gold'); save(); wShop(); } })}" ${coins() < it.cost ? 'disabled' : ''}><div class="ci">${it.i}</div><div class="ct">${it.n}</div><div class="cd">${it.d}</div><div class="price">🪙 ${it.cost} · have ${b[k] || 0}</div></button>`).join('')}</div>
+    <div class="col" style="margin-top:12px"><button data-a="${A(hideUI)}">Leave (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { hideUI(); return true; } });
+}
+function worldMenu() {
+  const w = wstate();
+  screen(`<h2>${ZONES[WS.z].icon} ${ZONES[WS.z].name}</h2><div class="sub">🏅 Badges ${w.badges}/${ZONES.length} · 🪙 ${coins()} · 📖 Caught ${Object.keys(dex().caught).length}/${Object.keys(ROSTER).length}</div>
+    <div class="col"><button class="opt big" data-a="0" data-n="1">▶ Keep exploring<kbd>1</kbd></button><button class="opt" data-a="1" data-n="2">🐾 Party &amp; pets<kbd>2</kbd></button><button class="opt" data-a="2" data-n="3">🎒 Bag<kbd>3</kbd></button><button class="opt" data-a="3" data-n="4">🗼 Rift Tower<kbd>4</kbd></button><button class="opt" data-a="4" data-n="5">🏠 Save &amp; title<kbd>5</kbd></button></div>`,
+    [hideUI, () => showSquadHub('team', worldMenu), () => bagScreen(worldMenu), () => showTower(), () => { save(); WS = null; showTitle(); }], 'menu', k => { if (k === 'escape') { hideUI(); return true; } });
+}
+function bagScreen(back) {
+  const b = bag(), acts = [], A = f => { acts.push(f); return acts.length - 1; };
+  screen(`<h2>🎒 Bag</h2><div class="sub">🪙 ${coins()} coins</div><div class="row">${Object.entries(ITEMS_W).filter(([k]) => b[k] > 0).map(([k, it]) => `<div class="card" style="min-height:0"><div class="ci">${it.i}</div><div class="ct">${it.n} ×${b[k]}</div><div class="cd">${it.d}</div>${it.heal || it.revive || it.cure || it.candy ? `<button data-a="${A(() => useBagItem(k, back))}">Use</button>` : ''}</div>`).join('') || '<div class="sub">Empty!</div>'}</div>
+    <div class="col" style="margin-top:12px"><button data-a="${A(back)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { back(); return true; } });
+}
+function useBagItem(k, back) {
+  const it = ITEMS_W[k], acts = [];
+  const ids = party();
+  screen(`<h2>${it.i} ${it.n}</h2><div class="sub">Use it on which pet?</div><div class="row">${ids.map((id, i) => { const hp = hpOf(id), mx = statsOf(id).hp, ok = it.revive ? hp <= 0 : it.candy ? lvOf(id) < MAX_LV : it.heal ? hp > 0 && hp < mx : false; acts.push(() => {
+    if (!ok) return; bag()[k]--; const c = col()[id];
+    if (it.heal) c.hp = Math.min(mx, hp + Math.round(mx * it.heal)) >= mx ? null : Math.min(mx, hp + Math.round(mx * it.heal));
+    if (it.revive) c.hp = Math.round(mx * it.revive);
+    let msg = '';
+    if (it.candy) { const out = []; giveXp(id, xpNeedLv(lvOf(id)) - (c.xp || 0), out); msg = `⬆️ ${UD(id).name} is now level ${lvOf(id)}! ${out.join(' ')}`; }
+    save(); sfx('level');
+    const ev = readyToEvolve(id);
+    if (ev) return showEvolution(id, () => bagScreen(back));
+    toast(msg || `${it.i} Used on ${UD(id).name}`); bagScreen(back);
+  }); return `<button class="card opt" style="min-height:0" data-a="${i}" ${ok ? '' : 'disabled'}><div class="ci">${UD(id).icon}</div><div class="ct">${UD(id).name} Lv${lvOf(id)}</div><div class="cd">❤️ ${hp}/${mx}</div></button>`; }).join('')}</div>
+    <div class="col" style="margin-top:12px"><button data-a="${ids.length}">← Back</button></div>`, acts.concat([() => bagScreen(back)]), 'menu', kk => { if (kk === 'escape') { bagScreen(back); return true; } });
+}
+function worldRender() {
+  if (!WS) return renderMenuBg(0);
+  const Z = ZONES[WS.z], T = WTILE, M = WS.M;
+  const camX = WS.fx * T + T / 2 - VW / 2, camY = WS.fy * T + T / 2 - VH / 2;
+  cx.fillStyle = Z.grass; cx.fillRect(0, 0, VW, VH);
+  const x0 = Math.max(0, Math.floor(camX / T) - 1), y0 = Math.max(0, Math.floor(camY / T) - 1), x1 = Math.min(WW - 1, Math.ceil((camX + VW) / T) + 1), y1 = Math.min(WH - 1, Math.ceil((camY + VH) / T) + 1);
+  cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  const w = wstate();
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const c = M.t[y * WW + x], sx = x * T - camX, sy = y * T - camY;
+    cx.fillStyle = (x + y) % 2 ? Z.grass : Z.grass2; cx.fillRect(sx, sy, T + 1, T + 1);
+    if (c === ':' || c === 'G' || c === 'B') { cx.fillStyle = Z.path; cx.fillRect(sx, sy, T + 1, T + 1); }
+    else if (c === ',') { cx.fillStyle = Z.tall; cx.fillRect(sx, sy, T + 1, T + 1); cx.strokeStyle = '#ffffff22'; cx.lineWidth = 2; for (let k = 0; k < 4; k++) { const bx = sx + 6 + k * 10, sway = Math.sin(WS.t * 2 + x + k) * 2; cx.beginPath(); cx.moveTo(bx, sy + T - 6); cx.lineTo(bx + sway + 3, sy + 10); cx.stroke(); } }
+    else if (c === '~') { cx.fillStyle = Z.water; cx.fillRect(sx, sy, T + 1, T + 1); cx.strokeStyle = '#ffffff33'; cx.lineWidth = 2; cx.beginPath(); const o = Math.sin(WS.t * 2 + x * .7 + y) * 3; cx.moveTo(sx + 6, sy + 20 + o); cx.quadraticCurveTo(sx + 22, sy + 14 + o, sx + 38, sy + 20 + o); cx.stroke(); }
+    const em = c === 'T' ? Z.tree : c === 'd' ? Z.deco[(x * 7 + y * 3) % Z.deco.length] : c === 'H' ? '⛲' : c === 'S' ? '🏪' : c === 'I' ? '🪧' : c === 'G' ? (w.badges > WS.z ? '🌀' : '🔒') : c === 'B' ? '🌀' : c === 'A' ? (w.badges > WS.z && !(w.anom || {})[WS.z] ? '🌀' : '') : c === '*' && !w.got[`${WS.z}-${x}-${y}`] ? '✨' : '';
+    if (em) { cx.font = `${c === 'd' || c === '*' ? 20 : c === 'A' ? 30 + Math.sin(WS.t * 4) * 4 : 32}px system-ui`; if (c === '*') cx.globalAlpha = .6 + Math.sin(WS.t * 5 + x) * .4; cx.fillText(em, sx + T / 2, sy + T / 2 + 2); cx.globalAlpha = 1; }
+  }
+  for (const n of M.npcs) {
+    if (n.kind === 'wall') continue;
+    const sx = n.x * T - camX + T / 2, sy = n.y * T - camY + T / 2; if (sx < -T || sy < -T || sx > VW + T || sy > VH + T) continue;
+    const beaten = w.beat[beatKey(WS.z, n.k)];
+    if (n.kind === 'warden' && beaten) continue;
+    cx.fillStyle = '#0006'; cx.beginPath(); cx.ellipse(sx, sy + 16, 14, 5, 0, 0, 6.283); cx.fill();
+    cx.font = `${n.kind === 'warden' ? 36 : 30}px system-ui`; cx.fillText(n.icon, sx, sy);
+    cx.font = 'bold 11px system-ui'; cx.fillStyle = '#000a'; cx.fillText(n.name, sx + 1, sy - 25); cx.fillStyle = n.kind === 'warden' ? '#ffd24a' : beaten ? '#bbb' : '#fff'; cx.fillText(n.name, sx, sy - 26);
+    if (!beaten && n.kind === 'trainer') { cx.font = '14px system-ui'; cx.fillText('❕', sx + 16, sy - 12); }
+  }
+  // your lead pet follows you around
+  const lead = party()[0];
+  if (lead && WS.trail[0]) { const [tx, ty] = WS.trail[0]; const sx = tx * T - camX + T / 2, sy = ty * T - camY + T / 2 + Math.sin(WS.t * 8) * 1.5; cx.fillStyle = '#0005'; cx.beginPath(); cx.ellipse(sx, sy + 13, 11, 4, 0, 0, 6.283); cx.fill(); cx.font = '26px system-ui'; cx.fillText(UD(lead).icon, sx, sy); }
+  const px = WS.fx * T - camX + T / 2, py = WS.fy * T - camY + T / 2 + (WS.mv ? Math.sin(WS.mv.p * Math.PI) * -3 : 0);
+  cx.fillStyle = '#0007'; cx.beginPath(); cx.ellipse(px, py + 16, 14, 5, 0, 0, 6.283); cx.fill();
+  cx.font = '32px system-ui'; cx.fillText(CHARS[(S.lastChar || ['knight'])[0]] ? CHARS[S.lastChar[0]].icon : '🧍', px, py);
+  if (WS.bubble) { const n = WS.bubble.n; cx.font = 'bold 28px system-ui'; cx.fillText('❗', n.x * T - camX + T / 2, n.y * T - camY - 14); }
+  cx.textBaseline = 'alphabetic';
+  // HUD
+  cx.fillStyle = '#000a'; cx.fillRect(10, 10, 330, 58); cx.textAlign = 'left'; cx.font = 'bold 18px system-ui'; cx.fillStyle = '#fff'; cx.fillText(`${Z.icon} ${Z.name}`, 20, 33);
+  cx.font = '14px system-ui'; cx.fillStyle = '#dde'; cx.fillText(`🏅 ${w.badges}/${ZONES.length}   🪙 ${coins()}   🔮 ${bag().orb || 0}   📖 ${Object.keys(dex().caught).length}`, 20, 56);
+  const pp = party(); cx.textAlign = 'right'; cx.fillStyle = '#000a'; cx.fillRect(VW - 12 - pp.length * 58, 10, pp.length * 58 + 2, 58);
+  pp.forEach((id, i) => { const x = VW - 12 - (pp.length - i) * 58 + 29, hp = hpOf(id), mx = statsOf(id).hp; cx.textAlign = 'center'; cx.font = '24px system-ui'; cx.globalAlpha = hp > 0 ? 1 : .35; cx.fillStyle = '#fff'; cx.fillText(UD(id).icon, x, 38); cx.globalAlpha = 1; cx.font = '10px system-ui'; cx.fillText('Lv' + lvOf(id), x, 62); cx.fillStyle = '#000'; cx.fillRect(x - 22, 44, 44, 5); cx.fillStyle = hp / mx > .5 ? '#5ee08a' : hp / mx > .2 ? '#ffd24a' : '#ff6070'; cx.fillRect(x - 22, 44, 44 * hp / mx, 5); });
+  cx.textAlign = 'center'; cx.font = '13px system-ui'; cx.fillStyle = '#000a'; cx.fillRect(VW / 2 - 250, VH - 30, 500, 22); cx.fillStyle = '#eee'; cx.fillText('WASD / arrows: walk · E or Enter: talk · P: party · Esc: menu', VW / 2, VH - 14);
+  if (WS.flash > 0) { cx.fillStyle = `rgba(255,255,255,${Math.min(1, WS.flash * 2)})`; cx.fillRect(0, 0, VW, VH); }
+}
+
+/* =====================================================================
+   🗼 RIFT TOWER — trainer battles floor after floor (your pets are fully
+   healed before each floor). Clearing floors gives gems, packs and
+   blessings that make your action runs stronger.
+   ===================================================================== */
 const BLESS = [
   { f: 10, icon: '🪙', txt: 'Runs start with +40 gold' },
   { f: 20, icon: '🐾', txt: 'Buddies are 30% stronger' },
@@ -1541,184 +2154,82 @@ const BLESS = [
   { f: 60, icon: '👑', txt: 'Your buddy uses its skill twice as often' },
 ];
 const hasBless = f => ((S.tower || {}).best || 0) >= f;
-function towerRng(f) { let s = hashStr('rift-tower-' + f); return () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), s | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function towerFloor(f) {
-  const R = towerRng(f), boss = f % 10 === 0;
-  const n = f <= 2 ? 2 : f <= 5 ? 3 : 4;
-  const rates = f <= 5 ? [80, 20, 0, 0, 0] : f <= 10 ? [65, 30, 5, 0, 0] : f <= 20 ? [30, 40, 25, 5, 0] : f <= 30 ? [15, 35, 35, 13, 2] : f <= 40 ? [5, 25, 40, 25, 5] : f <= 50 ? [0, 15, 40, 35, 10] : [0, 5, 35, 40, 20];
-  const pickR = () => { let r = R() * 100; for (let i = 0; i < 5; i++) { r -= rates[i]; if (r < 0) return i; } return 4; };
-  const all = Object.keys(ROSTER), ids = [], stars = [], lvs = [];
-  for (let k = 0; k < n; k++) { const r = pickR(); const pool = all.filter(q => ROSTER[q][2] === r); ids.push(pool[Math.floor(R() * pool.length)]); stars.push(clamp(1 + Math.floor(f / 25 + R() * .8), 1, 3)); lvs.push(clamp(1 + Math.floor(f * .35 + R() * 2), 1, 25)); }
-  let bossSlot = -1;
-  if (boss) { const r = f >= 30 ? 4 : 3, pool = all.filter(q => ROSTER[q][2] === r && q !== 'whale'); ids[0] = pool[Math.floor(R() * pool.length)]; }
-  // place melee in front, ranged in back
-  const order = ids.map((id, k) => ({ id, s: stars[k], l: lvs[k], m: UD(id).range === 'melee' ? 1 : 0, b: boss && k === 0 })).sort((a, b) => b.m - a.m || b.b - a.b);
-  const out = { ids: [null, null, null, null], stars: [1, 1, 1, 1], lvs: [1, 1, 1, 1] }, free = [0, 1, 2, 3];
-  order.forEach(o => { const s = (o.m ? [0, 1, 2, 3] : [2, 3, 0, 1]).find(x => free.includes(x)); free.splice(free.indexOf(s), 1); out.ids[s] = o.id; out.stars[s] = o.s; out.lvs[s] = o.l; if (o.b) bossSlot = s; });
-  return Object.assign(out, { mul: .75 + .013 * Math.min(f, 35) - .006 * Math.max(0, f - 35), bossSlot, boss });
+  const R = zoneRng('rift-tower-' + f), boss = f % 10 === 0;
+  const n = f <= 3 ? 2 : f <= 12 ? 3 : f <= 30 ? 4 : 5;
+  const rates = f <= 5 ? [80, 20, 0, 0, 0] : f <= 10 ? [65, 30, 5, 0, 0] : f <= 20 ? [35, 40, 20, 5, 0] : f <= 30 ? [20, 35, 30, 13, 2] : f <= 40 ? [10, 25, 38, 22, 5] : f <= 50 ? [0, 20, 40, 32, 8] : [0, 10, 35, 40, 15];
+  const out = [], all = Object.keys(ROSTER);
+  for (let k = 0; k < n; k++) {
+    let r = 0, roll = R() * 100; for (let i = 0; i < 5; i++) { roll -= rates[i]; if (roll < 0) { r = i; break; } }
+    if (boss && k === n - 1) r = f >= 30 ? 4 : 3;
+    const pool = all.filter(q => ROSTER[q][2] === r);
+    out.push({ id: pool[Math.floor(R() * pool.length)], lv: clamp(3 + Math.round(f * .9) + Math.floor(R() * 3) + (boss && k === n - 1 ? 3 : 0), 2, MAX_LV), star: clamp(1 + Math.floor(f / 20 + R()), 1, 4), boss: boss && k === n - 1 });
+  }
+  return out;
 }
 function towerReward(f) {
-  const r = { gems: 15 + f * 3, xp: 12 + f * 2, pack: null, force: 0, mystery: false };
+  const r = { gems: 15 + f * 3, pack: null, force: 0, mystery: false };
   if (f % 10 === 0) r.pack = 'rift'; else if (f % 5 === 0) r.pack = 'basic';
   if (f === 12 || f === 33) { r.pack = 'basic'; r.force = 3; r.mystery = true; }
   if (f === 25 || f === 50 || f === 60) { r.pack = 'rift'; r.force = 4; r.mystery = true; }
   return r;
 }
 let TW = { sel: null };
+const petChip = (id, lv, o = {}) => { const d = UD(id); return `<div class="pchip ${o.boss ? 'boss' : ''}" style="border-color:${RAR[d.rar].color}" title="${esc(d.name)}"><span>${d.icon}</span><small>${o.boss ? '👹 ' : ''}Lv${lv}</small></div>`; };
 function showTower(sel) {
   S.tower = S.tower || { best: 0 };
-  const best = S.tower.best, next = Math.min(best + 1, 999);
+  const best = S.tower.best, next = best + 1;
   TW.sel = clamp(sel || TW.sel || next, 1, next);
   const f = TW.sel, fl = towerFloor(f), rw = towerReward(f), first = f > best;
   const acts = [], A = fn => { acts.push(fn); return acts.length - 1; };
-  const foeTiles = [0, 2, 1, 3].map(i => unitTile(fl.ids[i], { a: A(() => {}), enemy: true, star: fl.stars[i], lv: fl.lvs[i], boss: i === fl.bossSlot, label: '' })).join('');
-  const t = team(), myTiles = [2, 0, 3, 1].map(i => unitTile(t[i], { a: A(() => { showSquadHub('team', () => showTower()); }), label: i < 2 ? 'front' : 'back' })).join('');
-  const ps = unitsPower(myTeamSpec()), pe = unitsPower(fl);
   const bl = BLESS.map(b => `<div class="bless ${best >= b.f ? 'on' : ''}" title="Clear floor ${b.f}"><span>${best >= b.f ? b.icon : '🔒'}</span><small>F${b.f}</small><small>${b.txt}</small></div>`).join('');
   screen(`<h2>🗼 Rift Tower <span class="tag">best: floor ${best}</span></h2>
-    <div class="sub">Turn-based squad battles. Clear floors for 💎 gems, packs and <b>blessings that make your runs stronger</b>. Your team also levels up.</div>
+    <div class="sub">Trainer battles, one floor at a time. Your pets are fully healed for every floor. Clear floors for 💎 gems, packs and <b>blessings that make your runs stronger</b>.</div>
     <div class="blessrow">${bl}</div>
     <div class="row" style="align-items:center;margin-top:8px"><button data-a="${A(() => showTower(f - 1))}" ${f <= 1 ? 'disabled' : ''}>◀</button>
-      <h3 style="margin:0 12px">${fl.boss ? '👹 BOSS ' : ''}Floor ${f}${first ? '' : ' <span class="tag">cleared</span>'}</h3>
+      <h3 style="margin:0 12px">${fl.some(x => x.boss) ? '👹 BOSS ' : ''}Floor ${f}${first ? '' : ' <span class="tag">cleared</span>'}</h3>
       <button data-a="${A(() => showTower(f + 1))}" ${f >= next ? 'disabled' : ''}>▶</button></div>
-    <div class="row" style="align-items:flex-start;gap:28px">
-      <div><h3>Your team <span class="keys">power ${ps}</span></h3><div class="sqboard two">${myTiles}</div><div class="keys">back ◀ ▶ front · click to edit</div></div>
-      <div class="vs">VS</div>
-      <div><h3>Enemy <span class="keys">power ${pe}</span></h3><div class="sqboard two">${foeTiles}</div><div class="keys">front ◀ ▶ back</div></div>
-    </div>
-    <div class="sub">${first ? `First clear: <b>💎 ${rw.gems}</b>${rw.mystery ? ' + <b style="color:var(--gold)">🎁 ??? mystery reward</b>' : rw.pack ? ` + ${PACKS[rw.pack].icon} <b>free ${PACKS[rw.pack].name}</b>` : ''} · team XP +${rw.xp}` : `Replay: 💎 5 · team XP +${Math.round(rw.xp * .6)}`}</div>
-    <div class="col" style="margin-top:8px"><button class="opt big" data-a="${A(() => startTowerBattle(f))}" data-n="1" ${teamUnits().length ? '' : 'disabled'}>⚔️ Fight!<kbd>1</kbd></button>
-    <button data-a="${A(() => showSquadHub('team', () => showTower()))}" data-n="2">🛡️ Edit team<kbd>2</kbd></button>
-    <button data-a="${A(() => { showSquadHub('packs', () => showTower()); })}" data-n="3">🎁 Packs (💎 ${S.gems})<kbd>3</kbd></button>
-    <button data-a="${A(showTitle)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { showTitle(); return true; } if (k === 'arrowleft' && f > 1) { showTower(f - 1); return true; } if (k === 'arrowright' && f < next) { showTower(f + 1); return true; } });
+    <div class="row" style="align-items:center;gap:24px"><div><h3>Your party</h3><div class="row">${party().map(id => petChip(id, lvOf(id))).join('')}</div></div><div class="vs">VS</div><div><h3>Enemy</h3><div class="row">${fl.map(x => petChip(x.id, x.lv, x)).join('')}</div></div></div>
+    <div class="sub">${first ? `First clear: <b>💎 ${rw.gems}</b>${rw.mystery ? ' + <b style="color:var(--gold)">🎁 ??? mystery reward</b>' : rw.pack ? ` + ${PACKS[rw.pack].icon} <b>free ${PACKS[rw.pack].name}</b>` : ''}` : 'Replay: 💎 5'} · your pets earn XP</div>
+    <div class="col" style="margin-top:8px"><button class="opt big" data-a="${A(() => startTowerBattle(f))}" data-n="1" ${party().length ? '' : 'disabled'}>⚔️ Fight!<kbd>1</kbd></button>
+    <button data-a="${A(() => showSquadHub('team', () => showTower()))}" data-n="2">🐾 Party<kbd>2</kbd></button>
+    <button data-a="${A(() => showSquadHub('packs', () => showTower()))}" data-n="3">🎁 Packs (💎 ${S.gems})<kbd>3</kbd></button>
+    <button data-a="${A(towerBack)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { towerBack(); return true; } if (k === 'arrowleft' && f > 1) { showTower(f - 1); return true; } if (k === 'arrowright' && f < next) { showTower(f + 1); return true; } });
 }
-function unitsPower(spec) { let p = 0; spec.ids.forEach((id, i) => { if (!id) return; const q = unitPower(id, spec.stars[i], spec.lvs[i]); p += q.hp / 10 + q.atk * (spec.bossSlot === i ? 1.9 : 1); }); return Math.round(p * (spec.mul || 1)); }
-
-/* ----- battle screen ----- */
-let TB = null;
+const towerBack = () => WS && mode === 'world' ? worldMenu() : showTitle();
 function startTowerBattle(f) {
-  const fl = towerFloor(f);
-  TB = tbNew(myTeamSpec(), fl); TB.floor = f; TB.auto = !!S.tbAuto; TB.speed = S.tbSpeed || 1; TB.mode = 'wait';
-  TB.startIds = teamUnits();
-  screen(`<div id="tbwrap"><div class="tbhead"><b>⚔️ ${fl.boss ? '👹 BOSS — ' : ''}Floor ${f}</b> <span id="tbround"></span></div>
-    <div id="tbturn" class="tbturn"></div>
-    <div class="tbfield"><div class="tbside me" id="tbme"></div><div class="vs">VS</div><div class="tbside foe" id="tbfoe"></div></div>
-    <div id="tbmsg" class="tbmsg"></div><div id="tbact" class="tbact"></div></div>`, [], 'menu', tbKey);
-  $('#tbwrap').onclick = e => { const c = e.target.closest('[data-u]'), b = e.target.closest('[data-tb]'); if (b && !b.disabled) { audioOn(); sfx('click'); tbButton(b.dataset.tb); } else if (c) tbClickUnit(+c.dataset.u); };
-  tbStep();
-}
-function tbKey(k) {
-  const B = TB; if (!B) return false;
-  if (k === 'escape') { if (B.mode === 'target') { B.mode = 'choose'; tbRender(); } return true; }
-  if (k === ' ') { tbButton('auto'); return true; }
-  if (B.mode === 'choose') { if (k === 'a' || k === '1') tbButton('atk'); else if (k === 's' || k === '2') tbButton('sp'); else if (k === 'g' || k === '3') tbButton('guard'); return true; }
-  if (B.mode === 'target' && /^[1-4]$/.test(k)) { const l = tbTargetsFor(B, B.cur, B.pending); if (l[+k - 1]) tbClickUnit(B.u.indexOf(l[+k - 1])); return true; }
-  if (B.mode === 'over' && (k === 'enter')) return false;
-  return true;
-}
-function tbTargetsFor(B, u, act) { if (!u) return []; if (act === 'sp') return AB[u.d.ab].t === 'enemy' ? tbFoes(B, u).sort((a, b) => a.slot - b.slot) : []; return tbValid(B, u).sort((a, b) => a.slot - b.slot); }
-function tbButton(b) {
-  const B = TB; if (!B || B.done) return;
-  if (b === 'auto') { B.auto = !B.auto; S.tbAuto = B.auto; if (B.auto && (B.mode === 'choose' || B.mode === 'target')) { const u = B.cur, a = tbAI(B, u); B.mode = 'busy'; tbDo(B, u, a.act, a.t); tbAfter(); } else tbRender(); return; }
-  if (b === 'speed') { B.speed = B.speed >= 3 ? 1 : B.speed + 1; S.tbSpeed = B.speed; tbRender(); return; }
-  if (b === 'flee') { B.done = 'lose'; B.fled = true; tbFinish(); return; }
-  if (B.mode !== 'choose' && B.mode !== 'target') return;
-  const u = B.cur;
-  if (b === 'guard') { B.mode = 'busy'; tbDo(B, u, 'guard'); tbAfter(); return; }
-  if (b === 'sp' && (u.cd > 0 || !u.d.ab)) return;
-  if (b === 'sp' && AB[u.d.ab].t !== 'enemy') { B.mode = 'busy'; tbDo(B, u, 'sp'); tbAfter(); return; }
-  const l = tbTargetsFor(B, u, b); if (l.length === 1) { B.mode = 'busy'; tbDo(B, u, b, l[0]); tbAfter(); return; }
-  B.mode = 'target'; B.pending = b; tbRender();
-}
-function tbClickUnit(i) {
-  const B = TB; if (!B || B.mode !== 'target') return;
-  const t = B.u[i], l = tbTargetsFor(B, B.cur, B.pending); if (!l.includes(t)) return;
-  B.mode = 'busy'; tbDo(B, B.cur, B.pending, t); tbAfter();
-}
-function tbAfter() { const B = TB; tbRender(); sfx(B.flash ? 'ult' : B.hits.length ? 'hit' : 'click'); const my = B; setTimeout(() => { if (TB === my) tbStep(); }, (B.flash ? 900 : 620) / B.speed); B.flash = null; }
-function tbStep() {
-  const B = TB; if (!B) return;
-  if (B.done) { tbFinish(); return; }
-  const u = tbNextActor(B); if (!u) { tbCheck(B); tbFinish(); return; }
-  B.cur = u; B.hits = [];
-  if (!tbBeginTurn(B, u)) { tbCheck(B); tbRender(); const my = B; setTimeout(() => { if (TB === my) tbStep(); }, 520 / B.speed); return; }
-  if (u.side === 0 && !B.auto) { B.mode = 'choose'; tbRender(); return; }
-  B.mode = 'busy'; tbRender();
-  const my = B; setTimeout(() => { if (TB !== my) return; const a = tbAI(B, u); tbDo(B, u, a.act, a.t); tbAfter(); }, 380 / B.speed);
-}
-function tbCard(B, x, i, targets) {
-  const R = RAR[x.d.rar], st = [x.stun > 0 && '💫', x.burn > 0 && '🔥', x.poison > 0 && '☠️', x.fx.blind > 0 && '🌫️', x.fx.taunt > 0 && '😤', x.fx.rage > 0 && '💢', x.fx.weak > 0 && '🥀', x.fx.slow > 0 && '🐌', x.fx.reflect > 0 && '🌵', x.fx.inv > 0 && '✨', x.fx.frostHide > 0 && '🧊', x.guard && '🛡️', x.crit > 0 && '🎯'].filter(Boolean).join('');
-  const ti = targets.indexOf(x), hit = B.hits.some(h => h.t === x), acting = B.cur === x;
-  const beat = B.cur && B.cur.side === 0 && x.side === 1 && BEATS[B.cur.d.el] === x.d.el;
-  return `<div class="tbu r${x.d.rar} ${x.alive ? '' : 'dead'} ${acting ? 'acting' : ''} ${hit ? 'hit' : ''} ${ti >= 0 ? 'tgt' : ''} ${x.boss ? 'boss' : ''} ${B.flash === x ? 'casting' : ''}" data-u="${i}" style="--rc:${R.color}" title="${esc(x.d.name + (x.d.txt ? ' — ' + x.d.txt : '') + (LPASS[x.id] ? ' 👑 ' + LPASS[x.id] : ''))}">
-    ${ti >= 0 ? `<kbd class="tk">${ti + 1}</kbd>` : ''}${beat ? '<span class="beat">+40%</span>' : ''}
-    <div class="ui1">${x.d.icon}</div><div class="un">${x.boss ? '👹 ' : ''}${x.d.name}</div>
-    <div class="us">${x.summon ? '' : '★'.repeat(x.star) + ' Lv' + x.lv} ${ELEMENTS[x.d.el].icon}${CLASSES[x.d.cls].icon}</div>
-    <div class="hpb"><i style="width:${Math.max(0, x.hp / x.maxHp * 100)}%"></i>${x.shield > 1 ? `<s style="width:${Math.min(100, x.shield / x.maxHp * 100)}%"></s>` : ''}</div>
-    <div class="uh">${Math.ceil(Math.max(0, x.hp))}/${Math.ceil(x.maxHp)}</div>
-    ${x.d.ab && x.alive ? `<div class="ucd ${x.cd <= 0 ? 'ready' : ''}">${x.cd <= 0 ? '✨ READY' : '✨ in ' + x.cd}</div>` : ''}
-    <div class="ust">${x.alive ? st : '💀'}</div></div>`;
-}
-function tbRender() {
-  const B = TB; if (!B || !$('#tbwrap')) return;
-  const targets = B.mode === 'target' ? tbTargetsFor(B, B.cur, B.pending) : [];
-  const side = (s, order) => order.map(slot => { const x = B.u.find(y => y.side === s && y.slot === slot && y.alive) || B.u.find(y => y.side === s && y.slot === slot); return x ? tbCard(B, x, B.u.indexOf(x), targets) : '<div class="tbu empty"></div>'; }).join('');
-  $('#tbme').innerHTML = side(0, [2, 0, 3, 1]);
-  $('#tbfoe').innerHTML = side(1, [0, 2, 1, 3]);
-  $('#tbround').textContent = `Round ${B.round}`;
-  const q = [B.cur, ...B.queue].filter(x => x && x.alive).slice(0, 8);
-  $('#tbturn').innerHTML = 'Next: ' + q.map((x, k) => `<span class="tq ${x.side ? 'foe' : 'me'} ${k === 0 ? 'now' : ''}">${x.d.icon}</span>`).join('');
-  const u = B.cur, msg = $('#tbmsg'), act = $('#tbact');
-  if (B.mode === 'choose' || B.mode === 'target') {
-    msg.innerHTML = B.mode === 'target' ? `Pick a target for <b>${u.d.icon} ${u.d.name}</b> — click it or press its number (Esc = back)` : `<b>${u.d.icon} ${u.d.name}</b>'s turn! ${u.d.range === 'melee' && u.d.cls !== 'assassin' ? '<span class="keys">(melee: must hit the front row first)</span>' : ''}`;
-    act.innerHTML = `<button class="opt" data-tb="atk">⚔️ Attack <kbd>A</kbd></button>
-      <button class="opt ${u.cd <= 0 && u.d.ab ? 'spready' : ''}" data-tb="sp" ${u.cd > 0 || !u.d.ab ? 'disabled' : ''} title="${esc(u.d.txt)}">✨ ${u.d.ab ? esc(u.d.txt.split(':')[0]) : 'Special'} ${u.cd > 0 ? `(${u.cd})` : ''}<kbd>S</kbd></button>
-      <button data-tb="guard">🛡️ Guard <kbd>G</kbd><br><small>half damage, special charges faster</small></button>`;
-  } else {
-    msg.innerHTML = B.log.slice(-2).join(' · ') || '...';
-    act.innerHTML = '';
-  }
-  act.innerHTML += `<div class="row tbsmall"><button data-tb="auto" class="${B.auto ? 'on' : ''}">🤖 Auto: ${B.auto ? "ON" : "off"} (Space)</button><button data-tb="speed">⏩ ${B.speed}×</button><button data-tb="flee">🏳️ Retreat</button></div>`;
-  if (u && (B.mode === 'choose' || B.mode === 'target') && u.d.ab) act.innerHTML += `<div class="keys">✨ ${esc(u.d.txt)}${LPASS[u.id] ? ` · 👑 ${LPASS[u.id]}` : ''}</div>`;
-  // floating numbers
-  for (const e of B.ev) { const el = document.querySelector(`#tbwrap [data-u="${B.u.indexOf(e.u)}"]`); if (!el) continue; const f = document.createElement('div'); f.className = 'tbf'; f.textContent = e.s; f.style.color = e.c; f.style.left = (30 + Math.random() * 40) + '%'; el.appendChild(f); }
-  B.ev = [];
-}
-function tbFinish() {
-  const B = TB; if (!B || B.mode === 'over') return; B.mode = 'over';
-  const won = B.done === 'win', f = B.floor, rw = towerReward(f), first = won && f > (S.tower.best || 0);
-  sfx(won ? 'win' : 'lose');
-  const flawless = won && B.u.filter(x => x.side === 0 && !x.summon).every(x => x.alive);
-  let gems = 0, xp = Math.round(rw.xp * (won ? (first ? 1 : .6) : .3)), newBless = null;
-  if (won) { gems = first ? rw.gems : 5; if (flawless && first) gems = Math.round(gems * 1.5); S.gems += gems; S.stats.towerWins = (S.stats.towerWins || 0) + 1; }
-  if (first) { S.tower.best = f; newBless = BLESS.find(b => b.f === f); }
-  const lvl = B.startIds.map(id => { const before = lvOf(id), n = giveXp(id, xp); return { id, before, n }; });
-  save(); checkAch();
-  const lvHTML = lvl.map(o => `<div class="lvchip ${o.n ? 'up' : ''}">${UD(o.id).icon} Lv ${lvOf(o.id)}${o.n ? ' ⬆️' : ''}<br><small>${col()[o.id].lv >= lvCap(o.id) ? 'MAX (more ★ raises it)' : `${Math.floor(col()[o.id].xp)}/${sqXpNeed(lvOf(o.id))} xp`}</small></div>`).join('');
-  const goPack = first && rw.pack;
-  TB = null;
-  screen(`<h1 style="font-size:44px">${won ? (flawless ? '🌟 FLAWLESS VICTORY!' : '🏆 Victory!') : B.fled ? '🏳️ Retreated' : '💔 Defeat'}</h1>
-    <div class="sub">${won ? `Floor ${f} ${first ? 'cleared for the first time!' : 'cleared again.'} +${gems} 💎${flawless && first ? ' (flawless bonus ×1.5)' : ''}` : 'Try another team: tanks in front, use the element wheel, and save specials for the right moment.'}</div>
-    ${newBless ? `<div class="panel" style="border-color:var(--gold)"><h2 style="margin:0">${newBless.icon} New blessing unlocked!</h2><div class="sub">${newBless.txt}</div></div>` : ''}
-    <h3>Team XP +${xp}</h3><div class="row">${lvHTML}</div>
-    <div class="col" style="margin-top:12px">${goPack ? `<button class="opt big" data-a="0" data-n="1">${rw.mystery ? '🎁 Open your mystery reward!' : `${PACKS[rw.pack].icon} Open your free ${PACKS[rw.pack].name}!`}<kbd>1</kbd></button>` : `<button class="opt big" data-a="1" data-n="1">${won ? '⚔️ Next floor' : '🔁 Try again'}<kbd>1</kbd></button>`}
-    <button data-a="2" data-n="2">🗼 Tower<kbd>2</kbd></button></div>`,
-    [() => openPack(rw.pack, 'reward', () => showTower(f + 1), rw.force), () => startTowerBattle(won ? Math.min(f + 1, S.tower.best + 1) : f), () => showTower(won ? f + 1 : f)]);
-  inputLock = performance.now() + 500;
+  const fl = towerFloor(f), rw = towerReward(f);
+  pbStart('tower', fl, { fullHeal: true, trainer: { name: `Floor ${f} Guardian`, icon: fl.some(x => x.boss) ? '👹' : '🗼', line: '' }, onEnd: res => {
+    const won = res === 'win', first = won && f > (S.tower.best || 0);
+    let gems = 0;
+    if (won) { gems = first ? rw.gems : 5; S.gems += gems; S.stats.towerWins = (S.stats.towerWins || 0) + 1; }
+    const newBless = first ? BLESS.find(b => b.f === f) : null;
+    if (first) S.tower.best = f;
+    save(); checkAch();
+    const goPack = first && rw.pack;
+    screen(`<h1 style="font-size:44px">${won ? '🏆 Floor cleared!' : '💔 Defeat'}</h1>
+      <div class="sub">${won ? `+${gems} 💎` : 'Level up your pets in the Rift World, catch stronger ones, and use the element wheel (🔥>🗡️>✨>⚡>❄️>🔥).'}</div>
+      ${newBless ? `<div class="panel" style="border-color:var(--gold)"><h2 style="margin:0">${newBless.icon} New blessing unlocked!</h2><div class="sub">${newBless.txt}</div></div>` : ''}
+      <div class="col" style="margin-top:12px">${goPack ? `<button class="opt big" data-a="0" data-n="1">${rw.mystery ? '🎁 Open your mystery reward!' : `${PACKS[rw.pack].icon} Open your free ${PACKS[rw.pack].name}!`}<kbd>1</kbd></button>` : `<button class="opt big" data-a="1" data-n="1">${won ? '⚔️ Next floor' : '🔁 Try again'}<kbd>1</kbd></button>`}
+      <button data-a="2" data-n="2">🗼 Tower<kbd>2</kbd></button></div>`,
+      [() => openPack(rw.pack, 'reward', () => showTower(f + 1), rw.force), () => startTowerBattle(won ? f + 1 : f), () => showTower(won ? f + 1 : f)]);
+    inputLock = performance.now() + 500;
+  } });
 }
 
-/* ----- screens: packs, collection, team ----- */
+/* ----- screens: packs, collection, party ----- */
 let SQV = { tab: 'packs', sel: null, back: null, filter: 'all' };
 const unitTile = (id, opts = {}) => {
   if (!id) return `<button class="tile empty ${opts.sel ? 'sel' : ''}" data-a="${opts.a}"><span class="small">${opts.label === undefined ? 'empty' : opts.label}</span></button>`;
-  const d = UD(id), owned = col()[id], R = RAR[d.rar], st = opts.enemy ? opts.star || 1 : owned ? starOf(owned.n) : 0, lv = opts.enemy ? opts.lv : owned ? lvOf(id) : 0, show = owned || opts.enemy;
-  return `<button class="tile r${d.rar} ${opts.sel ? 'sel' : ''} ${owned || opts.enemy ? '' : 'locked'} ${opts.enemy ? 'enemy' : ''} ${opts.boss ? 'boss' : ''}" data-a="${opts.a}" title="${esc(show ? d.name + ' — ' + d.txt + (LPASS[id] ? ' 👑 ' + LPASS[id] : '') : '???')}" style="border-color:${R.color}">
-    <span class="ti">${show ? d.icon : '❔'}</span><span class="tn">${opts.boss ? '👹 ' : ''}${show ? d.name : '???'}</span><span class="ts">${st ? '★'.repeat(st) : ''}${lv ? ` <span class="tl">Lv${lv}</span>` : ''}</span><span class="te" style="color:${R.color}">${R.name}${show ? ' · ' + ELEMENTS[d.el].icon + CLASSES[d.cls].icon : ''}</span></button>`;
+  const d = UD(id), owned = col()[id], R = RAR[d.rar], st = owned ? starOf(owned.n) : 0, lv = owned ? lvOf(id) : 0, seen = owned || dex().seen[id];
+  const hp = owned ? hpOf(id) / statsOf(id).hp : 1;
+  return `<button class="tile r${d.rar} ${opts.sel ? 'sel' : ''} ${owned ? '' : 'locked'}" data-a="${opts.a}" title="${esc(seen ? d.name + ' — ' + d.txt : '???')}" style="border-color:${R.color}">
+    <span class="ti">${seen ? d.icon : '❔'}${owned && owned.shiny ? '<sup>✨</sup>' : ''}</span><span class="tn">${seen ? d.name : '???'}</span><span class="ts">${st ? '★'.repeat(st) : ''}${lv ? ` <span class="tl">Lv${lv}</span>` : ''}</span><span class="te" style="color:${R.color}">${R.name}${seen ? ' · ' + ELEMENTS[d.el].icon + CLASSES[d.cls].icon : ''}</span>${owned && hp < 1 ? `<span class="thp"><i style="width:${hp * 100}%"></i></span>` : ''}</button>`;
 };
 function showSquadHub(tab, back) { SQV = { tab: tab || SQV.tab || 'packs', sel: null, back: back || SQV.back, filter: SQV.filter || 'all' }; drawSquadHub(); }
 function drawSquadHub() {
   const acts = [], A = f => { acts.push(f); return acts.length - 1; };
-  const tabs = ['packs', 'collection', 'team'].map(t => `<button data-a="${A(() => { SQV.tab = t; SQV.sel = null; drawSquadHub(); })}" class="${SQV.tab === t ? 'on' : ''}">${{ packs: '🎁 Packs', collection: '📖 Collection', team: '🛡️ Team & Buddy' }[t]}</button>`).join('');
+  const tabs = ['packs', 'collection', 'team'].map(t => `<button data-a="${A(() => { SQV.tab = t; SQV.sel = null; drawSquadHub(); })}" class="${SQV.tab === t ? 'on' : ''}">${{ packs: '🎁 Packs', collection: '📖 Pet Dex', team: '🐾 Party & Buddy' }[t]}</button>`).join('');
   const owned = Object.keys(col()).length, total = Object.keys(ROSTER).length, inRun = !!run && mode === 'fight';
   let body = '';
   if (SQV.tab === 'packs') {
@@ -1728,45 +2239,54 @@ function drawSquadHub() {
         <button class="opt" data-a="${A(() => openPack(k, 'gems', drawSquadHub))}" ${S.gems < p.gems ? 'disabled' : ''}>💎 ${p.gems}</button>
         ${inRun && p.gold ? `<button data-a="${A(() => openPack(k, 'gold', drawSquadHub))}" ${run.gold < p.gold ? 'disabled' : ''}>🪙 ${p.gold} gold</button>` : ''}
         ${k === 'basic' && free ? `<button class="opt" data-a="${A(() => openPack('basic', 'free', drawSquadHub))}">🎁 Daily free pull!</button>` : ''}</div>`).join('')}</div>
-      <div class="keys">Earn 💎 gems from runs and the 🗼 Rift Tower. Duplicates power members up: 2 copies ★2, 4 ★3, 8 ★4, 16 ★5 (each ★ also raises the level cap).</div>`;
+      <div class="keys">Earn 💎 gems from runs, Wardens and the 🗼 Rift Tower. Pets from packs start at level 5 (duplicates add ★ stars: 2 copies ★2, 4 ★3, 8 ★4, 16 ★5 — every star adds to every stat).</div>`;
   } else if (SQV.tab === 'collection') {
     const ids = Object.keys(ROSTER).filter(id => SQV.filter === 'all' || String(ROSTER[id][2]) === SQV.filter).sort((a, b) => ROSTER[b][2] - ROSTER[a][2] || (col()[b] ? 1 : 0) - (col()[a] ? 1 : 0));
     const f = ['all', '4', '3', '2', '1', '0'].map(k => `<button data-a="${A(() => { SQV.filter = k; drawSquadHub(); })}" class="${SQV.filter === k ? 'on' : ''}" style="${k !== 'all' ? 'color:' + RAR[+k].color : ''}">${k === 'all' ? 'All' : RAR[+k].name} ${k === 'all' ? '' : Object.keys(col()).filter(id => ROSTER[id][2] === +k).length + '/' + Object.keys(ROSTER).filter(id => ROSTER[id][2] === +k).length}</button>`).join('');
-    body = `<div class="sub">Collected <b>${owned}/${total}</b></div><div class="tabs">${f}</div><div class="colgrid">${ids.map(id => unitTile(id, { a: A(() => { SQV.sel = id; drawSquadHub(); }), sel: SQV.sel === id })).join('')}</div>${unitInfo(SQV.sel)}`;
+    body = `<div class="sub">Caught <b>${owned}/${total}</b> · seen ${Object.keys(dex().seen).length}</div><div class="tabs">${f}</div><div class="colgrid">${ids.map(id => unitTile(id, { a: A(() => { SQV.sel = id; drawSquadHub(); }), sel: SQV.sel === id })).join('')}</div>${unitInfo(SQV.sel, A)}`;
   } else {
-    const t = team();
-    const slots = [2, 0, 3, 1].map(i => unitTile(t[i], { a: A(() => teamSlot(i)), sel: SQV.sel === 'slot' + i, label: i < 2 ? 'front' : 'back' }));
-    const mine = Object.keys(col()).sort((a, b) => ROSTER[b][2] - ROSTER[a][2] || ownStar(b) - ownStar(a) || lvOf(b) - lvOf(a));
-    body = `${synHTML2(t)}<h3>Tower team <span class="keys">(back ◀ ▶ front · the front takes the hits and melee can only reach the front)</span></h3><div class="sqboard two">${slots.join('')}</div>
-      <div class="keys">${SQV.sel && !String(SQV.sel).startsWith('slot') ? `Now click a slot to place <b>${UD(SQV.sel).icon} ${UD(SQV.sel).name}</b>, or a buddy button.` : 'Click a member below, then a slot or a buddy button. Click a placed member, then another slot to swap, or the same slot to remove it.'}</div>
-      <h3>🐾 Buddies <span class="keys">(fight beside you in runs — rarer buddies are MUCH stronger)</span></h3><div class="row">${[0, 1].map(p => { const b = (S.buddies || [])[p]; return `<button data-a="${A(() => { if (SQV.sel && !String(SQV.sel).startsWith('slot')) { S.buddies = S.buddies || [null, null]; S.buddies[p] = SQV.sel; SQV.sel = null; save(); drawSquadHub(); } })}" ${b ? `style="border-color:${RAR[UD(b).rar].color}"` : ''}>${p ? 'P2' : 'P1'} buddy: ${b ? UD(b).icon + ' ' + UD(b).name + ' ' + '★'.repeat(ownStar(b)) + ' Lv' + lvOf(b) : '— none —'}</button>`; }).join('')}</div>
-      ${SQV.sel && !String(SQV.sel).startsWith('slot') ? unitInfo(SQV.sel) : ''}
-      <h3>Your members</h3><div class="colgrid">${mine.map(id => unitTile(id, { a: A(() => { SQV.sel = SQV.sel === id ? null : id; drawSquadHub(); }), sel: SQV.sel === id })).join('') || '<div class="sub">Open packs to get members!</div>'}</div>`;
+    const pt = party();
+    const slots = [0, 1, 2, 3, 4, 5].map(i => unitTile(pt[i], { a: A(() => partySlot(i)), sel: SQV.sel === 'slot' + i, label: i === 0 ? 'lead' : 'empty' }));
+    const mine = Object.keys(col()).sort((a, b) => lvOf(b) - lvOf(a) || ROSTER[b][2] - ROSTER[a][2]);
+    body = `<h3>Party <span class="keys">(up to 6 · the first one leads battles and follows you in the Rift World)</span></h3><div class="colgrid" style="max-width:700px">${slots.join('')}</div>
+      <div class="keys">${SQV.sel && !String(SQV.sel).startsWith('slot') ? `Now click a party slot to place <b>${UD(SQV.sel).icon} ${UD(SQV.sel).name}</b>, or a buddy button.` : 'Click a pet below, then a party slot or a buddy button. Click a party pet, then another slot to swap, or the same slot to remove it.'}</div>
+      <h3>🐾 Buddies <span class="keys">(fight beside you in action runs — stronger, higher-level pets hit harder)</span></h3><div class="row">${[0, 1].map(p => { const b = (S.buddies || [])[p]; return `<button data-a="${A(() => { if (SQV.sel && !String(SQV.sel).startsWith('slot')) { S.buddies = S.buddies || [null, null]; S.buddies[p] = SQV.sel; SQV.sel = null; save(); drawSquadHub(); } })}" ${b && ROSTER[b] ? `style="border-color:${RAR[UD(b).rar].color}"` : ''}>${p ? 'P2' : 'P1'} buddy: ${b && ROSTER[b] ? UD(b).icon + ' ' + UD(b).name + ' Lv' + lvOf(b) : '— none —'}</button>`; }).join('')}</div>
+      ${SQV.sel && !String(SQV.sel).startsWith('slot') ? unitInfo(SQV.sel, A) : String(SQV.sel).startsWith('slot') && pt[+String(SQV.sel).slice(4)] ? unitInfo(pt[+String(SQV.sel).slice(4)], A) : ''}
+      <h3>All your pets</h3><div class="colgrid">${mine.map(id => unitTile(id, { a: A(() => { SQV.sel = SQV.sel === id ? null : id; drawSquadHub(); }), sel: SQV.sel === id })).join('') || '<div class="sub">Catch pets in the Rift World or open packs!</div>'}</div>`;
   }
-  screen(`<h2>🃏 Squad &amp; Packs</h2><div class="tabs">${tabs}${!inRun ? `<button data-a="${A(() => showTower())}">🗼 Rift Tower</button>` : ''}</div>${body}
+  screen(`<h2>🃏 Pets &amp; Packs</h2><div class="tabs">${tabs}</div>${body}
     <div class="col" style="margin-top:12px"><button data-a="${A(closeSquadHub)}">← Back (Esc)</button></div>`, acts, 'menu', k => { if (k === 'escape') { closeSquadHub(); return true; } });
 }
-function unitInfo(id) {
-  if (!id) return '<div class="keys">Click a member to see what it does.</div>';
-  const d = UD(id), o = col()[id], st = o ? starOf(o.n) : 1, lv = o ? lvOf(id) : 1, p = unitPower(id, st, lv), R = RAR[d.rar];
-  return `<div class="panel small" style="max-width:760px;border-color:${R.color}"><b style="font-size:17px">${d.icon} ${o ? d.name : '???'}</b> <span style="color:${R.color}">${R.name}</span> · ${ELEMENTS[d.el].icon} ${ELEMENTS[d.el].name} · ${CLASSES[d.cls].icon} ${CLASSES[d.cls].name} · ${d.range}
-    ${o ? `<br>${'★'.repeat(st)}${'☆'.repeat(5 - st)} — copies ${o.n}${st < 5 ? ` (next ★ at ${STAR_COPIES[st + 1]})` : ' (max)'} · Lv ${lv}/${lvCap(id)} · ❤️ ${Math.round(p.hp)} ⚔️ ${Math.round(p.atk)} 💨 ${d.spd}<br>✨ <b>${d.txt}</b> <span class="keys">(every ${d.cdT} turns)</span>${LPASS[id] ? `<br><b style="color:var(--gold)">👑 ${LPASS[id]}</b>` : ''}<br>🐾 As a buddy: ${buddyDesc(id)}` : '<br>Not collected yet — open packs to find it!'}</div>`;
+function unitInfo(id, A) {
+  if (!id) return '<div class="keys">Click a pet to see its stats and moves.</div>';
+  const d = UD(id), o = col()[id], R = RAR[d.rar], seen = o || dex().seen[id], ab = abilityOf(id);
+  if (!seen) return '<div class="panel small">❔ You haven\'t met this pet yet. Explore the Rift World or open packs!</div>';
+  const st = o ? starOf(o.n) : 1, lv = o ? lvOf(id) : 5, s = petStats(id, lv, st, o && o.shiny), b = baseStats(id), mv = o ? movesOf(id) : [], can = o ? learned(id, lv) : [];
+  const evo = EVO[id] ? `Evolves into ${UD(EVO[id][0]).icon} ${UD(EVO[id][0]).name} at Lv ${EVO[id][1]}.` : EVO_FROM[id] ? `Evolved from ${UD(EVO_FROM[id]).icon} ${UD(EVO_FROM[id]).name}.` : '';
+  const moveBtn = m => { const x = getMove(m), el = moveEl(x, d); const on = mv.includes(m); return `<button class="mvchip el-${el} ${on ? 'on' : ''}" data-a="${A ? A(() => { const c = col()[id]; let cur = movesOf(id).slice(); if (on) { if (cur.length > 1) cur = cur.filter(z => z !== m); } else if (cur.length < 4) cur.push(m); else { toast('A pet can know 4 moves — click one to forget it first.'); return; } c.mv = cur; save(); drawSquadHub(); }) : ''}" title="${esc(x.d || '')}">${on ? '✅' : '⬜'} ${el === 'normal' ? '⚪' : ELEMENTS[el].icon} ${x.n}${x.p ? ` <small>${x.p}${x.hits ? '×' + x.hits[0] + '-' + x.hits[1] : ''}</small>` : ' <small>status</small>'}</button>`; };
+  return `<div class="panel small petinfo" style="max-width:820px;border-color:${R.color}">
+    <div class="pihead"><span class="pibig">${d.icon}</span><div><b style="font-size:18px">${o && o.shiny ? '✨ ' : ''}${d.name}</b> <span style="color:${R.color}">${R.name}</span><br>${ELEMENTS[d.el].icon} ${ELEMENTS[d.el].name} · ${CLASSES[d.cls].icon} ${CLASSES[d.cls].name}${o ? ` · Lv <b>${lv}</b> · ${'★'.repeat(st)}${'☆'.repeat(5 - st)} (${o.n} cop${o.n > 1 ? 'ies' : 'y'})` : ''}
+      ${o ? `<div class="pbxp" style="width:220px"><i style="width:${lv >= MAX_LV ? 100 : clamp((o.xp || 0) / xpNeedLv(lv) * 100, 0, 100)}%"></i></div><small>${lv >= MAX_LV ? 'MAX level' : `${o.xp || 0}/${xpNeedLv(lv)} XP to Lv ${lv + 1}`}</small>` : ''}</div></div>
+    <div class="picols"><div><b>Stats${o ? ` at Lv ${lv}` : ''}</b> <small>(base total ${bstOf(id)})</small>${statBars(o ? s : b, !o)}${o ? `<small>❤️ now: ${hpOf(id)}/${s.hp}</small>` : ''}</div>
+    <div><b>${ab[1]}</b><br><small>${ab[2]}</small>${evo ? `<br><br>🧬 ${evo}` : ''}<br><br>🐾 <b>As a buddy</b> in action runs: ${buddyDesc(id)}</div></div>
+    ${o && readyToEvolve(id) && A ? `<div class="row"><button class="opt big" data-a="${A(() => showEvolution(id, drawSquadHub))}">🧬 ${d.name} is ready to evolve into ${UD(EVO[id][0]).icon} ${UD(EVO[id][0]).name}! Evolve</button></div>` : ''}
+    ${o ? `<b>Moves</b> <small>(click to equip up to 4)</small><div class="mvrow">${can.map(moveBtn).join('')}</div><small>Next move: ${(learnset(id).find(([l]) => l > lv) || [0, null])[1] ? `${getMove(learnset(id).find(([l]) => l > lv)[1]).n} at Lv ${learnset(id).find(([l]) => l > lv)[0]}` : 'knows everything!'}</small>` : '<small>Not caught yet.</small>'}</div>`;
 }
-function teamSlot(i) {
-  const t = team();
-  if (SQV.sel && !String(SQV.sel).startsWith('slot')) { const id = SQV.sel; const had = t.indexOf(id); if (had >= 0) t[had] = t[i]; t[i] = id; SQV.sel = null; }
-  else if (String(SQV.sel).startsWith('slot')) { const j = +String(SQV.sel).slice(4); if (j === i) t[i] = null; else [t[i], t[j]] = [t[j], t[i]]; SQV.sel = null; }
-  else if (t[i]) SQV.sel = 'slot' + i;
+function partySlot(i) {
+  const pt = party();
+  if (SQV.sel && !String(SQV.sel).startsWith('slot')) { const id = SQV.sel; const had = pt.indexOf(id); if (had >= 0) pt.splice(had, 1); if (i >= pt.length) pt.push(id); else pt.splice(i, 0, id); S.party = pt.slice(0, 6); SQV.sel = null; }
+  else if (String(SQV.sel).startsWith('slot')) { const j = +String(SQV.sel).slice(4); if (j === i) { if (pt.length > 1) pt.splice(i, 1); } else if (pt[i] && pt[j]) [pt[i], pt[j]] = [pt[j], pt[i]]; S.party = pt; SQV.sel = null; }
+  else if (pt[i]) SQV.sel = 'slot' + i;
   save(); drawSquadHub();
 }
 function closeSquadHub() { const b = SQV.back; SQV.back = null; if (b) b(); else showTitle(); }
 function showPackDoor() { // 🎁 door in a run: buy packs with gold (or gems)
   const acts = [], A = f => { acts.push(f); return acts.length - 1; };
-  screen(`<h2>🎁 Pack Machine</h2><div class="sub">🪙 ${run.gold} gold · 💎 ${S.gems} gems — members go into your collection forever.</div>
+  screen(`<h2>🎁 Pack Machine</h2><div class="sub">🪙 ${run.gold} gold · 💎 ${S.gems} gems — pets go into your collection forever.</div>
     <div class="row">
-      <button class="card opt" data-a="${A(() => openPack('basic', 'gold', showPackDoor))}" ${run.gold < 90 ? 'disabled' : ''}><div class="ci">📦</div><div class="ct">Basic Pack</div><div class="cd">3 members</div><div class="price">🪙 90 gold</div></button>
-      <button class="card opt" data-a="${A(() => openPack('basic', 'gems', showPackDoor))}" ${S.gems < 100 ? 'disabled' : ''}><div class="ci">📦</div><div class="ct">Basic Pack</div><div class="cd">3 members</div><div class="price">💎 100</div></button>
-      <button class="card opt" data-a="${A(() => openPack('rift', 'gems', showPackDoor))}" ${S.gems < 300 ? 'disabled' : ''}><div class="ci">🌀</div><div class="ct">Rift Pack</div><div class="cd">5 members, Rare+ guaranteed</div><div class="price">💎 300</div></button>
+      <button class="card opt" data-a="${A(() => openPack('basic', 'gold', showPackDoor))}" ${run.gold < 90 ? 'disabled' : ''}><div class="ci">📦</div><div class="ct">Basic Pack</div><div class="cd">3 pets</div><div class="price">🪙 90 gold</div></button>
+      <button class="card opt" data-a="${A(() => openPack('basic', 'gems', showPackDoor))}" ${S.gems < 100 ? 'disabled' : ''}><div class="ci">📦</div><div class="ct">Basic Pack</div><div class="cd">3 pets</div><div class="price">💎 100</div></button>
+      <button class="card opt" data-a="${A(() => openPack('rift', 'gems', showPackDoor))}" ${S.gems < 300 ? 'disabled' : ''}><div class="ci">🌀</div><div class="ct">Rift Pack</div><div class="cd">5 pets, Rare+ guaranteed</div><div class="price">💎 300</div></button>
     </div>
     <div class="col" style="margin-top:12px"><button data-a="${A(() => roomDone('🎁 You leave the pack machine.'))}">Leave →</button></div>`, acts, 'menu', k => { if (k === 'escape') { roomDone(); return true; } });
 }
@@ -1781,10 +2301,10 @@ const LEG_BUDDY = {
   whale: 'crashes a tidal wave through everything', ninetail: 'fires 18 foxfire orbs', luckycat: 'showers you with gold and hits a jackpot', sun: 'heals everyone and burns the ground',
   chrono: 'freezes time for every enemy', kong: 'slams the ground and stuns everything nearby', reaper: 'reaps every weak enemy on screen',
 };
-function buddyDesc(id) { const d = UD(id); return LEG_BUDDY[id] ? `<b style="color:var(--gold)">👑 ${LEG_BUDDY[id]}</b> every 7s` : `${BUDDY_SKILL[d.cls]} every ${d.rar === 3 ? '7s (Epic: ×1.6 power)' : '9s'}`; }
+function buddyDesc(id) { const d = UD(id); return (LEG_BUDDY[id] ? `<b style="color:var(--gold)">👑 ${LEG_BUDDY[id]}</b> every 7s` : `${BUDDY_SKILL[d.cls]} every ${d.rar === 3 ? '7s' : '9s'}`) + ` · power ${Math.round(petPower(id))}`; }
 const buddyCd = c => (c.d.rar === 4 ? 7 : c.d.rar === 3 ? 7 : 9) * (hasBless(60) ? .5 : 1);
 function makeCompanions() {
-  G.comps = PL.map((pl, k) => { const id = (S.buddies || [])[k]; if (!id || !col()[id]) return null; const d = UD(id), st = ownStar(id), lv = lvOf(id); return { id, d, star: st, lv, own: pl.i, x: pl.x + 30, y: pl.y + 20, t: .5, skT: 5, ang: k * Math.PI, pow: Math.pow(RAR[d.rar].mul, 1.5) * starMul(st) * lvMul(lv) * (hasBless(20) ? 1.3 : 1) }; }).filter(Boolean);
+  G.comps = PL.map((pl, k) => { const id = (S.buddies || [])[k]; if (!id || !col()[id]) return null; const d = UD(id), st = ownStar(id), lv = lvOf(id); return { id, d, star: st, lv, own: pl.i, x: pl.x + 30, y: pl.y + 20, t: .5, skT: 5, ang: k * Math.PI, pow: petPower(id) / 26 * (hasBless(20) ? 1.3 : 1) }; }).filter(Boolean);
 }
 function updateCompanions(dt) {
   if (!G.comps || G.phase !== 'fight') return;
@@ -1795,10 +2315,10 @@ function updateCompanions(dt) {
     P = pl; ST = pl.st;
     const m = c.pow * (1 + .3 * (run.act - 1)), col2 = ELEMENTS[c.d.el].color;
     c.t -= dt;
-    if (c.t <= 0) { c.t = c.d.rar >= 3 ? .7 : 1.1; const t = nearest(c.x, c.y, c.d.range === 'ranged' ? 460 : 260); if (t) shoot(c.x, c.y, Math.atan2(t.y - c.y, t.x - c.x), 480, c.d.rar >= 3 ? 7 : 5, c.d.atk * m * .6, c.d.rar >= 3 ? 2 : 1, 1.2, col2, { el: c.d.el, chill: c.d.el === 'frost' }); }
+    if (c.t <= 0) { c.t = c.d.rar >= 3 ? .7 : 1.1; const t = nearest(c.x, c.y, c.d.range === 'ranged' ? 460 : 260); if (t) shoot(c.x, c.y, Math.atan2(t.y - c.y, t.x - c.x), 480, c.d.rar >= 3 ? 7 : 5, 6 * m, c.d.rar >= 3 ? 2 : 1, 1.2, col2, { el: c.d.el, chill: c.d.el === 'frost' }); }
     c.skT -= dt;
     if (c.skT <= 0) {
-      c.skT = buddyCd(c); const big = c.d.atk * m * (c.d.rar === 3 ? 1.6 : 1);
+      c.skT = buddyCd(c); const big = 7 * m * (c.d.rar === 3 ? 1.3 : 1);
       if (LEG_BUDDY[c.id]) { legBuddy(c, pl, big); continue; }
       const cls = c.d.cls;
       if (cls === 'guardian') { pl.invul = Math.max(pl.invul, c.d.rar === 3 ? 2 : 1.2); G.rings.push({ x: pl.x, y: pl.y, r: 6, max: 50, t: .4, color: '#7fe3ff' }); }
@@ -2507,8 +3027,8 @@ function endRun(how, then) {
   if (!r.online || NET.role === 'host') S.run = null;
   run = null;
   const newChars = checkUnlocks();
-  const bxp = Math.round(r.floors * 3 + r.kills / 30), buds = [...new Set((S.buddies || []).slice(0, r.players.length).filter(id => id && col()[id]))];
-  const budUp = buds.map(id => ({ id, n: giveXp(id, bxp) }));
+  const buds = [...new Set((S.buddies || []).slice(0, r.players.length).filter(id => id && col()[id]))], bxp = Math.round(Math.min(2.5, r.floors / 12 + r.bosses * .3) * xpNeedLv(buds.length ? lvOf(buds[0]) : 1));
+  const budUp = buds.map(id => ({ id, n: giveXp(id, bxp) })); buds.forEach(id => { if (readyToEvolve(id)) evolvePet(id); });
   const hatched = (r.eggs || []).map(k => pullOne(PACKS[k] || PACKS.egg));
   save();
   if (typeof netSend === 'function' && r.online) netSend({ t: 'end' });
@@ -2523,7 +3043,7 @@ function endRun(how, then) {
       <div>Level: <b>${r.level}</b></div><div>Relics: <b>${r.relics.length}</b></div>
     </div>
     <h2 style="margin-top:14px;color:#7fe3ff">+${shards} 💠 shards · <span style="color:#ff9af0">+${gems} 💎 gems</span></h2>
-    ${budUp.length ? `<p style="text-align:center">🐾 ${budUp.map(o => `${UD(o.id).icon} ${UD(o.id).name} +${bxp} xp${o.n ? ` <b style="color:var(--gold)">⬆️ Lv ${lvOf(o.id)}!</b>` : ''}`).join(' · ')}</p>` : ''}
+    ${budUp.length ? `<p style="text-align:center">🐾 ${budUp.map(o => `${UD(ROSTER[o.id] && col()[o.id] ? o.id : (EVO[o.id] || [o.id])[0]).icon} ${UD(ROSTER[o.id] && col()[o.id] ? o.id : (EVO[o.id] || [o.id])[0]).name} +${bxp} xp${o.n ? ` <b style="color:var(--gold)">⬆️ Lv ${lvOf(col()[o.id] ? o.id : (EVO[o.id] || [o.id])[0])}!</b>` : ''}`).join(' · ')}</p>` : ''}
     ${newChars.length ? `<p style="text-align:center;color:var(--gold)">🔓 New runner: ${newChars.map(k => CHARS[k].icon + ' ' + CHARS[k].name).join(', ')}!</p>` : ''}
     </div>
     <div class="col" style="margin-top:14px"><button class="opt big" data-a="0" data-n="1">⚔️ Play again<kbd>1</kbd></button><button class="opt big" data-a="1" data-n="2">💠 Spend shards<kbd>2</kbd></button><button class="opt" data-a="3" data-n="3">🃏 Open packs (💎 ${S.gems})<kbd>3</kbd></button><button class="opt" data-a="2" data-n="4">🏠 Title<kbd>4</kbd></button></div>`,
@@ -2945,6 +3465,7 @@ addEventListener('keydown', e => {
     if (G && G.phase === 'doors' && e.code === 'KeyT' && !e.repeat && !(run.online && NET.role === 'guest')) { paused = true; bankHp(); showSquadHub('team', () => { paused = false; hideUI(); }); }
     return;
   }
+  if (mode === 'world' && ui.className === 'hidden') { if (e.code === 'Escape' && !e.repeat) worldMenu(); else if (e.code === 'KeyP' && !e.repeat) showSquadHub('team', hideUI); else if (e.code === 'KeyB' && !e.repeat) bagScreen(hideUI); return; }
   if (ui.className === 'hidden' || e.repeat && !k.startsWith('arrow')) return;
   if (performance.now() < inputLock) return;
   if (keyHook && keyHook(k) === true) return;
@@ -2969,6 +3490,7 @@ function loop(now) {
   saveTimer += dt; if (saveTimer > 20) { saveTimer = 0; if (mode !== 'fight') save(); }
   try {
     if (NET.role === 'guest') { if (G && G.remote && run) { guestTick(dt); render(); } else renderMenuBg(dt); }
+    else if (mode === 'world') worldRender(), worldUpdate(dt);
     else if ((mode === 'fight' || mode === 'dead') && G) {
       if (!paused && mode === 'fight') update(dt); else if (mode === 'dead') { for (const p of G.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.t -= dt; } }
       if (G) render(); else renderMenuBg(dt);
