@@ -19,11 +19,14 @@ so the AI can't be talked into "I win".
 - Design document: [`docs/book-game-design.md`](docs/book-game-design.md)
 
 ## ⚔️ Rift Runners — `rift-runners.html`
-Action roguelite with a strategy map. WASD/arrows to move, Space to dash, Esc to pause.
-Save backup code: **Stats & Save Backup**.
+Action roguelite with a strategy map. **WASD/arrows** move · **Space** dash · **E** class skill · **Q** ultimate · **R** Rift Art (found during a run) · **Esc** pause.
+Save backup code: **Stats & Save Backup**. Progress (including pets) is saved in the browser.
 
-- **Looks:** glowing weapons and bullets, particles, hit-stop, screen shake, animated floors and weather for every act,
-  cinematic boss entrances, boss phases, slow-motion finishers, and an animated menu and map.
-- **Endgame:** Act 3 and Endless are much harder: Rift Surges near the end of fights, elites with modifiers
-  (Swift, Shielded, Volatile, Summoner), brutes that slam the ground, and bosses with extra phases (lasers, falling boulders, bullet spirals).
-- **⚙️ Settings:** turn screen shake off, or set Effects to Low if your computer lags. "Auto" lowers them by itself.
+- **Pets & Rift Capsules:** 20 original pets in 5 rarities (Common → Legendary), each with its own job (tank, healer, striker, bomber, collector…).
+  Bring 3 into every run (buy up to 5 slots). Open capsules with 🔷 cores from runs, plus a free daily capsule. Duplicates add ★ stars;
+  guaranteed Epic+ every 25 pulls and Legendary every 80.
+- **Living maps:** trees, pillars, shrines with blessings, chests, healing wells, explosive barrels, act hazards (thorns, lava vents, icicles,
+  void rifts, crystal spikes, storm clouds) that hurt enemies too, and random events (meteor shower, treasure goblin, golden hour).
+- **Evolutions** play completely differently (beam, knife storm, double halo, holy pillars, thunder ground, meteors, tornadoes, ice spikes, inferno).
+- **Endgame:** Act 3+ adds wardens that shield allies, burrowers, Rift Surges, elite modifiers and boss mechanics (the Gaze, shockwave rings, eggs).
+- **⚙️ Settings:** screen shake, effects quality, and 🔋 Battery saver (30 FPS). Menus are throttled to save battery on Chromebooks.
