@@ -25,8 +25,10 @@ Save backup code: **Stats & Save Backup**. Progress (including pets) is saved in
 - **Pets & Rift Capsules:** 20 original pets in 5 rarities (Common → Legendary), each with its own job (tank, healer, striker, bomber, collector…).
   Bring 3 into every run (buy up to 5 slots). Open capsules with 🔷 cores from runs, plus a free daily capsule. Duplicates add ★ stars;
   guaranteed Epic+ every 25 pulls and Legendary every 80.
+- **Fight goals:** 15 goal types shown on the map (Survive, Hunt, Defend, Capture, Collect, Defuse, Escort, King of the Hill, Rift Anchors,
+  Bounty, Nest, Overload, Breakout, Gauntlet, Chaos). Win for bonus gold + cores; flawless pays 1.5×.
 - **Living maps:** trees, pillars, shrines with blessings, chests, healing wells, explosive barrels, act hazards (thorns, lava vents, icicles,
-  void rifts, crystal spikes, storm clouds) that hurt enemies too, and random events (meteor shower, treasure goblin, golden hour).
+  void rifts, crystal spikes, storm clouds) that hurt enemies too, and one random event per fight (treasure goblin or golden hour).
 - **Evolutions** play completely differently (beam, knife storm, double halo, holy pillars, thunder ground, meteors, tornadoes, ice spikes, inferno).
 - **Endgame:** Act 3+ adds wardens that shield allies, burrowers, Rift Surges, elite modifiers and boss mechanics (the Gaze, shockwave rings, eggs).
 - **⚙️ Settings:** screen shake, effects quality, and 🔋 Battery saver (30 FPS). Menus are throttled to save battery on Chromebooks.
