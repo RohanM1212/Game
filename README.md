@@ -36,13 +36,12 @@ A co-op action roguelite. Fully offline: one file, no internet needed (sound is 
 - **Rooms with goals:** ⏳ survive, 🎯 hunt the marked beasts, 💎 defend the crystal, 🌀 capture the portal, ✨ collect the sparks.
 - **Arenas with stuff:** pillars block enemy shots, 🛢️ barrels explode, a ⛲ healing shrine, and a hazard per biome (bushes, lava, ice, darkness, storms).
 - **Every runner has an ultimate** (Bulwark Slam, Arrow Rain, Meteor, Carpet Bomb, Firestorm, Blood Moon, Blizzard, Thunderstorm, Cyclone, Jackpot).
-- **🌍 Rift World (Pokémon + Prodigy style):** choose a starter, explore 6 zones, find wild pets in the tall grass, weaken and catch them
-  with orbs, beat trainers and each zone's Warden for badges. 1-vs-1 pet battles with switching, items and 4 moves per pet.
-- **🐾 Pets:** 74 pets in 5 rarities, each with a stat spread (HP, Attack, Defence, Speed), an ability, a learnset, and evolutions
-  (some 3 stages). Rarer pets have bigger stat totals, but level matters just as much. Packs, catching and duplicates (★) all help.
-- **🗼 Rift Tower:** floor-by-floor trainer battles for gems, packs and blessings that power up your action runs. Your 🐾 buddy fights
-  beside you in runs, as strong as its stats, and earns XP.
+- **🃏 Squad & Packs:** collect squad members in 5 rarities (Common → ✨Legendary✨) from packs bought with 💎 gems or 🪙 gold.
+  Duplicates add stars, battles add levels, and rarer members are much stronger. Each player brings one as a 🐾 Buddy into runs.
+- **🗼 Rift Tower (side mode, from the title screen):** turn-based squad battles — choose Attack, Special or Guard for each member,
+  use the element wheel (🔥 > 🗡️ > ✨ > ⚡ > ❄️ > 🔥) and rows (melee must hit the front row). Climbing the tower gives gems, packs,
+  and blessings that make every run stronger. There are a few secrets to find.
 - **Element sets:** weapons are 🔥 fire, ❄️ frost, ⚡ storm, 🗡️ blade or ✨ arcane; own 2 or 4 of one element for a set bonus. Plus evolutions, relics, and new enemies with tells (chargers, snipers, healers, summoners, bats).
 - **Online co-op (experimental):** two computers connect by swapping two codes (no server). Works best at home; school Wi-Fi often blocks it.
 - Progress, upgrades and unlocks save in the browser; **Stats → Save Backup** gives a code to move it. Old saves carry over.
-- Robot testers (for developers): `node tools/playtest-rift/bot.js solo 3` plays whole runs at high speed; `online.js` tests online play; `shots.js` takes screenshots; `pets-test.js` tests the Rift World, pet battles, catching, evolution, the tower and buddies, and prints a balance table.
+- Robot testers (for developers): `node tools/playtest-rift/bot.js solo 3` plays whole runs at high speed; `online.js` tests online play; `shots.js` takes screenshots; `squad-test.js` tests packs, the tower and buddies and prints a balance table.
