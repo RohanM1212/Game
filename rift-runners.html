@@ -368,10 +368,16 @@ function newRun(charId, heat, daily) {
 function saveRun() {
   if (!run) return;
   run.seed = RNG.s;
-  const copy = JSON.parse(JSON.stringify(run, (k, v) => ['t', 'ang', 'blades', 'lx', 'ly', 'cd', 'pulse', 'rad'].includes(k) ? undefined : v));
+  const copy = JSON.parse(JSON.stringify(run)); // weapon timers are rebuilt each fight, so drop just those
+  for (const w of copy.weapons) for (const k of ['t', 'ang', 'blades', 'lx', 'ly', 'cd', 'pulse', 'rad', 'p2']) delete w[k];
   S.run = copy; save();
 }
-function resumeRun() { run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1; showMap(); }
+function resumeRun() {
+  run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1;
+  // older saves lost their map's room types: rebuild this act's map and start the act's path over
+  if (!run.map || run.map.some(row => row.some(n => !NODE[n.t]))) { run.map = genMap(run.act); run.pos = { r: -1, i: -1 }; run.path = []; run.target = null; saveRun(); }
+  showMap();
+}
 
 /* ================= MAP ================= */
 function genMap(act) {
