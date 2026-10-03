@@ -462,6 +462,7 @@ function showHelp() {
   screen(`<h2>How to Play</h2><div class="panel help">
   <ul>
     <li><b>Move:</b> WASD or Arrow keys. <b>Dash:</b> Space (you can't be hurt while dashing). <b>Pause:</b> Esc or P.</li>
+    <li><b>Ultimate:</b> your 💥 bar fills as you fight and kill. Press <b>E</b> (or Shift/Q) when it's full.</li>
     <li><b>Your weapons fire on their own.</b> Focus on dodging and collecting the XP gems 💎 enemies drop.</li>
     <li><b>Level up</b> to choose new weapons, upgrades and passives (press 1/2/3, or R to reroll).</li>
     <li><b>Evolve:</b> get a weapon to level 5 AND own its matching passive → an EVOLVE card appears!
@@ -486,7 +487,7 @@ function showCharSelect(daily) {
     const w = c.weapon ? WEAPONS[c.weapon] : { icon: '🎲', name: 'Random' };
     return `<button class="card opt ${un ? '' : 'locked'}" data-a="${i}" ${un ? `data-n="${++n <= 9 ? n : ''}"` : 'disabled'}>
       <div class="ci">${un ? c.icon : '🔒'}</div><div class="ct">${c.name}</div>
-      <div class="cs">${w.icon} ${w.name}</div><div class="cd">${un ? c.desc : 'Unlock: ' + c.unlock.text}</div>${un && n <= 9 ? `<kbd>${n}</kbd>` : ''}</button>`;
+      <div class="cs">${w.icon} ${w.name}</div><div class="cd">${un ? c.desc + `<br><b>💥 ${ULT_NAMES[id]}</b>` : 'Unlock: ' + c.unlock.text}</div>${un && n <= 9 ? `<kbd>${n}</kbd>` : ''}</button>`;
   }).join('');
   const heatRow = S.maxHeat > 0 && !daily ? `<div class="bar"><button data-a="${ids.length}">◀ Q</button><span class="it">🌡️ Heat <b>${csHeat}</b> / ${S.maxHeat} &nbsp;<small style="color:var(--dim)">(+15% enemy HP &amp; +25% shards per level)</small></span><button data-a="${ids.length + 1}">E ▶</button></div>` : '';
   const acts = ids.map(id => () => newRun(id, daily ? 0 : csHeat, daily));
@@ -885,7 +886,7 @@ function startFight(type) {
   const actDmg = act === 1 ? 1 : act === 2 ? 1.35 : 1.9 * Math.pow(1.28, act - 3);
   const rowHp = act === 1 ? .05 : act === 2 ? .08 : .12;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
-  P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color, trail: [], dustT: 0, walk: 0 };
+  P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color, trail: [], dustT: 0, walk: 0, ult: 0 };
   mode = 'fight'; paused = false; hideUI();
   if (has('wind')) P.hp = Math.min(ST.maxHp, P.hp + ST.maxHp * .2);
   P.hp = Math.min(P.hp, ST.maxHp);
@@ -1003,7 +1004,7 @@ function killEnemy(e, silent) {
   e.dead = true;
   if (silent) { burst(e.x, e.y, e.color, 4); flashGlow(e.x, e.y, e.r * 2.6, e.color, .3); return; }
   G.kills++; run.kills++; S.stats.kills++;
-  G.combo++; G.comboT = 2.5;
+  G.combo++; G.comboT = 2.5; P.ult = Math.min(100, P.ult + 1);
   if (!e.boss) deathFx(e);
   if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
   const gc = e.elite ? 1 : .12 * (1 + ST.luck);
@@ -1202,6 +1203,39 @@ const WUPD = {
   },
 };
 
+/* ----- ultimates (E / Shift) ----- */
+const ULT_NAMES = { knight: 'Bulwark Slam', ranger: 'Arrow Rain', mage: 'Meteor', bomber: 'Carpet Bomb', pyro: 'Firestorm', vampire: 'Blood Moon', cryo: 'Blizzard', gambler: 'Jackpot', storm: 'Thunderstorm', ranger2: 'Cyclone' };
+const onScr = e => vis(e.x, e.y, 0);
+const ULTS = {
+  knight() { G.rings.push({ x: P.x, y: P.y, r: 10, max: 280, t: .5, color: '#9fb4ff', fill: true, w: 6 }); for (const e of G.enemies) { const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; if (d < 280 + e.r) damageEnemy(e, wDmg(90), (e.x - P.x) / d * 900, (e.y - P.y) / d * 900); } P.invul = Math.max(P.invul, 3); },
+  ranger() { G.rain = { t: 4, acc: 0 }; },
+  mage() { let best = null, bn = -1; for (const e of G.enemies) { if (!onScr(e)) continue; let n = e.boss ? 20 : 0; for (const f of G.enemies) if ((f.x - e.x) ** 2 + (f.y - e.y) ** 2 < 40000) n++; if (n > bn) { bn = n; best = e; } } G.areas.push({ kind: 'boom', x: best ? best.x : P.x + P.fx * 200, y: best ? best.y : P.y + P.fy * 200, t: .6, r: 210, dmg: wDmg(260), c: '#ff9a4a' }); },
+  bomber() { for (let k = 0; k < 16; k++) { const a = k / 16 * 6.283, d = 120 + (k % 3) * 100; G.areas.push({ kind: 'boom', x: P.x + Math.cos(a) * d, y: P.y + Math.sin(a) * d, t: .4 + k * .05, r: 90, dmg: wDmg(70), c: '#ffb040' }); } },
+  pyro() { for (let i = 0; i < 3; i++) G.rings.push({ x: P.x, y: P.y, r: 20, max: 480, t: .6, color: '#ff6a20', fill: true, w: 8, d: i * .1 }); for (const e of G.enemies) if (Math.hypot(e.x - P.x, e.y - P.y) < 480) damageEnemy(e, wDmg(95)); },
+  vampire() { let h = 0; for (const e of G.enemies) if (onScr(e)) { damageEnemy(e, wDmg(45)); h += 1.2; } P.hp = Math.min(ST.maxHp, P.hp + Math.min(45, h)); G.rings.push({ x: P.x, y: P.y, r: 10, max: 400, t: .6, color: '#ff5c8a', w: 6 }); },
+  cryo() { for (const e of G.enemies) if (onScr(e)) { e.slowT = e.boss ? 2 : 3.2; e.slowAmt = e.boss ? .6 : 1; damageEnemy(e, wDmg(25)); } G.rings.push({ x: P.x, y: P.y, r: 10, max: 600, t: .7, color: '#9fe8ff', fill: true, w: 6 }); },
+  storm() { G.rain = { t: 1.6, acc: 0, bolt: true }; },
+  ranger2() { for (let k = 0; k < 8; k++) { const a = k / 8 * 6.283; shoot(P.x, P.y, a, 480, 18, wDmg(40), 1e9, 3, '#e0b070', { kind: 'boom', bt: 0, ba: a, spd: 480 }); } },
+};
+ULTS.gambler = () => { const ks = Object.keys(ULTS).filter(k => k !== 'gambler'); ULTS[pick(ks)](); if (Math.random() < .3) ULTS[pick(ks)](); };
+function useUlt() {
+  if (mode !== 'fight' || paused || G.ending || P.ult < 100) return;
+  P.ult = 0; ULTS[run.char](); hitstop(.08); addShake(.5); screenFlash(P.color, .3, .4);
+  setBanner(`💥 ${ULT_NAMES[run.char]}!`, 1.1, '#ffd24a');
+}
+function rainTick(dt) {
+  const R = G.rain; if (!R) return;
+  R.t -= dt; R.acc += dt * (R.bolt ? 15 : 22);
+  while (R.acc >= 1) {
+    R.acc--;
+    const t = R.bolt ? G.enemies.filter(onScr).sort(() => Math.random() - .5)[0] : null;
+    const x = t ? t.x : P.x + (Math.random() - .5) * 500, y = t ? t.y : P.y + (Math.random() - .5) * 400;
+    if (R.bolt) { zap(x, y - 420, x, y, 3); explodeAt(x, y, 50, wDmg(70), '#fff47a'); }
+    else { G.projs.push({ x, y: y - 300, vx: 0, vy: 900, r: 5, dmg: wDmg(22), pierce: 3, life: .33, color: '#c8ffb0', hits: new Set(), kind: 'knife' }); }
+  }
+  if (R.t <= 0) G.rain = null;
+}
+
 /* ----- update ----- */
 const keys = {};
 function update(dt) {
@@ -1223,6 +1257,7 @@ function update(dt) {
   P.invul -= dt; P.dashCd -= dt; P.aegisT -= dt;
   if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
   if (mode !== 'fight') return;
+  P.ult = Math.min(100, P.ult + 1.6 * dt); rainTick(dt);
   // weapons (remember each cooldown so the HUD can draw it)
   if (!G.ending) for (const w of run.weapons) { const before = w.t || 0; WUPD[w.id](w, dt); if (w.t > before + .01) w.cd = w.t; if (w.pulse > 0) w.pulse -= dt; }
   spawnTick(dt);
@@ -1315,7 +1350,7 @@ function update(dt) {
       explodeAt(a.x, a.y, a.r, 0, '#ffb070'); chunks(a.x, a.y, '#6a5040', 6); addShake(.15);
       if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r) hurt(a.dmg);
     }
-    else if (a.kind === 'boom' && a.t <= 0) { explodeAt(a.x, a.y, a.r, 0, a.c); addShake(.25); }
+    else if (a.kind === 'boom' && a.t <= 0) { explodeAt(a.x, a.y, a.r, a.dmg || 0, a.c); addShake(.25); }
   }
   G.areas = G.areas.filter(a => a.t > 0);
   // pickups
@@ -1933,9 +1968,11 @@ function drawPlayer(q) {
   cx.fillStyle = shade(c, -.45); cx.beginPath(); cx.arc(0, 0, P.r + 2, 0, 6.283); cx.fill();
   cx.fillStyle = c; cx.beginPath(); cx.arc(0, 0, P.r, 0, 6.283); cx.fill();
   cx.fillStyle = 'rgba(255,255,255,.45)'; cx.beginPath(); cx.ellipse(-P.r * .32, -P.r * .42, P.r * .45, P.r * .28, -.4, 0, 6.283); cx.fill();
-  cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(P.fx * 6, P.fy * 6, 4.2, 0, 6.283); cx.fill();
-  cx.fillStyle = '#0b0d14'; cx.beginPath(); cx.arc(P.fx * 7.5, P.fy * 7.5, 2.1, 0, 6.283); cx.fill();
+  cx.fillStyle = shade(c, .6); cx.beginPath(); cx.arc(0, 0, P.r * .38, 0, 6.283); cx.fill();
+  cx.save(); cx.rotate(Math.atan2(P.fy, P.fx)); cx.fillStyle = '#fff';
+  cx.beginPath(); cx.moveTo(P.r + 6, 0); cx.lineTo(P.r + 1, -4); cx.lineTo(P.r + 1, 4); cx.closePath(); cx.fill(); cx.restore();
   cx.restore(); cx.globalAlpha = 1;
+  if (P.ult >= 100) { cx.strokeStyle = '#ffd24a'; cx.lineWidth = 2; cx.beginPath(); cx.arc(P.x, P.y, P.r + 11 + Math.sin(G.now * 8) * 2, 0, 6.283); cx.stroke(); }
   if (P.dashCd > 0) { cx.strokeStyle = 'rgba(127,227,255,.75)'; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(P.x, P.y, P.r + 7, -Math.PI / 2, -Math.PI / 2 + 6.283 * (1 - P.dashCd / ST.dashCd)); cx.stroke(); }
 }
 function drawEnemy(e, q) {
@@ -1959,8 +1996,7 @@ function drawEnemy(e, q) {
   } else if (e.type === 'runner') {
     cx.rotate(a); cx.beginPath(); cx.ellipse(0, 0, r * 1.35, r * .82, 0, 0, 6.283); cx.fill(); cx.stroke();
     if (q) { cx.strokeStyle = rgba(e.color, .5); cx.beginPath(); for (let i = -1; i <= 1; i++) { cx.moveTo(-r * 1.6, i * r * .45); cx.lineTo(-r * 2.4 - Math.random() * 4, i * r * .45); } cx.stroke(); }
-    cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(r * .55, -r * .3, r * .26, 0, 6.283); cx.arc(r * .55, r * .3, r * .26, 0, 6.283); cx.fill();
-    cx.fillStyle = '#111'; cx.beginPath(); cx.arc(r * .65, -r * .3, r * .13, 0, 6.283); cx.arc(r * .65, r * .3, r * .13, 0, 6.283); cx.fill();
+    cx.strokeStyle = shade(e.color, .5); cx.lineWidth = 2; cx.beginPath(); cx.moveTo(-r * .6, 0); cx.lineTo(r * .9, 0); cx.stroke();
     eyes = false;
   } else if (e.type === 'exploder') {
     cx.rotate(G.now * 2 + e.ph); cx.beginPath();
@@ -1974,10 +2010,9 @@ function drawEnemy(e, q) {
   }
   if (q && e.type !== 'shooter' && e.type !== 'runner') { cx.fillStyle = 'rgba(255,255,255,.28)'; cx.beginPath(); cx.ellipse(-r * .3, -r * .4, r * .42, r * .25, -.4, 0, 6.283); cx.fill(); }
   if (eyes) {
-    const ex = Math.cos(a) * r * .32, ey = Math.sin(a) * r * .32, s = Math.max(1.8, r * .2);
-    if (q) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(ex - r * .3, ey - r * .12, s * 1.15, 0, 6.283); cx.arc(ex + r * .3, ey - r * .12, s * 1.15, 0, 6.283); cx.fill(); }
-    cx.fillStyle = G.hard ? '#ff2040' : '#111'; cx.beginPath(); cx.arc(ex - r * .3 + Math.cos(a) * s * .4, ey - r * .12 + Math.sin(a) * s * .4, s * .6, 0, 6.283); cx.arc(ex + r * .3 + Math.cos(a) * s * .4, ey - r * .12 + Math.sin(a) * s * .4, s * .6, 0, 6.283); cx.fill();
-    if (e.type === 'brute') { cx.strokeStyle = '#111'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(ex - r * .55, ey - r * .45); cx.lineTo(ex - r * .12, ey - r * .3); cx.moveTo(ex + r * .55, ey - r * .45); cx.lineTo(ex + r * .12, ey - r * .3); cx.stroke(); }
+    // a pointed "snout" toward you and a glowing core (red-hot in the late game)
+    cx.save(); cx.rotate(a); cx.fillStyle = dark; cx.beginPath(); cx.moveTo(r * 1.3, 0); cx.lineTo(r * .75, -r * .32); cx.lineTo(r * .75, r * .32); cx.closePath(); cx.fill(); cx.restore();
+    cx.fillStyle = G.hard ? '#ff4060' : shade(e.color, .55); cx.beginPath(); cx.arc(0, 0, r * (e.type === 'brute' ? .3 : .26) * (1 + .15 * Math.sin(G.now * 6 + e.ph)), 0, 6.283); cx.fill();
   }
   cx.restore();
   if (e.slowT > 0) { cx.fillStyle = 'rgba(170,235,255,.32)'; cx.strokeStyle = 'rgba(220,250,255,.8)'; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(e.x, e.y, r + 1, 0, 6.283); cx.fill(); cx.stroke(); }
@@ -2125,6 +2160,11 @@ function drawHUD() {
   if (ready) { cx.strokeStyle = 'rgba(127,227,255,.8)'; cx.lineWidth = 1.5; rr(dx, dy, dw, dh, 15); cx.stroke(); }
   cx.textAlign = 'center'; cx.font = '800 12px system-ui,sans-serif'; cx.fillStyle = ready ? '#bff2ff' : 'rgba(255,255,255,.5)';
   cx.fillText(ready ? 'DASH READY · SPACE' : 'DASH ' + P.dashCd.toFixed(1), dx + dw / 2, dy + 19);
+  const uy = dy - dh - 8, uk = P.ult / 100, ur = uk >= 1;
+  cx.fillStyle = 'rgba(8,10,20,.75)'; rr(dx, uy, dw, dh, 15); cx.fill();
+  cx.fillStyle = ur ? `rgba(255,210,74,${.35 + .2 * Math.sin(t * 8)})` : 'rgba(255,210,74,.18)'; rr(dx, uy, dw * uk, dh, 15); cx.fill();
+  cx.textAlign = 'center'; cx.font = '800 12px system-ui,sans-serif'; cx.fillStyle = ur ? '#ffe27a' : 'rgba(255,255,255,.5)';
+  cx.fillText(ur ? `💥 ${ULT_NAMES[run.char].toUpperCase()} · E` : `ULTIMATE ${Math.floor(P.ult)}%`, dx + dw / 2, uy + 19);
   cx.textAlign = 'right'; cx.font = '600 12px system-ui,sans-serif'; cx.fillStyle = 'rgba(255,255,255,.45)'; cx.fillText('Esc · Pause', VW - 14, 30);
   // combo counter
   if (G.combo >= 10) {
@@ -2188,6 +2228,7 @@ addEventListener('keydown', e => {
   keys[k] = true;
   if (mode === 'fight' && !paused) {
     if (k === ' ' && !e.repeat) dash();
+    if ((k === 'e' || k === 'shift' || k === 'q') && !e.repeat) useUlt();
     if ((k === 'escape' || k === 'p') && !e.repeat) pauseMenu();
     return;
   }
