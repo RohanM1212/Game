@@ -915,7 +915,7 @@ function startFight(type) {
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
   const actHp = act === 1 ? 1 : act === 2 ? 1.7 : 2.9 * Math.pow(1.6, act - 3);
   const actDmg = act === 1 ? 1 : act === 2 ? 1.35 : 1.9 * Math.pow(1.28, act - 3);
-  const rowHp = act === 1 ? .05 : act === 2 ? .08 : .12;
+  const rowHp = act === 1 ? .05 : act === 2 ? .08 : .1;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
   P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color, trail: [], dustT: 0, walk: 0, ult: 0 };
   mode = 'fight'; paused = false; hideUI();
@@ -1448,7 +1448,7 @@ function setupGoals(key) {
   const keys = key === 'chaos' ? shuffle(CHAOS_POOL.slice()).slice(0, 2) : [key];
   G.goal = { key, list: keys.map(k => ({ k, s: GOAL_INIT[k](), done: false, fail: false })), flawless: true, result: null };
   if (keys.every(k => GOALS[k].timed)) return;
-  G.dur *= key === 'chaos' ? 1.7 : 1.4; // goals get extra time; the timer becomes a deadline
+  G.dur *= key === 'chaos' ? 1.5 : 1.25; // goals get extra time; the timer becomes a deadline
 }
 const gs = k => G.goal && G.goal.list.find(g => g.k === k);
 function goalUpdate(dt) {
