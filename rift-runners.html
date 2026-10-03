@@ -1436,7 +1436,7 @@ const GOAL_INIT = {
   escort() { const a = spotNear(60, 80), ang = Math.atan2(WORLD / 2 - a.y, WORLD / 2 - a.x) + (Math.random() - .5), d = 1200; const end = { x: clamp(a.x + Math.cos(ang) * d, 150, WORLD - 150), y: clamp(a.y + Math.sin(ang) * d, 150, WORLD - 150) }; const c = { x: a.x, y: a.y, r: 24, hp: 0, maxHp: 0, minK: 1, sx: a.x, sy: a.y }; c.hp = c.maxHp = 280 + 200 * run.act; G.guard = c; G.props = G.props.filter(p => !p.solid || distSeg(p, c, end) > p.r + 40); return { c, end }; },
   hill() { return { z: { ...spotNear(200, 360), r: 95 }, charge: 0, mv: 8 }; },
   anchors() { const list = []; for (let i = 0; i < 4; i++) { const s = spotNear(300, 700); const e = makeEnemy('brute', s.x, s.y); Object.assign(e, { anchor: true, spd: 0, dmg: 0, xp: 6, r: 26, color: '#6a50c8', hp: 170 * G.hpMul, maxHp: 170 * G.hpMul, spawnT: 0, sumA: 2 + i }); list.push(e); } return { list }; },
-  bounty() { const s = spotNear(500, 700); const e = makeEnemy(pick(['brute', 'shooter', 'grunt', 'splitter']), s.x, s.y); eliteize(e); e.hp = e.maxHp = e.maxHp * 2.2; e.spawnT = .5; e.bounty = pick(['Gnash', 'Vexa', 'Morrow', 'Skarr', 'Quillon', 'Brakka']) + ' the ' + pick(['Hungry', 'Cruel', 'Sly', 'Undying', 'Vast']); e.affix = Object.keys(AFFIX).sort(() => Math.random() - .5).slice(0, Math.min(3, run.act)); for (const k of e.affix) { if (k === 'swift') e.spd *= 1.45; if (k === 'shield') { e.shield = e.shieldMax = e.maxHp * .45; e.shieldHit = -9; } if (k === 'summoner') e.sumT = 2.5; } return { e }; },
+  bounty() { const s = spotNear(500, 700); const e = makeEnemy(pick(['brute', 'shooter', 'grunt', 'splitter']), s.x, s.y); eliteize(e); e.hp = e.maxHp = e.maxHp * 2.2; e.spawnT = .35; e.bounty = pick(['Gnash', 'Vexa', 'Morrow', 'Skarr', 'Quillon', 'Brakka']) + ' the ' + pick(['Hungry', 'Cruel', 'Sly', 'Undying', 'Vast']); e.affix = Object.keys(AFFIX).sort(() => Math.random() - .5).slice(0, Math.min(3, run.act)); for (const k of e.affix) { if (k === 'swift') e.spd *= 1.45; if (k === 'shield') { e.shield = e.shieldMax = e.maxHp * .45; e.shieldHit = -9; } if (k === 'summoner') e.sumT = 2.5; } return { e }; },
   nest() { const list = []; for (let i = 0; i < 4; i++) { const s = spotNear(350, 900); const e = makeEnemy('grunt', s.x, s.y); Object.assign(e, { nest: true, spd: 0, dmg: 0, xp: 6, r: 28, color: '#a8b060', hp: 220 * G.hpMul, maxHp: 220 * G.hpMul, spawnT: 0, hatchT: 9 + i * 2 }); list.push(e); } return { list }; },
   overload() { return { orbs: [], got: 0, need: 8, t: 1, missed: 0 }; },
   breakout() { G.wall = { x: WORLD / 2, y: WORLD / 2, r: 1150, min: 260 }; const sp = []; for (let i = 0; i < 8; i++) sp.push(spotNear(150, 700)); return { sp, got: 0, need: 6 }; },
@@ -2685,7 +2685,7 @@ function render(dt) {
   cx.fillStyle = 'rgba(0,0,0,.28)'; cx.beginPath();
   for (const e of G.enemies) {
     if (!vis(e.x, e.y, e.r + 20)) continue;
-    const s = e.spawnT > 0 ? 1 - e.spawnT / .35 : 1, sy = e.y + e.r * .8;
+    const s = e.spawnT > 0 ? clamp(1 - e.spawnT / .35, .05, 1) : 1, sy = e.y + e.r * .8;
     cx.moveTo(e.x + e.r * s, sy); cx.ellipse(e.x, sy, e.r * s, e.r * .35 * s, 0, 0, 6.283);
   }
   if (mode === 'fight') { cx.moveTo(P.x + P.r, P.y + P.r * .9); cx.ellipse(P.x, P.y + P.r * .9, P.r, P.r * .35, 0, 0, 6.283); }
