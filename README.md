@@ -21,3 +21,9 @@ so the AI can't be talked into "I win".
 ## ⚔️ Rift Runners — `rift-runners.html`
 Action roguelite with a strategy map. WASD/arrows to move, Space to dash, Esc to pause.
 Save backup code: **Stats & Save Backup**.
+
+- **Looks:** glowing weapons and bullets, particles, hit-stop, screen shake, animated floors and weather for every act,
+  cinematic boss entrances, boss phases, slow-motion finishers, and an animated menu and map.
+- **Endgame:** Act 3 and Endless are much harder: Rift Surges near the end of fights, elites with modifiers
+  (Swift, Shielded, Volatile, Summoner), brutes that slam the ground, and bosses with extra phases (lasers, falling boulders, bullet spirals).
+- **⚙️ Settings:** turn screen shake off, or set Effects to Low if your computer lags. "Auto" lowers them by itself.
