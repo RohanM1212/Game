@@ -118,6 +118,7 @@ img.ic{width:1.15em;height:1.15em;vertical-align:-.22em;display:inline-block}
 body.touch .keys-hint{display:none}
 @media (max-height:520px){.node{width:38px;height:38px}.node img.ic{width:20px;height:20px}.node.boss{width:48px;height:48px}h2{font-size:20px;margin:2px 0 6px}.bar{padding:4px 10px;font-size:13px;margin-bottom:6px}.card{min-height:150px;padding:10px 8px}.card .ci img.ic{width:38px;height:38px}#ui{padding:10px 10px}}
 .dmgbars{margin:10px 0;display:flex;flex-direction:column;gap:4px}.db{display:grid;grid-template-columns:150px 1fr 40px;align-items:center;gap:8px;font-size:13px}.db i{height:10px;border-radius:5px;background:linear-gradient(90deg,#7c9cff,#b48cff)}.db b{text-align:right}
+.hist{display:flex;flex-direction:column;gap:4px;font-size:14px}
 #toasts{position:fixed;top:70px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;z-index:10}
 .toast{background:linear-gradient(180deg,#232a40f2,#181d2df2);border:1px solid var(--acc);padding:9px 18px;border-radius:12px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.45),0 0 18px rgba(124,156,255,.25);animation:tin .45s cubic-bezier(.2,1.6,.4,1),tout .4s ease-in 2.2s forwards}
 @keyframes tin{from{opacity:0;transform:translateY(-14px) scale(.85)}}
@@ -375,6 +376,7 @@ function calcStats(r) {
   if (R('twin')) s.proj += 1;
   if (R('dice')) s.crit += .15;
   if (R('quiver')) { s.proj += 1; s.might -= .1; }
+  if (r.mut) { if (r.mut.includes('gold')) s.goldMul *= 2; if (r.mut.includes('glass')) s.maxHp *= .6; if (r.mut.includes('swarm')) s.xpMul *= 1.4; if (r.mut.includes('vamp')) s.killHeal += .4; if (r.mut.includes('haste')) s.speed *= 1.15; if (r.mut.includes('lucky')) s.crit += .25; }
   if (R('heartstone')) s.killHeal += .2;
   if (R('gildheart')) s.maxHp += Math.floor(r.gold / 20);
   if (G && G.buff && r === run) { const k = G.buff.k; if (k === 'might') s.might += .4; if (k === 'haste') s.cdMul *= .7; if (k === 'swift') s.speed *= 1.3; }
@@ -412,7 +414,7 @@ function newRun(charId, heat, daily) {
     kills: 0, elites: 0, bosses: 0, floors: 0, curse: 0, endless: false, won: false, seed: 0, hp: 0 };
   run.dseed = seed; run.syn = {}; if (heat >= 9) run.curse = 1;
   run.map = genMap(1);
-  if (daily) addRelic(pick(Object.keys(RELICS)));
+  if (daily) { addRelic(pick(Object.keys(RELICS))); run.mut = dailyMuts(run.daily); if (run.mut.includes('glass')) run.bonus.might = (run.bonus.might || 0) + .5; }
   run.hp = calcStats(run).maxHp;
   S.lastChar = charId; S.heat = heat; S.stats.runs++;
   saveRun(); showMap();
@@ -576,7 +578,7 @@ function showCharSelect(daily) {
   acts.push(() => { csHeat = Math.min(S.maxHeat, csHeat + 1); showCharSelect(daily); });
   acts.push(showTitle);
   screen(`<h2>${daily ? '📅 Daily Challenge — ' + todayStr() : 'Choose your Runner'}</h2>
-    <div class="sub">${daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.' : 'Each character starts with a different weapon.'}</div>
+    <div class="sub">${daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.<br>Today\'s rules: ' + dailyMuts(todayStr()).map(k => `<b>${MUTS[k].name}</b> (${MUTS[k].desc})`).join(' · ') : 'Each character starts with a different weapon.'}</div>
     ${heatRow}<div class="row">${cards}</div>
     <div class="col" style="margin-top:14px"><button data-a="${ids.length + 2}">← Back (Esc)</button></div>`, acts, 'menu', k => {
     if (k === 'escape') { showTitle(); return true; }
@@ -630,6 +632,7 @@ function showStats(msg) {
     <div>Gold collected: <b>${s.gold.toLocaleString()}</b></div><div>Evolutions: <b>${s.evolutions}</b></div><div>Highest level: <b>${s.bestLevel}</b></div>
     <div>Shards earned: <b>${s.shardsEarned}</b></div><div>Max Heat unlocked: <b>${S.maxHeat}</b></div><div>Play time: <b>${h}h ${m}m</b></div>
   </div></div>
+  ${(S.history || []).length ? `<h2 style="margin-top:16px">📜 Recent Runs</h2><div class="panel"><div class="hist">${S.history.map(h => `<div>${h.w ? '🏆' : h.how === 'dead' ? '💀' : '🏳️'} <b>${CHARS[h.c] ? CHARS[h.c].icon + ' ' + CHARS[h.c].name : h.c}</b> · Act ${h.a} · ${h.f} floors · ${h.k} kills · Lv ${h.l}${h.h ? ' · Heat ' + h.h : ''}${h.daily ? ' · Daily' : ''} <small style="color:var(--dim)">${h.d}</small></div>`).join('')}</div></div>` : ''}
   <h2 style="margin-top:16px">💾 Save Backup</h2>
   <div class="panel"><p style="margin-top:0">School Chromebooks sometimes wipe browser data. <b>Copy this code</b> and email it to yourself or paste it in a Google Doc. Paste it back here to restore everything, or to move your save to a new version of the game.</p>
     <textarea id="code" readonly></textarea>
@@ -842,7 +845,7 @@ function buildChoices0() {
   if (nW < 5) for (const id in WEAPONS) if (!run.weapons.some(w => w.id === id)) opts.push({ k: 'wnew', id, w: nW < 3 ? 7 : 4 });
   for (const id in PASSIVES) { const l = run.passives[id] || 0; if (l > 0 && l < PASSIVES[id].max) opts.push({ k: 'pup', id, w: 7 }); else if (l === 0 && nP < 5) opts.push({ k: 'pnew', id, w: 4 }); }
   const st = calcStats(run);
-  const n = Math.min(5, 3 + (S.meta.choice || 0) + (st.luck >= .3 ? 1 : 0));
+  const n = Math.min(5, 3 + (S.meta.choice || 0) + (st.luck >= .3 ? 1 : 0) + (mut('lucky') ? 1 : 0));
   for (const k of synReady()) opts.push({ k: 'syn', id: k, w: 100 });
   const res = opts.filter(o => o.k === 'evo' || o.k === 'syn').slice(0, n);
   let rest = opts.filter(o => o.k !== 'evo' && o.k !== 'syn');
@@ -1099,7 +1102,7 @@ const EMO = {
   '■': ['square', '#7c9cff'], '□': ['squareO', '#4a5578'], '⬜': ['squareO', '#8a94b0'], '📋': ['clip', '#7c9cff'], '📥': ['download', '#5ee08a'], '🗑️': ['trash', '#ff6070'], '🔨': ['hammer', '#a8b2c8'],
   '🩸': ['drop', '#ff3050'], '💧': ['drop', '#4fb8ff'], '📦': ['chest', '#a07040'], '📚': ['book', '#7c9cff'], '🧙': ['hat', '#7a5aff'], '🕳️': ['hole', '#b48cff'], '🦇': ['bat', '#5a3a6a'], '🗼': ['tower', '#7a8aa8'],
   '🎭': ['mask', '#ff7ab8'], '👁️': ['eye', '#c040ff'], '♾️': ['infinity', '#b48cff'], '🏠': ['home', '#ffae5c'], '⏸': ['pause', '#e8ecf6'], '📳': ['waves', '#7c9cff'], '🟣': ['dot', '#b45cff'], '🟡': ['dot', '#ffd24a'], '◆': ['diamond', '#ff6070'],
-  '🧬': ['dna', '#5ad0a0'], '💡': ['bulb', '#ffe680'], '🔔': ['bell', '#ffd24a'], '🔕': ['bell', '#6a7088'], '🎵': ['note', '#c49cff'], '👥': ['ghosts', '#c0c8ff'], '🤍': ['heart', '#f4f0e6'], '🎁': ['chest', '#ff7ab8'],
+  '🧬': ['dna', '#5ad0a0'], '📜': ['clip', '#e0c890'], '💡': ['bulb', '#ffe680'], '🔔': ['bell', '#ffd24a'], '🔕': ['bell', '#6a7088'], '🎵': ['note', '#c49cff'], '👥': ['ghosts', '#c0c8ff'], '🤍': ['heart', '#f4f0e6'], '🎁': ['chest', '#ff7ab8'],
 };
 const EMO_RE = /(?:[←-⇿⌀-⏿■-➿⬀-⯿☀-⛿]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF])[️‍]?/g;
 const glyphCache = new Map(), glyphUrl = new Map();
@@ -1246,6 +1249,7 @@ function startFight(type) {
   P.hp = Math.min(P.hp, ST.maxHp);
   const dur = type === 'boss' ? Infinity : (type === 'elite' ? 45 : 36 + row * 1.5) * (has('hourglass') ? .8 : 1);
   const eliteT = type === 'elite' ? [3, 20] : type === 'fight' && act >= 4 ? [dur * .35, dur * .7] : type === 'fight' && act >= 3 ? [dur * .5] : type === 'fight' && heat(10) ? [dur * .4] : [];
+  if (type === 'fight' && mut('elites')) eliteT.push(dur * .6);
   G = { type, time: 0, now: 0, dur, hard: act >= 3,
     enemies: [], projs: [], eb: [], pick: [], areas: [], parts: [], texts: [], bolts: [], rings: [], decals: [], ghosts: [], lasers: [], amb: [],
     spawnAcc: 0, swarmT: 13, eliteT, ending: 0, tookDmg: false, boss: null, kills: 0,
@@ -1284,7 +1288,7 @@ function makeEnemy(type, x, y) {
   const e = { type, x, y, r: d.r, hp: d.hp * G.hpMul, maxHp: d.hp * G.hpMul, spd: d.spd * (.9 + Math.random() * .2), dmg: d.dmg * G.dmgMul, color: d.color, xp: d.xp,
     slowT: 0, slowAmt: 0, kx: 0, ky: 0, flash: 0, orbitT: 0, auraT: 0, fireT: 0, boomT: 0, shootT: 1 + Math.random() * 2, dead: false,
     spawnT: .35, ph: Math.random() * 6.283, tg: Math.random() < .45, sp0: heat(1) ? 1.1 : 1, slamCd: 2 + Math.random() * 2, slam: 0, shield: 0, affix: [] };
-  e.spd *= e.sp0; G.enemies.push(e); return e;
+  e.spd *= e.sp0; if (mut('haste')) e.spd *= 1.15; if (mut('giants') && !e.boss) { e.r *= 1.35; e.spd *= .8; e.hp = e.maxHp = e.maxHp * 1.5; } G.enemies.push(e); return e;
 }
 function spawnPos() {
   const dist = Math.hypot(VW, VH) / 2 / G.zoom + 40;
@@ -1321,7 +1325,7 @@ function spawnTick(dt) {
   if (G.hard && G.type !== 'boss' && !G.surge && prog > .72) {
     G.surge = true; setBanner('⚠️ RIFT SURGE', 2.2, '#ff5060', 'THE RIFT IS COLLAPSING. HOLD ON!'); screenFlash('#ff2040', .3, .5); addShake(.4);
   }
-  const rate = (run.act === 1 ? .8 + 2.4 * prog : 1.2 + 2.8 * prog) * (1 + (G.hard ? .3 : .22) * (run.act - 1)) * (1 + .08 * run.heat) * (G.type === 'boss' ? .45 : 1) * (G.surge ? 1.6 : 1) * (heat(5) ? 1.3 : 1) * (G.goal && gs('gauntlet') ? 1.7 : 1) * (G.goal && (gs('defend') || gs('escort')) ? 1.15 : 1);
+  const rate = (run.act === 1 ? .8 + 2.4 * prog : 1.2 + 2.8 * prog) * (1 + (G.hard ? .3 : .22) * (run.act - 1)) * (1 + .08 * run.heat) * (G.type === 'boss' ? .45 : 1) * (G.surge ? 1.6 : 1) * (heat(5) ? 1.3 : 1) * (G.goal && gs('gauntlet') ? 1.7 : 1) * (mut('swarm') ? 1.4 : 1) * (G.goal && (gs('defend') || gs('escort')) ? 1.15 : 1);
   G.spawnAcc += rate * dt;
   const cap = G.hard ? 260 : 230;
   while (G.spawnAcc >= 1) { G.spawnAcc--; if (G.enemies.length < cap) { const [x, y] = spawnPos(); makeEnemy(pickType(), x, y); } }
@@ -2421,6 +2425,18 @@ function showGamble() {
 }
 
 /* ================= DAILY RUN — same choices for everyone ================= */
+const MUTS = {
+  gold:   { name: 'Gold Rush',     desc: 'double gold' },
+  glass:  { name: 'Glass Cannon',  desc: '+50% damage, -40% max HP' },
+  swarm:  { name: 'Swarm Day',     desc: '+40% enemies, +40% XP' },
+  giants: { name: 'Giants',        desc: 'enemies are bigger, slower and tougher' },
+  vamp:   { name: 'Bloodthirst',   desc: 'every kill heals 0.4 HP' },
+  haste:  { name: 'Overdrive',     desc: 'everything moves 15% faster, you too' },
+  lucky:  { name: 'Lucky Day',     desc: '+25% crit, +1 level-up choice' },
+  elites: { name: 'Elite Squad',   desc: 'an extra elite in every fight, +50% cores' },
+};
+function dailyMuts(day) { const ks = Object.keys(MUTS), h = Math.abs(hashStr('mut' + day)), a = h % ks.length; let b = Math.floor(h / 7) % ks.length; if (b === a) b = (b + 1) % ks.length; return [ks[a], ks[b]]; }
+const mut = k => run && run.mut && run.mut.includes(k);
 function seededChoices(fn) { // level-up offers depend only on the run seed, level and reroll count
   const keep = RNG.s; RNG.s = hashStr((run.dseed || 0) + ':' + run.level + ':' + (run.rr || 0)); try { return fn(); } finally { RNG.s = keep; }
 }
@@ -2825,9 +2841,10 @@ function endRun(how, then) {
   S.shards += shards; S.stats.shardsEarned += shards;
   if (how === 'dead') S.stats.deaths++;
   S.stats.bestAct = Math.max(S.stats.bestAct, r.act);
-  const cores = Math.round(r.floors * 4 + r.elites * 8 + r.bosses * 35 + Math.max(0, r.act - 1) * 20 + (r.won ? 60 : 0) + (r.bonusCores || 0)); r.cores = cores; S.cores += cores;
+  const cores = Math.round((r.mut && r.mut.includes('elites') ? 1.5 : 1) * (r.floors * 4 + r.elites * 8 + r.bosses * 35 + Math.max(0, r.act - 1) * 20 + (r.won ? 60 : 0)) + (r.bonusCores || 0)); r.cores = cores; S.cores += cores;
   if (r.daily) { S.stats.dailies++; r.score = dailyScore(r); S.daily[r.daily] = Math.max(S.daily[r.daily] || 0, r.score); }
   checkAch(r);
+  S.history = [{ d: todayStr(), c: r.char, a: r.act, f: r.floors, k: r.kills, l: r.level, w: !!r.won, how, h: r.heat, daily: !!r.daily }].concat(S.history || []).slice(0, 15);
   S.run = null; run = null;
   const newChars = checkUnlocks();
   save();
