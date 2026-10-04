@@ -467,7 +467,7 @@ function genMap(act) {
       let t;
       if (r === 0) t = 'fight';
       else if (r === R - 1) t = 'rest';
-      else t = weighted([{ t: 'fight', w: 44 }, { t: 'elite', w: r >= 2 ? 16 : 0 }, { t: 'event', w: 22 }, { t: 'shop', w: r >= 2 ? 10 : 0 }, { t: 'rest', w: r >= 3 ? 6 : 0 }, { t: 'forge', w: r >= 2 ? 4 : 0 }, { t: 'gamble', w: r >= 1 ? 4 : 0 }, { t: 'challenge', w: r >= 2 ? 6 : 0 }, { t: 'treasure', w: 5 }]).t;
+      else t = weighted([{ t: 'fight', w: 44 }, { t: 'elite', w: r >= 2 ? 16 : 0 }, { t: 'event', w: 22 }, { t: 'shop', w: r >= 2 ? 10 : 0 }, { t: 'rest', w: r >= 3 ? 6 : 0 }, { t: 'forge', w: r >= 2 ? 4 : 0 }, { t: 'gamble', w: r >= 1 ? 4 : 0 }, { t: 'challenge', w: r >= 2 ? 6 : 0 }, { t: 'treasure', w: 5 }, { t: 'den', w: r >= 2 ? 3 : 0 }]).t;
       row.push({ t, x: (i + 1) / (n + 1) + (rnd() - .5) * .06, next: [] });
     }
     rows.push(row);
@@ -718,6 +718,7 @@ function enterNode(r, i) {
   else if (t === 'rest') showRest();
   else if (t === 'treasure') showTreasure();
   else if (t === 'forge') showForge();
+  else if (t === 'den') showDen();
   else if (t === 'gamble') showGamble();
   else if (t === 'challenge') { run.challenge = true; startFight('fight'); }
 }
@@ -2086,7 +2087,7 @@ function petBonus(kind) { // passive bonuses from the equipped team
   return kind === 'cdr' ? Math.min(.35, v) : v;
 }
 function spawnPets() {
-  const TB = teamBonus(); G.pets = (S.team || []).filter(id => PETS[id] && S.pets[id]).map((id, i) => ({ id, d: PETS[id], pw: petPow(id) * TB.bond(PETS[id].role), x: P.x, y: P.y, i, cd: 1 + i * .3, cd2: 2, vx: 0, vy: 0, hop: 0, rev: id === 'phoenix' }));
+  const TB = teamBonus(); G.pets = (S.team || []).filter(id => PETS[id] && S.pets[id]).map((id, i) => ({ id, d: PETS[id], pw: petPow(id) * TB.bond(PETS[id].role) * (1 + (run.petBoost || 0)), x: P.x, y: P.y, i, cd: 1 + i * .3, cd2: 2, vx: 0, vy: 0, hop: 0, rev: id === 'phoenix' }));
 }
 let __petSrc = null; // which pet is dealing damage right now (for the end-of-run pet stats)
 const petAct = (pt, cd, ic) => { pt.cd = cd; pt.cdMax = cd; pt.emo = { t: .8, ic }; pt.punch = .25; };
@@ -2428,13 +2429,21 @@ EVENTS.push(
 );
 
 /* ================= NEW ROOMS: Forge, Gamble, Challenge ================= */
-Object.assign(NODE, { forge: { icon: '🔨', name: 'Forge' }, gamble: { icon: '🎰', name: 'Gamble' }, challenge: { icon: '🔥', name: 'Challenge fight (big reward)' } });
+Object.assign(NODE, { den: { icon: '🐾', name: 'Pet Den' }, forge: { icon: '🔨', name: 'Forge' }, gamble: { icon: '🎰', name: 'Gamble' }, challenge: { icon: '🔥', name: 'Challenge fight (big reward)' } });
 function showForge() {
   const ws = run.weapons.filter(w => w.lvl < 5);
   const opts = ws.map(w => ({ html: `<div class="ci">${WEAPONS[w.id].icon}</div><div class="ct">${WEAPONS[w.id].name}</div><div class="cs">Level ${w.lvl} → ${w.lvl + 1}</div><div class="cd">Hammer it into shape.</div>`, go: () => { w.lvl++; completeNode(`🔨 ${WEAPONS[w.id].name} is now level ${w.lvl}.`); } }));
   opts.push({ html: `<div class="ci">⚔️</div><div class="ct">Temper</div><div class="cs">-15% HP</div><div class="cd">+12% damage for the rest of the run.</div>`, go: () => { run.bonus.might = (run.bonus.might || 0) + .12; run.hp = Math.max(1, run.hp - calcStats(run).maxHp * .15); completeNode('🔨 Your weapons feel sharper. +12% damage.'); } });
   if (run.relics.length) opts.push({ html: `<div class="ci">💎</div><div class="ct">Reforge</div><div class="cs">Relic swap</div><div class="cd">Trade a random relic for a new one.</div>`, go: () => { const lose = pick(run.relics); run.relics = run.relics.filter(x => x !== lose); const got = randomRelics(1).filter(x => x !== lose)[0]; if (got) addRelic(got); run.hp = Math.min(run.hp, calcStats(run).maxHp); completeNode(`🔨 ${RELICS[lose].name} became ${got ? RELICS[got].name : 'dust'}.`); } });
   screen(`<h2>🔨 The Forge</h2><div class="sub">Pick one.</div><div class="row">${opts.map((o, i) => `<button class="card opt" data-a="${i}" data-n="${i + 1}">${o.html}<kbd>${i + 1}</kbd></button>`).join('')}</div>`, opts.map(o => o.go));
+  inputLock = performance.now() + 350;
+}
+function showDen() {
+  const team = (S.team || []).filter(id => PETS[id] && S.pets[id]), opts = [];
+  if (team.length) opts.push({ html: `<div class="ci">🐾</div><div class="ct">Feast</div><div class="cs">Pets +30% power</div><div class="cd">Your team eats well. Lasts the rest of the run.</div>`, go: () => { run.petBoost = (run.petBoost || 0) + .3; completeNode('🐾 Your pets are stronger for the rest of the run!'); } });
+  opts.push({ html: `<div class="ci">🥚</div><div class="ct">Hatchery</div><div class="cs">+80 🔷 cores</div><div class="cd">Collect the eggs and sell them back home.</div>`, go: () => { run.bonusCores = (run.bonusCores || 0) + 80; completeNode('🥚 +80 🔷 cores when the run ends!'); } });
+  opts.push({ html: `<div class="ci">💚</div><div class="ct">Nap</div><div class="cs">Heal 25% · +1 reroll</div><div class="cd">Curl up with the critters for a bit.</div>`, go: () => { healPct(.25); run.rerolls++; completeNode('💚 Rested. +1 reroll.'); } });
+  screen(`<h2>🐾 Pet Den</h2><div class="sub">${team.length ? 'Your team sniffs around excitedly.' : 'Wild critters live here. (Bring pets to unlock the Feast.)'} Pick one.</div><div class="row">${opts.map((o, i) => `<button class="card opt" data-a="${i}" data-n="${i + 1}">${o.html}<kbd>${i + 1}</kbd></button>`).join('')}</div>`, opts.map(o => o.go));
   inputLock = performance.now() + 350;
 }
 function showGamble() {

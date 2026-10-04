@@ -34,7 +34,7 @@ Works on phones/tablets too: a touch joystick and ability buttons appear automat
 - **6 bosses:** Colossus, Hive Queen, Void Eye, then The Mitosis (splits into pieces), The Phantom (teleports, fake clones)
   and The Rift Herald (summons portals and is shielded until you break them) for Endless.
 - **11 weapons** incl. Spirit Scythe and Rift Drones. **8 synergies:** level two matching weapons to 4+ to fuse them (Superconductor, Napalm, Solar Wheel, Spellblades, Storm Rang, Cryo Charges, Ember Scythe, Tesla Drones). **31 relics.**
-- **New rooms:** 🔨 Forge, 🎰 Gamble, 🔥 Challenge fights, plus risk/reward events (Blood Pact, Cursed Idol, Dice Table, and more).
+- **New rooms:** 🔨 Forge, 🎰 Gamble, 🔥 Challenge fights, 🐾 Pet Den (pet power, cores or a nap), plus risk/reward events (Blood Pact, Cursed Idol, Dice Table, and more).
 - **Twist characters:** Reaper (levels from kills, no XP), Sentinel (only fires while standing still), Juggernaut (no dash, crushes on contact).
 - **Heat 1–10:** each level adds a modifier (faster foes, pricier shops, extra elite modifiers, weaker healing, and more).
 - **Daily run:** same map, same level-up offers and 2 daily rules (Gold Rush, Giants, Swarm Day, Overdrive...) for everyone that day; your score is shown with a copyable line to share.
@@ -42,6 +42,7 @@ Works on phones/tablets too: a touch joystick and ability buttons appear automat
 - **👹 Boss Rush** (unlocks after your first win): all 6 bosses back to back, with level-ups, a relic and a full heal between bosses.
 - **Pet team bonuses:** two pets with the same role bond (+25% power), four different roles give +6% damage and +15 HP, two Legendaries give +5% damage.
 - **Controller support:** left stick moves, A dash, X skill, Y ultimate, B Rift Art, Start pause; the D-pad works in menus.
+- **New enemies:** Mender (heals allies) and Mortar (lobs telegraphed shells). **Prismatic** 5-star pets shimmer and get +10% power.
 - **Quality of life:** act title cards, a "Your build" sheet in the pause menu, the death screen shows what took you down,
   trophy badges on runners you've won with, and a damage-numbers setting (all / crits only / off).
 - **Art:** all icons are drawn in code in one flat style (no emoji).
