@@ -19,7 +19,7 @@ so the AI can't be talked into "I win".
 - Design document: [`docs/book-game-design.md`](docs/book-game-design.md)
 
 ## ⚔️ Rift Runners — `rift-runners.html`
-Action roguelite with a strategy map. **WASD/arrows** move · **Space** dash · **E** class skill · **Q** ultimate · **R** Rift Art (found during a run) · **Esc** pause.
+Action roguelite with a strategy map. Synthesized sound + music (**M** mutes). **WASD/arrows** move · **Space** dash · **E** class skill · **Q** ultimate · **R** Rift Art (found during a run) · **Esc** pause.
 Save backup code: **Stats & Save Backup**. Progress (including pets) is saved in the browser.
 
 - **Pets & Rift Capsules:** 20 original pets in 5 rarities (Common → Legendary), each with its own job (tank, healer, striker, bomber, collector…).
