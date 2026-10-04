@@ -436,7 +436,7 @@ function newRun(charId, heat, daily, rush) {
   if (daily) { addRelic(pick(Object.keys(RELICS))); run.mut = dailyMuts(run.daily); if (run.mut.includes('glass')) run.bonus.might = (run.bonus.might || 0) + .5; }
   run.hp = calcStats(run).maxHp;
   S.lastChar = charId; S.heat = heat; S.stats.runs++;
-  if (rush) { run.rush = true; run.gold = 0; saveRun(); rushNext(6); return; }
+  if (rush) { run.rush = true; run.gold = 0; saveRun(); rushNext(8); return; }
   saveRun(); actIntro(() => showMap());
 }
 function saveRun() {
@@ -601,7 +601,7 @@ function showCharSelect(daily, rush) {
   acts.push(() => { csHeat = Math.min(S.maxHeat, csHeat + 1); showCharSelect(daily, rush); });
   acts.push(showTitle);
   screen(`<h2>${daily ? '📅 Daily Challenge — ' + todayStr() : rush ? '👹 Boss Rush' : 'Choose your Runner'}</h2>
-    <div class="sub">${rush ? 'Face all 6 bosses in a row. You start with 6 level-ups, and get a relic and 4 more level-ups after every boss. No map, no shops, no mercy.' : daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.<br>Today\'s rules: ' + dailyMuts(todayStr()).map(k => `<b>${MUTS[k].name}</b> (${MUTS[k].desc})`).join(' · ') : 'Each character starts with a different weapon.'}</div>
+    <div class="sub">${rush ? 'Face all 6 bosses in a row. You start with 8 level-ups. After every boss: a relic, a full heal and 7 more level-ups. No map, no shops, no mercy.' : daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.<br>Today\'s rules: ' + dailyMuts(todayStr()).map(k => `<b>${MUTS[k].name}</b> (${MUTS[k].desc})`).join(' · ') : 'Each character starts with a different weapon.'}</div>
     ${heatRow}<div class="row">${cards}</div>
     <div class="col" style="margin-top:14px"><button data-a="${ids.length + 2}">← Back (Esc)</button></div>`, acts, 'menu', k => {
     if (k === 'escape') { showTitle(); return true; }
@@ -1436,7 +1436,7 @@ function explodeAt(x, y, r, dmg, color, hurtPlayer) {
   if (dmg > 0 && G.props) for (const b of G.props) if (b.barrel && !b.dead && Math.hypot(b.x - x, b.y - y) < r + b.r) setTimeout(() => G && blowBarrel(b), 90);
   if (hurtPlayer && Math.hypot(P.x - x, P.y - y) < r + P.r) hurt(hurtPlayer);
 }
-function hurt(d) {
+function hurt(d, src) {
   if (P.invul > 0 || P.dashT > 0 || G.ending || mode !== 'fight') return;
   if (P.bubble) { sfx('shield'); P.bubble = false; P.invul = .5; burst(P.x, P.y, '#6ab8ff', 16); popText(P.x, P.y - 26, 'POP!', '#bfe4ff', true); return; }
   if (has('aegis') && P.aegisT <= 0) {
@@ -1456,7 +1456,7 @@ function hurt(d) {
       for (let i = 0; i < 3; i++) G.rings.push({ x: P.x, y: P.y, r: 10, max: 300, t: .6, color: '#ffe680', w: 6, d: i * .12 });
       burst(P.x, P.y, '#ffe680', 40, 1.6); screenFlash('#fff2b0', .6, .6); setBanner('👼 REVIVED!', 1.5, '#ffe680');
     } else {
-      P.hp = 0; mode = 'dead'; G.dying = .001; sfx('death');
+      P.hp = 0; mode = 'dead'; G.dying = .001; sfx('death'); run.killedBy = src || (G.type === 'boss' && G.boss ? G.boss.name : 'enemy fire');
       burst(P.x, P.y, P.color, 40, 1.5); chunks(P.x, P.y, P.color, 14); screenFlash('#ffffff', .6, .5); addShake(.8);
       setTimeout(() => { run.hp = 0; endRun('dead'); }, 1600);
     }
@@ -2235,7 +2235,7 @@ function pushOut(o, r) { for (const p of G.props) { if (!p.solid || p.dead) cont
 function blowBarrel(b) {
   if (b.dead) return; b.dead = true;
   explodeAt(b.x, b.y, 120, wDmg(55) + 30 * run.act, '#ff6a30'); chunks(b.x, b.y, '#a03020', 10); addShake(.3);
-  if (Math.hypot(P.x - b.x, P.y - b.y) < 120 + P.r) hurt(10 + 4 * run.act);
+  if (Math.hypot(P.x - b.x, P.y - b.y) < 120 + P.r) hurt(10 + 4 * run.act, 'an exploding barrel');
   for (const o of G.props) if (o.barrel && !o.dead && Math.hypot(o.x - b.x, o.y - b.y) < 130) setTimeout(() => G && blowBarrel(o), 120);
 }
 const BUFFS = { might: { n: '💪 Fury: +40% damage', c: '#ff6070' }, haste: { n: '⏱️ Frenzy: faster weapons', c: '#ffd24a' }, swift: { n: '👟 Wind: +30% speed', c: '#7ee08a' }, ult: { n: '💥 Overcharge: ultimate filled!', c: '#ffb84a' } };
@@ -2259,7 +2259,7 @@ function mapUpdate(dt) {
       for (const e of G.enemies) if (!e.boss && (e.x - p.x) ** 2 + (e.y - p.y) ** 2 < p.r * p.r) { e.slowT = Math.max(e.slowT, .2); e.slowAmt = Math.max(e.slowAmt, .45); if (e.fireT <= G.now) { e.fireT = G.now + .6; damageEnemy(e, 4 + 3 * run.act); } }
     } else if (p.hz === 'rifts') {
       if (dP < p.r * 3.5 && dP > 5) { const f = 70 * (1 - dP / (p.r * 3.5)); P.x -= (P.x - p.x) / dP * f * dt; P.y -= (P.y - p.y) / dP * f * dt; }
-      if (dP < p.r * .5 && P.dashT <= 0) hurt(hzDmg * .4);
+      if (dP < p.r * .5 && P.dashT <= 0) hurt(hzDmg * .4, 'a hazard');
       for (const e of G.enemies) { if (e.boss) continue; const d = Math.hypot(e.x - p.x, e.y - p.y) || 1; if (d < p.r * 3.5) { e.x -= (e.x - p.x) / d * 60 * dt; e.y -= (e.y - p.y) / d * 60 * dt; } if (d < p.r * .5 && e.fireT <= G.now) { e.fireT = G.now + .5; damageEnemy(e, hzDmg); } }
     } else if (p.hz === 'vents' || p.hz === 'spikes') {
       p.cyc += dt; const cyc = 5;
@@ -2585,7 +2585,7 @@ function update(dt) {
     if (d < e.r + P.r && !e.hidden && !G.decoy) {
       if (e.type === 'exploder' && !e.boss) { killEnemy(e); }
       else { if (twist('juggernaut') && e.boomT <= G.now) { e.boomT = G.now + .35; damageEnemy(e, 22 * ST.might * (1 + .05 * run.level), (e.x - P.x) * 6, (e.y - P.y) * 6); }
-        if (has('thorns') && e.boomT <= G.now) { e.boomT = G.now + .4; damageEnemy(e, 30 * ST.might); } hurt(e.dmg); }
+        if (has('thorns') && e.boomT <= G.now) { e.boomT = G.now + .4; damageEnemy(e, 30 * ST.might); } hurt(e.dmg, e.boss ? e.name : (e.elite ? 'an elite ' : 'a ') + e.type); }
     }
   }
   separate();
@@ -2650,7 +2650,7 @@ function update(dt) {
       if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r) hurt(a.dmg);
     }
     else if (a.kind === 'boom' && a.t <= 0) { explodeAt(a.x, a.y, a.r, a.dmg || 0, a.c); addShake(.25); }
-    else if (a.kind === 'acid') { if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r - 4 && P.dashT <= 0) { P.slowed = Math.max(P.slowed || 0, .35); if ((G.acidT = (G.acidT || 0) - dt) <= 0) { G.acidT = .5; hurt(a.dmg); } } }
+    else if (a.kind === 'acid') { if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r - 4 && P.dashT <= 0) { P.slowed = Math.max(P.slowed || 0, .35); if ((G.acidT = (G.acidT || 0) - dt) <= 0) { G.acidT = .5; hurt(a.dmg, 'acid'); } } }
     else if (a.kind === 'glob' && a.t <= 0) { G.areas.push({ kind: 'acid', x: a.x, y: a.y, t: 3, max: 3, r: a.r * .8, dmg: a.dmg * .55 }); burst(a.x, a.y, '#7af0b0', 10); if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r && P.dashT <= 0) hurt(a.dmg * 1.5); }
     else if (a.kind === 'echo' && a.t <= 0) { explodeAt(a.x, a.y, a.r, 0, '#c0c8ff', a.dmg); addShake(.2); }
     else if (a.kind === 'quake' && a.t <= 0) { explodeAt(P.x, P.y, a.r, a.dmg, a.c); addShake(.5); for (const e of G.enemies) if (!e.boss && Math.hypot(e.x - P.x, e.y - P.y) < a.r) { e.slowT = 1.5; e.slowAmt = .8; } }
@@ -2839,7 +2839,7 @@ function bossReward(g) {
   if (run.rush) {
     S.stats.rushBest = Math.max(S.stats.rushBest || 0, run.act); save();
     if (run.act >= 6) { run.won = true; S.stats.rushWins = (S.stats.rushWins || 0) + 1; checkAch(); sfx('win'); setTimeout(() => endRun('win'), 50); return; }
-    relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! (${run.act}/6) · healed 40%`, () => { run.act++; saveRun(); rushNext(4); });
+    relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! (${run.act}/6) · fully healed`, () => { run.act++; run.hp = calcStats(run).maxHp; saveRun(); rushNext(7); });
     return;
   }
   relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! +${g} gold, healed 40%`, () => {
@@ -2902,7 +2902,7 @@ function endRun(how, then) {
   save();
   if (then) { then(); return; }
   const title = how === 'win' ? '🏆 Run Complete!' : how === 'dead' ? '💀 You Fell' : '🏳️ Run Ended';
-  screen(`<h1 style="font-size:48px">${title}</h1>
+  screen(`<h1 style="font-size:48px">${title}</h1>${how === 'dead' && r.killedBy ? `<div class="sub" style="color:#ff8a9a">Taken down by <b>${r.killedBy}</b>${r.rush ? ` · Boss ${r.act}/6` : ''}</div>` : ''}
     <div class="panel" style="max-width:520px"><div class="grid" style="width:100%;grid-template-columns:1fr 1fr">
       <div>Character: <b>${CHARS[r.char].icon} ${CHARS[r.char].name}</b></div><div>Reached: <b>Act ${r.act}</b></div>
       <div>Floors cleared: <b>${r.floors}</b></div><div>Kills: <b>${r.kills}</b></div>
@@ -2916,7 +2916,7 @@ function endRun(how, then) {
     ${newChars.length ? `<p style="text-align:center;color:var(--gold)">🔓 New character: ${newChars.map(k => CHARS[k].icon + ' ' + CHARS[k].name).join(', ')}!</p>` : ''}
     </div>
     <div class="col" style="margin-top:14px"><button class="opt big" data-a="0" data-n="1">⚔️ Play again<kbd>1</kbd></button><button class="opt big" data-a="1" data-n="2">💠 Spend shards<kbd>2</kbd></button><button class="opt" data-a="2" data-n="3">🏠 Title<kbd>3</kbd></button></div>`,
-    [() => showCharSelect(false), showUpgrades, showTitle]);
+    [() => showCharSelect(false, !!r.rush), showUpgrades, showTitle]);
   inputLock = performance.now() + 700;
 }
 function checkUnlocks() {
