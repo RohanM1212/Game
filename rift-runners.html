@@ -171,6 +171,8 @@ const WEAPONS = {
   bomb:      { name: 'Sticky Charges',  icon: '💣', desc: 'Sticks charges on enemies. Bigger crowd, bigger boom.', evo: 'might', evoName: 'Chain Reaction' },
   boomerang: { name: 'Ricochet Blade',  icon: '🪃', desc: 'Bounces between enemies, faster and stronger each hit.', evo: 'swift', evoName: 'Shatterstorm' },
   frost:     { name: 'Frost Nova',      icon: '❄️', desc: 'Blasts nearby enemies and slows them.',        evo: 'armor', evoName: 'Absolute Zero' },
+  scythe:    { name: 'Spirit Scythe',   icon: '🌙', desc: 'Sweeps a huge arc in front of you.',            evo: 'growth', evoName: 'Death Spiral' },
+  drones:    { name: 'Rift Drones',     icon: '🗼', desc: 'Drones circle you and shoot nearby enemies.',    evo: 'magnet', evoName: 'Drone Swarm' },
   fire:      { name: 'Fire Trail',      icon: '🔥', desc: 'Leaves burning ground where you walk.',        evo: 'crit',  evoName: 'Inferno' },
 };
 const PASSIVES = {
@@ -302,8 +304,8 @@ const ACHIEVEMENTS = [
   { id: 'heat10', name: 'Inferno Master',  desc: 'Win a run on Heat 10',          reward: 500, test: s => s.stats.heat10 >= 1 },
   { id: 'daily',  name: 'Daily Habit',     desc: 'Finish a Daily Challenge run',  reward: 15,  test: s => s.stats.dailies >= 1 },
   { id: 'syn1',   name: 'Better Together',  desc: 'Unlock a weapon synergy',       reward: 30,  test: s => Object.keys(s.codex.syn).length >= 1 },
-  { id: 'syn6',   name: 'Perfect Harmony',  desc: 'Discover all 6 synergies',      reward: 200, test: s => Object.keys(s.codex.syn).length >= 6 },
-  { id: 'evo9',   name: 'Master Smith',     desc: 'Discover all 9 evolutions',     reward: 200, test: s => Object.keys(s.codex.evo).length >= 9 },
+  { id: 'syn6',   name: 'Perfect Harmony',  desc: 'Discover all 8 synergies',      reward: 200, test: s => Object.keys(s.codex.syn).length >= 8 },
+  { id: 'evo9',   name: 'Master Smith',     desc: 'Discover all 11 evolutions',    reward: 200, test: s => Object.keys(s.codex.evo).length >= 11 },
   { id: 'boss6',  name: 'Rift Breaker',     desc: 'Defeat all 6 bosses',           reward: 250, test: s => Object.keys(s.codex.boss).length >= 6 },
   { id: 'chal1',  name: 'Up for a Challenge', desc: 'Win a Challenge fight',       reward: 25,  test: s => s.stats.challenges >= 1 },
   { id: 'flaw10', name: 'Spotless',         desc: 'Complete 10 goals flawlessly',  reward: 60,  test: s => s.stats.flawless >= 10 },
@@ -419,7 +421,7 @@ function saveRun() {
   if (!run) return;
   run.seed = RNG.s;
   const copy = JSON.parse(JSON.stringify(run)); // weapon timers are rebuilt each fight, so drop just those
-  for (const w of copy.weapons) for (const k of ['t', 'ang', 'blades', 'lx', 'ly', 'cd', 'pulse', 'rad', 'p2']) delete w[k];
+  for (const w of copy.weapons) for (const k of ['t', 'ang', 'blades', 'lx', 'ly', 'cd', 'pulse', 'rad', 'p2', 'drones']) delete w[k];
   S.run = copy; save();
 }
 function resumeRun() {
@@ -1234,8 +1236,8 @@ function startFight(type) {
   ST = calcStats(run);
   const act = run.act, row = run.target ? run.target.r : 0;
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
-  const actHp = act === 1 ? 1 : act === 2 ? 1.7 : 2.9 * Math.pow(1.6, act - 3);
-  const actDmg = act === 1 ? 1 : act === 2 ? 1.35 : 1.9 * Math.pow(1.28, act - 3);
+  const actHp = act === 1 ? 1 : act === 2 ? 1.65 : 2.65 * Math.pow(1.6, act - 3);
+  const actDmg = act === 1 ? 1 : act === 2 ? 1.3 : 1.75 * Math.pow(1.28, act - 3);
   const rowHp = act === 1 ? .05 : act === 2 ? .08 : .1;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
   P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color, trail: [], dustT: 0, walk: 0, ult: 0 };
@@ -1255,7 +1257,7 @@ function startFight(type) {
   setBanner(type === 'boss' ? '👹 BOSS FIGHT' : type === 'elite' ? '💀 ELITE FIGHT' : `Act ${act} · Floor ${row + 1}`, 2.2, type === 'fight' ? '#ffffff' : '#ff8090', actInfo(act).name);
   for (const w of run.weapons) { w.t = .4 + Math.random() * .3; w.ang = 0; w.cd = 0; }
   Object.assign(P, { skillCd: 1, artCd: 1, mirror: 0, breath: 0, field: 0, fieldT: 0, healT: 0, slowed: 0, bubble: false });
-  Object.assign(G, { props: [], beams: [], turrets: [], pets: [], slashes: [], waves: [], timeStop: 0, decoy: null, buff: null, golden: 0, meteorsT: 0, cloud: null, gaze: null, rain: null });
+  Object.assign(G, { props: [], beams: [], turrets: [], pets: [], slashes: [], sweeps: [], waves: [], timeStop: 0, decoy: null, buff: null, golden: 0, meteorsT: 0, cloud: null, gaze: null, rain: null });
   buildMap(); spawnPets(); G.petDmg = {}; G.wdmg = {};
   if (type === 'fight') { const node = run.target && run.map[run.target.r] && run.map[run.target.r][run.target.i]; const gk = (node && node.o) || 'survive'; setupGoals(gk); const gd = GOALS[gk]; setBanner(`${gd.icon} ${gd.name.toUpperCase()}`, 3, '#ffd24a', gd.desc.toUpperCase()); }
   G.eventT = G.type === 'fight' && !(G.goal && G.goal.key === 'chaos') ? (Number.isFinite(G.dur) ? G.dur * (.3 + Math.random() * .3) : 1e9) : 1e9;
@@ -1296,7 +1298,7 @@ function spawnPos() {
 function pickType() {
   const t = G.time, a = run.act;
   return weighted([{ k: 'grunt', w: 10 }, { k: 'runner', w: t > 5 ? 5 : 0 }, { k: 'brute', w: t > 14 ? 1.5 + a : 0 }, { k: 'shooter', w: t > 9 ? 1.5 + a : 0 },
-    { k: 'splitter', w: a >= 2 || t > 24 ? 3 : 0 }, { k: 'exploder', w: a >= 2 || t > 30 ? 2.5 : 0 }, { k: 'warden', w: a >= 3 && t > 8 ? 1.2 : 0 }, { k: 'burrower', w: a >= 3 && t > 6 ? 2 : 0 }, { k: 'dasher', w: a >= 2 && t > 6 ? 2 : 0 }, { k: 'sludge', w: a >= 2 && t > 10 ? 1.5 : 0 }]).k;
+    { k: 'splitter', w: a >= 2 || t > 24 ? 3 : 0 }, { k: 'exploder', w: a >= 2 || t > 30 ? 2.5 : 0 }, { k: 'warden', w: a >= 3 && t > 8 ? 1.2 : 0 }, { k: 'burrower', w: a >= 3 && t > 6 ? 2 : 0 }, { k: 'dasher', w: a >= 2 && t > 6 ? 1.4 : 0 }, { k: 'sludge', w: a >= 2 && t > 10 ? 1 : 0 }]).k;
 }
 function eliteize(e) { e.elite = true; e.hp = e.maxHp = e.maxHp * 9; e.r *= 1.7; e.dmg *= 1.5; e.spd *= .9; e.xp *= 10; e.affix = []; return e; }
 function makeElite(type) {
@@ -1558,6 +1560,15 @@ const WUPD = {
     if (fxq()) for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283 + Math.random() * .2, s = r * 3.2; part({ k: 'spark', x: P.x, y: P.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, t: .3, max: .3, c: '#cff4ff', r: 2.5, drag: .88 }); }
     for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < r + e.r) { e.slowT = 2; e.slowAmt = e.boss ? .3 : (w.evo ? 1 : .5); damageEnemy(e, dmg); }
   },
+  scythe(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const L = w.lvl; w.t = (1.4 - .07 * L) * ST.cdMul;
+    scytheSweep(Math.atan2(P.fy, P.fx), (110 + 8 * L) * ST.area, 1.3 + .08 * L, wDmg(18 + 7 * L), '#cfd8ff');
+  },
+  drones(w, dt) {
+    const L = w.lvl, n = 1 + Math.floor((L + 1) / 3) + Math.min(2, ST.proj);
+    droneTick(w, dt, n, wDmg(11 + 4 * L), .55 - .03 * L, '#7fe3ff');
+  },
   fire(w, dt) {
     w.t -= dt; if (w.t > 0) return;
     const L = w.lvl; w.t = .22 * ST.cdMul;
@@ -1707,6 +1718,11 @@ const EVO = {
     }
   },
   bomb(w, dt) { w.t -= dt; if (w.t > 0) return; w.t = 2 * ST.cdMul; if (!stickyThrow(6, true)) w.t = .2; }, // Chain Reaction
+  scythe(w, dt) { // Death Spiral: a full spinning circle, twice
+    w.t -= dt; if (w.t > 0) return; w.t = 1.1 * ST.cdMul;
+    const a0 = G.now * 4; scytheSweep(a0, 175 * ST.area, 3.2, wDmg(50), '#e8eeff'); setTimeout(() => G && mode === 'fight' && scytheSweep(a0 + 3.14, 175 * ST.area, 3.2, wDmg(32), '#b0b8ff'), 180);
+  },
+  drones(w, dt) { droneTick(w, dt, 5 + Math.min(2, ST.proj), wDmg(30), .35, '#bff8ff', true); }, // Drone Swarm: more drones, piercing lasers
   boomerang(w, dt) { w.t -= dt; if (w.t > 0) return; w.t = 1.9 * ST.cdMul; if (!ricoThrow(6, true)) w.t = .1; }, // Shatterstorm
   frost(w, dt) { // Absolute Zero: freezing nova + ice spikes; frozen enemies take +50%
     w.t -= dt; if (w.t > 0) return; w.t = 2.4 * ST.cdMul;
@@ -1724,6 +1740,19 @@ const EVO = {
     G.areas.push({ kind: 'fire', x: P.x, y: P.y, t: 3.2, r: 40 * ST.area, dmg: wDmg(16), evo: true });
   },
 };
+function scytheSweep(a, R, arc, dmg, c) {
+  for (const e of G.enemies) { if (e.dead) continue; const dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy); if (d > R + e.r) continue; let da = Math.abs(Math.atan2(dy, dx) - a); if (da > Math.PI) da = 6.283 - da; if (da < arc / 2) damageEnemy(e, dmg, dx / (d || 1) * 220, dy / (d || 1) * 220); }
+  G.sweeps.push({ a, R, arc, t: .22, max: .22, c }); sfx('dash');
+  if (syn('emberscythe')) for (let i = 0; i < 3; i++) { const b = a - arc / 2 + arc * (i + .5) / 3; G.areas.push({ kind: 'fire', x: P.x + Math.cos(b) * R * .7, y: P.y + Math.sin(b) * R * .7, t: 2.2, r: 30 * ST.area, dmg: dmg * .12, evo: true, src: 'scythe' }); }
+}
+function droneTick(w, dt, n, dmg, cd, c, laser) {
+  w.ang = (w.ang || 0) + dt * 2.2; w.drones = [];
+  for (let i = 0; i < n; i++) {
+    const a = w.ang + i / n * 6.283, x = P.x + Math.cos(a) * 58, y = P.y + Math.sin(a) * 40 - 18; w.drones.push([x, y]);
+    w['dc' + i] = (w['dc' + i] || i * .1) - dt;
+    if (w['dc' + i] <= 0) { const t = nearest(x, y, 380); if (t) { w['dc' + i] = cd * ST.cdMul; const ang = Math.atan2(t.y - y, t.x - x); if (laser) beam(x, y, ang, 380, 7, dmg, c); else shoot(x, y, ang, 600, 4, dmg, 1, .8, c); if (syn('tesladrones')) { let cur = t; const hs = new Set([t]); for (let k = 0; k < 2; k++) { const nx = G.enemies.find(f => !f.dead && !hs.has(f) && Math.hypot(f.x - cur.x, f.y - cur.y) < 150); if (!nx) break; zap(cur.x, cur.y, nx.x, nx.y, 1.5); damageEnemy(nx, dmg * .6); hs.add(nx); cur = nx; } } } }
+  }
+}
 function beam(x, y, a, len, w, dmg, c) {
   const ca = Math.cos(a), sa = Math.sin(a);
   let kn = 0; for (const e of G.enemies) { if (e.dead) continue; const px = e.x - x, py = e.y - y, al = px * ca + py * sa; if (al > 0 && al < len && Math.abs(-px * sa + py * ca) < w / 2 + e.r) { damageEnemy(e, dmg, ca * 80, sa * 80); if (c === '#c9a8ff' && syn('spellblades') && kn++ < 6) shoot(e.x, e.y, Math.random() * 6.283, 420, 4, dmg * .3, 2, .7, '#e8f0ff', { kind: 'bat', child: true }); } }
@@ -2225,6 +2254,8 @@ const SYN = {
   spellblades:    { a: 'wand', b: 'daggers', name: 'Spellblades', desc: 'Magic hits burst into 3 seeking knives.' },
   stormrang:      { a: 'boomerang', b: 'lightning', name: 'Storm Rang', desc: 'Every Ricochet bounce calls down a lightning strike.' },
   cryocharge:     { a: 'bomb', b: 'frost', name: 'Cryo Charges', desc: 'Sticky Charges freeze everything they hit.' },
+  emberscythe:    { a: 'scythe', b: 'fire', name: 'Ember Scythe', desc: 'Scythe sweeps leave a trail of fire.' },
+  tesladrones:    { a: 'drones', b: 'lightning', name: 'Tesla Drones', desc: 'Drone shots arc to 2 more enemies.' },
 };
 const syn = k => run && run.syn && run.syn[k];
 let __wsrc = null; // which weapon is dealing damage right now
@@ -2275,7 +2306,7 @@ Object.assign(ULTS, {
 
 /* ================= NEW ENEMIES ================= */
 Object.assign(ENEMIES, {
-  dasher: { hp: 26, spd: 70, dmg: 14, r: 11, xp: 2, color: '#ff8a5a' },
+  dasher: { hp: 26, spd: 70, dmg: 10, r: 11, xp: 2, color: '#ff8a5a' },
   sludge: { hp: 40, spd: 55, dmg: 10, r: 14, xp: 2, color: '#9ad04a' },
 });
 
@@ -2427,6 +2458,7 @@ function update(dt) {
   for (const w of G.waves) { w.r += w.spd * dt; if (!w.hit && Math.abs(Math.hypot(P.x - w.x, P.y - w.y) - w.r) < w.w / 2 + P.r && P.dashT <= 0) { w.hit = true; hurt(w.dmg); } }
   G.waves = G.waves.filter(w => w.r < 1300);
   for (const b of G.beams) b.t -= dt; G.beams = G.beams.filter(b => b.t > 0);
+  for (const b of G.sweeps) b.t -= dt; G.sweeps = G.sweeps.filter(b => b.t > 0);
   // weapons (remember each cooldown so the HUD can draw it)
   if (P.fortress > 0) P.fortress -= dt;
   if (!G.ending) for (const w of run.weapons) { if (twist('sentinel') && P.moving && !(P.fortress > 0)) continue; const before = w.t || 0; __wsrc = w.id; const np = G.projs.length, na = G.areas.length; (w.evo && EVO[w.id] ? EVO[w.id] : WUPD[w.id])(w, P.fortress > 0 ? dt * 2 : dt); __wsrc = null; for (let i = np; i < G.projs.length; i++) G.projs[i].src = G.projs[i].src || w.id; for (let i = na; i < G.areas.length; i++) G.areas[i].src = G.areas[i].src || w.id; if (w.t > before + .01) w.cd = w.t; if (w.pulse > 0) w.pulse -= dt; }
@@ -2482,11 +2514,11 @@ function update(dt) {
     } else if (e.type === 'dasher' && !e.elite) {
       e.dcd = (e.dcd === undefined ? 1 + Math.random() * 2 : e.dcd) - dt;
       if (e.dst === 'aim') { if ((e.dt -= dt) <= 0) { e.dst = 'dash'; e.dt = .42; } }
-      else if (e.dst === 'dash') { e.x += Math.cos(e.da) * 560 * dt; e.y += Math.sin(e.da) * 560 * dt; if ((e.dt -= dt) <= 0) { e.dst = null; e.dcd = 2.6 + Math.random(); } }
-      else if (e.dcd <= 0 && d < 380) { e.dst = 'aim'; e.dt = .55; e.da = Math.atan2(dy, dx); }
+      else if (e.dst === 'dash') { e.x += Math.cos(e.da) * 500 * dt; e.y += Math.sin(e.da) * 500 * dt; if ((e.dt -= dt) <= 0) { e.dst = null; e.dcd = 2.6 + Math.random(); } }
+      else if (e.dcd <= 0 && d < 380) { e.dst = 'aim'; e.dt = .7; e.da = Math.atan2(dy, dx); }
       else { e.x += dx / d * sp * dt; e.y += dy / d * sp * dt; }
     } else if (e.type === 'sludge' && !e.elite) {
-      if ((e.slT = (e.slT === undefined ? 1 : e.slT) - dt) <= 0) { e.slT = 1.4; G.areas.push({ kind: 'acid', x: e.x, y: e.y, t: 3.5, max: 3.5, r: 26, dmg: e.dmg * .6 }); }
+      if ((e.slT = (e.slT === undefined ? 1 : e.slT) - dt) <= 0) { e.slT = 1.4; G.areas.push({ kind: 'acid', x: e.x, y: e.y, t: 3, max: 3, r: 24, dmg: e.dmg * .45 }); }
       e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     } else { e.x += dx / d * sp * dt; e.y += dy / d * sp * dt; }
     if (e.elite) {
@@ -2742,7 +2774,7 @@ function finishFight() {
   const goalMsg = G.goal && G.goal.reward ? ' · ' + G.goal.reward : '', wasChallenge = G.challenge; if (G.rngKeep !== undefined) RNG.s = G.rngKeep; run.challenge = false;
   run.wdmg = run.wdmg || {}; for (const k in G.wdmg) run.wdmg[k] = (run.wdmg[k] || 0) + Math.round(G.wdmg[k]);
   run.petDmg = run.petDmg || {}; for (const k in G.petDmg) run.petDmg[k] = (run.petDmg[k] || 0) + Math.round(G.petDmg[k]);
-  for (const w of run.weapons) { delete w.lx; delete w.ly; delete w.blades; delete w.cd; delete w.pulse; delete w.rad; }
+  for (const w of run.weapons) { delete w.drones; for (const k in w) if (/^dc\d/.test(k)) delete w[k]; delete w.lx; delete w.ly; delete w.blades; delete w.cd; delete w.pulse; delete w.rad; }
   G = null;
   if (wasChallenge) { S.stats.challenges++; run.bonusCores = (run.bonusCores || 0) + 30; relicChoice(`🔥 Challenge conquered! +${g} gold · +30 🔷${goalMsg}`, () => completeNode()); }
   else if (type === 'elite') { run.elites++; S.stats.elites++; relicChoice(`💀 Elite defeated! +${g} gold`, () => completeNode()); }
@@ -3247,11 +3279,14 @@ function render(dt) {
   for (const T of G.turrets) { cx.fillStyle = '#2a3450'; cx.strokeStyle = '#7fe3ff'; cx.lineWidth = 2; rr(T.x - 9, T.y - 24, 18, 26, 4); cx.fill(); cx.stroke(); add(); glow(T.x, T.y - 22, 14, '#7fe3ff', .7 + .3 * Math.sin(t * 10)); norm(); }
   if (G.decoy) { const D = G.decoy; cx.globalAlpha = .55 + .25 * Math.sin(t * 12); cx.fillStyle = P.color; cx.beginPath(); cx.arc(D.x, D.y, P.r, 0, 6.283); cx.fill(); cx.globalAlpha = 1; cx.strokeStyle = '#ff7ab8'; cx.lineWidth = 2; cx.beginPath(); cx.arc(D.x, D.y, P.r + 6 + Math.sin(t * 8) * 3, 0, 6.283); cx.stroke(); }
   drawPetsWorld(t, q);
+  for (const w of run.weapons) if (w.drones) for (const [x, y] of w.drones) { cx.fillStyle = '#2a3450'; cx.strokeStyle = w.evo ? '#bff8ff' : '#7fe3ff'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(x, y - 8); cx.lineTo(x + 8, y); cx.lineTo(x, y + 8); cx.lineTo(x - 8, y); cx.closePath(); cx.fill(); cx.stroke(); cx.fillStyle = cx.strokeStyle; cx.fillRect(x - 2, y - 2, 4, 4); }
   if (P.bubble) { cx.strokeStyle = 'rgba(150,210,255,.7)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(P.x, P.y, P.r + 9, 0, 6.283); cx.stroke(); }
   if (P.mirror > 0) { add(); cx.globalAlpha = .6 + .3 * Math.sin(t * 20); cx.strokeStyle = '#bfd0ff'; cx.lineWidth = 4; cx.beginPath(); cx.arc(P.x, P.y, 72, 0, 6.283); cx.stroke(); glow(P.x, P.y, 80, '#9fb4ff', .25); norm(); }
   if (P.field > 0) { add(); cx.globalAlpha = .35; cx.strokeStyle = '#fff47a'; cx.lineWidth = 2; cx.setLineDash([6, 8]); cx.beginPath(); cx.arc(P.x, P.y, 170, t * 4, t * 4 + 6.283); cx.stroke(); cx.setLineDash([]); glow(P.x, P.y, 170, '#fff47a', .12); norm(); }
   add();
   for (const b of G.beams) { const k = b.t / b.max, ex = b.x + Math.cos(b.a) * b.len, ey = b.y + Math.sin(b.a) * b.len; cx.globalAlpha = k; cx.strokeStyle = rgba(b.c, .35); cx.lineWidth = b.w * 2.2; cx.beginPath(); cx.moveTo(b.x, b.y); cx.lineTo(ex, ey); cx.stroke(); cx.strokeStyle = rgba(b.c, .9); cx.lineWidth = b.w * .8; cx.stroke(); cx.strokeStyle = '#fff'; cx.lineWidth = b.w * .3; cx.stroke(); }
+  for (const sw of G.sweeps) { const k = sw.t / sw.max, a0 = sw.a - sw.arc / 2 + (1 - k) * .3; cx.globalAlpha = k * .5; cx.fillStyle = sw.c; cx.beginPath(); cx.moveTo(P.x, P.y); cx.arc(P.x, P.y, sw.R, a0, a0 + sw.arc); cx.closePath(); cx.fill(); cx.globalAlpha = k; cx.strokeStyle = '#ffffff'; cx.lineWidth = 4; cx.beginPath(); cx.arc(P.x, P.y, sw.R, a0, a0 + sw.arc); cx.stroke(); }
+  for (const w of run.weapons) if (w.drones) for (const [x, y] of w.drones) glow(x, y, 16, w.evo ? '#bff8ff' : '#7fe3ff', .6);
   for (const w of G.waves) { cx.globalAlpha = .9; cx.strokeStyle = rgba(w.c, .25); cx.lineWidth = w.w * 2; cx.beginPath(); cx.arc(w.x, w.y, w.r, 0, 6.283); cx.stroke(); cx.strokeStyle = w.c; cx.lineWidth = w.w * .5; cx.stroke(); }
   norm();
   if (G.gaze) { const z = G.gaze, k = 1 - z.t / z.max; for (const c of z.safe) { cx.fillStyle = rgba('#a8ffe0', .14 + .1 * Math.sin(t * 10)); cx.strokeStyle = '#a8ffe0'; cx.lineWidth = 3; cx.beginPath(); cx.arc(c.x, c.y, c.r, 0, 6.283); cx.fill(); cx.stroke(); cx.strokeStyle = '#ffffff'; cx.beginPath(); cx.arc(c.x, c.y, c.r + 6, -Math.PI / 2, -Math.PI / 2 + 6.283 * (1 - k)); cx.stroke(); } }

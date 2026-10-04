@@ -33,7 +33,7 @@ Works on phones/tablets too: a touch joystick and ability buttons appear automat
 - **Endgame:** Act 3+ adds wardens that shield allies, burrowers, Rift Surges, elite modifiers and boss mechanics (the Gaze, shockwave rings, eggs).
 - **6 bosses:** Colossus, Hive Queen, Void Eye, then The Mitosis (splits into pieces), The Phantom (teleports, fake clones)
   and The Rift Herald (summons portals and is shielded until you break them) for Endless.
-- **Synergies:** level two matching weapons to 4+ to fuse them (Superconductor, Napalm, Solar Wheel, Spellblades, Storm Rang, Cryo Charges).
+- **11 weapons** incl. Spirit Scythe and Rift Drones. **8 synergies:** level two matching weapons to 4+ to fuse them (Superconductor, Napalm, Solar Wheel, Spellblades, Storm Rang, Cryo Charges, Ember Scythe, Tesla Drones). **31 relics.**
 - **New rooms:** 🔨 Forge, 🎰 Gamble, 🔥 Challenge fights, plus risk/reward events (Blood Pact, Cursed Idol, Dice Table, and more).
 - **Twist characters:** Reaper (levels from kills, no XP), Sentinel (only fires while standing still), Juggernaut (no dash, crushes on contact).
 - **Heat 1–10:** each level adds a modifier (faster foes, pricier shops, extra elite modifiers, weaker healing, and more).
