@@ -39,5 +39,10 @@ Works on phones/tablets too: a touch joystick and ability buttons appear automat
 - **Heat 1–10:** each level adds a modifier (faster foes, pricier shops, extra elite modifiers, weaker healing, and more).
 - **Daily run:** same map, same level-up offers and 2 daily rules (Gold Rush, Giants, Swarm Day, Overdrive...) for everyone that day; your score is shown with a copyable line to share.
 - **Codex (C):** tracks discovered evolutions, synergies, bosses, relics and enemies; 11 new achievements.
+- **👹 Boss Rush** (unlocks after your first win): all 6 bosses back to back, with level-ups, a relic and a full heal between bosses.
+- **Pet team bonuses:** two pets with the same role bond (+25% power), four different roles give +6% damage and +15 HP, two Legendaries give +5% damage.
+- **Controller support:** left stick moves, A dash, X skill, Y ultimate, B Rift Art, Start pause; the D-pad works in menus.
+- **Quality of life:** act title cards, a "Your build" sheet in the pause menu, the death screen shows what took you down,
+  trophy badges on runners you've won with, and a damage-numbers setting (all / crits only / off).
 - **Art:** all icons are drawn in code in one flat style (no emoji).
 - **⚙️ Settings:** screen shake, effects quality, and 🔋 Battery saver (30 FPS). Menus are throttled to save battery on Chromebooks.
