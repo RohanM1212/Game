@@ -1261,7 +1261,7 @@ const AFFIX = {
 function startFight(type) {
   const rk0 = RNG.s; // fights never change the run's random sequence, so daily runs stay identical
   ST = calcStats(run);
-  const act = run.rush ? Math.min(3, run.act) + Math.max(0, run.act - 3) * .5 : run.act, row = run.target ? run.target.r : 0;
+  const act = run.rush ? 1 + (run.act - 1) * .6 : run.act, row = run.target ? run.target.r : 0;
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
   const actHp = act === 1 ? 1 : act === 2 ? 1.65 : 2.8 * Math.pow(1.6, act - 3);
   const actDmg = act === 1 ? 1 : act === 2 ? 1.3 : 1.75 * Math.pow(1.28, act - 3);
@@ -1385,7 +1385,7 @@ function damageEnemy(e, amt, kx = 0, ky = 0) {
   e.flash = .08;
   if (e.shield > 0) {
     e.shield -= amt; e.shieldHit = G.now;
-    popText(e.x + (Math.random() - .5) * 10, e.y - e.r, Math.round(amt), '#9fb4ff', crit);
+    if (S.opt.nums !== false) popText(e.x + (Math.random() - .5) * 10, e.y - e.r, Math.round(amt), '#9fb4ff', crit);
     if (e.shield <= 0) {
       e.shield = 0; burst(e.x, e.y, '#9fb4ff', 18, 1.3); flashGlow(e.x, e.y, e.r * 3, '#9fb4ff', .25);
       G.rings.push({ x: e.x, y: e.y, r: e.r, max: e.r * 2.8, t: .35, color: '#9fb4ff', w: 4 }); popText(e.x, e.y - e.r - 16, 'SHIELD BROKEN', '#cfe0ff', true);
@@ -1394,7 +1394,7 @@ function damageEnemy(e, amt, kx = 0, ky = 0) {
   }
   e.hp -= amt;
   if (!e.boss) { const kb = e.elite ? .3 : 1; e.kx += kx * kb; e.ky += ky * kb; }
-  popText(e.x + (Math.random() - .5) * 10, e.y - e.r, Math.round(amt), crit ? '#ffd24a' : '#ffffff', crit);
+  if (S.opt.nums !== false && (crit || S.opt.nums !== 'crit')) popText(e.x + (Math.random() - .5) * 10, e.y - e.r, Math.round(amt), crit ? '#ffd24a' : '#ffffff', crit);
   if (crit) { burst(e.x, e.y, '#ffd24a', 3, .7); sfx('crit'); } else sfx('hit');
   if (e.hp <= 0) killEnemy(e);
 }
@@ -2954,10 +2954,11 @@ function showSettings(back = showTitle, cls = 'menu') {
     <button class="opt" data-a="3" data-n="3">🔋 Battery saver: <b>${o.saver ? 'On (30 FPS)' : 'Off'}</b><kbd>3</kbd></button>
     <button class="opt" data-a="4" data-n="4">🔔 Sound effects: <b>${o.sound !== false ? 'On' : 'Off'}</b><kbd>4</kbd></button>
     <button class="opt" data-a="5" data-n="5">🎵 Music: <b>${o.music !== false ? 'On' : 'Off'}</b><kbd>5</kbd></button>
-    <button class="opt" data-a="2" data-n="6">← Back (Esc)<kbd>6</kbd></button></div>
+    <button class="opt" data-a="6" data-n="6">🎯 Damage numbers: <b>${o.nums === false ? 'Off' : o.nums === 'crit' ? 'Crits only' : 'All'}</b><kbd>6</kbd></button>
+    <button class="opt" data-a="2" data-n="7">← Back (Esc)<kbd>7</kbd></button></div>
     <div class="foot">"Auto" turns effects down and saves battery by itself if the game starts to lag.</div>`,
     [() => { o.shake = !o.shake; save(); showSettings(back, cls); },
-     () => { o.fx = o.fx === 'auto' ? 'high' : o.fx === 'high' ? 'low' : 'auto'; autoQ = 1; autoSaver = false; slowFrames = 0; save(); showSettings(back, cls); }, back, () => { o.saver = !o.saver; save(); showSettings(back, cls); }, () => { o.sound = o.sound === false; audioVol(); save(); showSettings(back, cls); }, () => { o.music = o.music === false; audioVol(); save(); showSettings(back, cls); }],
+     () => { o.fx = o.fx === 'auto' ? 'high' : o.fx === 'high' ? 'low' : 'auto'; autoQ = 1; autoSaver = false; slowFrames = 0; save(); showSettings(back, cls); }, back, () => { o.saver = !o.saver; save(); showSettings(back, cls); }, () => { o.sound = o.sound === false; audioVol(); save(); showSettings(back, cls); }, () => { o.music = o.music === false; audioVol(); save(); showSettings(back, cls); }, () => { o.nums = o.nums === false ? true : o.nums === 'crit' ? false : 'crit'; save(); showSettings(back, cls); }],
     cls, k => { if (k === 'escape') { back(); return true; } });
 }
 
