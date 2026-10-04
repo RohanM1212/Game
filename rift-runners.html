@@ -209,6 +209,16 @@ const RELICS = {
   heart:     { name: 'Giant Heart',     icon: '💗', desc: '+40 max HP.' },
   twin:      { name: 'Twin Charm',      icon: '♊', desc: '+1 projectile / blade / bomb.' },
   dice:      { name: 'Loaded Dice',     icon: '🎲', desc: '+15% critical hit chance.' },
+  quiver:    { name: 'Endless Quiver',  icon: '🏹', desc: '+1 projectile / blade / bomb, but -10% damage.' },
+  heartstone:{ name: 'Heartstone',      icon: '💗', desc: 'Every kill heals 0.2 HP.' },
+  timeshard: { name: 'Time Shard',      icon: '⌛', desc: 'Your ultimate charges 40% faster.' },
+  quickhands:{ name: 'Quick Hands',     icon: '⏱️', desc: 'Your class skill recharges 30% faster.' },
+  bloodrage: { name: 'Blood Rage',      icon: '😡', desc: '+3% damage for each enemy near you (up to +45%).' },
+  gildheart: { name: 'Gilded Heart',    icon: '🪙', desc: '+1 max HP for every 20 gold you carry.' },
+  stormcore: { name: 'Storm Core',      icon: '🌩️', desc: 'Dashing releases a lightning burst around you.' },
+  treats:    { name: 'Pet Treats',      icon: '🐾', desc: 'Your pets deal 50% more damage and act 25% faster.' },
+  scope:     { name: 'Sniper Scope',    icon: '🔎', desc: '+30% damage to enemies far from you.' },
+  ironwill:  { name: 'Iron Will',       icon: '🛡️', desc: 'Below 30% HP you take half damage.' },
 };
 const CHARS = {
   knight:  { name: 'Knight',      icon: '🛡️', color: '#9fb4ff', weapon: 'orbit',     desc: 'Sturdy. +30 max HP, +1 armor.', mods: { maxHp: 30, armor: 1 }, unlock: null },
@@ -362,6 +372,9 @@ function calcStats(r) {
   if (R('heart')) s.maxHp += 40;
   if (R('twin')) s.proj += 1;
   if (R('dice')) s.crit += .15;
+  if (R('quiver')) { s.proj += 1; s.might -= .1; }
+  if (R('heartstone')) s.killHeal += .2;
+  if (R('gildheart')) s.maxHp += Math.floor(r.gold / 20);
   if (G && G.buff && r === run) { const k = G.buff.k; if (k === 'might') s.might += .4; if (k === 'haste') s.cdMul *= .7; if (k === 'swift') s.speed *= 1.3; }
   if (r === run) { s.luck += petBonus('luck'); s.goldMul += petBonus('gold'); s.magnet += petBonus('magnet'); }
   s.crit += s.luck * .3;
@@ -1326,13 +1339,14 @@ function spawnTick(dt) {
 /* ----- combat helpers ----- */
 function nearest(x, y, maxD) { let best = null, bd = maxD * maxD; for (const e of G.enemies) { if (e.dead || e.hidden) continue; const d = (e.x - x) ** 2 + (e.y - y) ** 2; if (d < bd) { bd = d; best = e; } } return best; }
 function berserkMul() { return has('berserk') ? 1 + .8 * (1 - P.hp / ST.maxHp) : 1; }
-function wDmg(base) { return base * ST.might * berserkMul(); }
+function wDmg(base) { return base * ST.might * berserkMul() * (has('bloodrage') && G ? 1 + Math.min(.45, (G.nearN || 0) * .03) : 1); }
 function shoot(x, y, a, spd, r, dmg, pierce, life, color, extra) { G.projs.push(Object.assign({ x, y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, r, dmg, pierce, life, color, hits: new Set(), kind: 'bolt' }, extra)); }
 function damageEnemy(e, amt, kx = 0, ky = 0) {
   if (e.dead) return;
   const crit = Math.random() < ST.crit;
   if (crit) amt *= 2;
   if (e.hidden) return;
+  if (has('scope') && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 > 250 * 250) amt *= 1.3;
   if (__wsrc === 'lightning' && syn('superconductor') && e.slowT > 0) { amt *= 3; burst(e.x, e.y, '#cff4ff', 5); }
   if (e.warded) { if (Math.random() < .1) popText(e.x, e.y - e.r - 10, 'WARDED', '#ffb060', false); return; }
   if (__wsrc && G.wdmg && !__petSrc) G.wdmg[__wsrc] = (G.wdmg[__wsrc] || 0) + amt;
@@ -1359,7 +1373,7 @@ function killEnemy(e, silent) {
   e.dead = true;
   if (silent) { burst(e.x, e.y, e.color, 4); flashGlow(e.x, e.y, e.r * 2.6, e.color, .3); return; }
   G.kills++; run.kills++; S.stats.kills++;
-  G.combo++; G.comboT = 2.5; sfx('kill'); P.ult = Math.min(100, P.ult + 1);
+  G.combo++; G.comboT = 2.5; sfx('kill'); P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.4 : 1));
   if (!e.boss) deathFx(e);
   if (twist('reaper') && !e.boss) addXp(xpNeed(run.level) / (6 + run.level * 1.2));
   else if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
@@ -1399,7 +1413,7 @@ function hurt(d) {
     P.aegisT = 12; P.invul = .5; G.rings.push({ x: P.x, y: P.y, r: 10, max: 70, t: .35, color: '#7fe3ff', w: 5 });
     burst(P.x, P.y, '#7fe3ff', 14); popText(P.x, P.y - 26, 'BLOCKED', '#7fe3ff', true); return;
   }
-  d = Math.max(1, Math.round(d - ST.armor));
+  d = Math.max(1, Math.round(d - ST.armor)); if (has('ironwill') && P.hp < ST.maxHp * .3) d = Math.max(1, Math.round(d / 2));
   P.hp -= d; P.invul = .7; G.tookDmg = true; sfx('hurt');
   addShake(.42); hitstop(.045); screenFlash('#ff2040', .28, .35);
   burst(P.x, P.y, '#ff6070', 10); popText(P.x, P.y - 22, '-' + d, '#ff6070', true);
@@ -1422,6 +1436,7 @@ function dash() {
   if (P.dashCd > 0 || mode !== 'fight' || paused || twist('juggernaut')) return;
   let dx = P.fx, dy = P.fy;
   P.dashT = .22; P.dashCd = ST.dashCd; sfx('dash'); P.dvx = dx * 620; P.dvy = dy * 620;
+  if (has('stormcore')) { let n = 0; for (const e of G.enemies) if (!e.dead && n < 6 && Math.hypot(e.x - P.x, e.y - P.y) < 200) { n++; zap(P.x, P.y, e.x, e.y, 2); damageEnemy(e, wDmg(30)); } sfx('zap'); }
   burst(P.x, P.y, P.color, 8); G.rings.push({ x: P.x, y: P.y, r: 6, max: 42, t: .22, color: P.color, w: 3 });
   if (has('frostheart')) { for (const e of G.enemies) if (Math.hypot(e.x - P.x, e.y - P.y) < 150) { e.slowT = 2; e.slowAmt = e.boss ? .3 : 1; } G.rings.push({ x: P.x, y: P.y, r: 10, max: 150, t: .3, color: '#7fe3ff', fill: true, w: 4 }); }
 }
@@ -1619,7 +1634,7 @@ const SKILL_FX = {
 SKILL_FX.gambler = () => { const k = pick(Object.keys(SKILL_FX).filter(k => k !== 'gambler')); SKILL_FX[k](); popText(P.x, P.y - 30, SKILLS[k].name, '#ffd24a', true); };
 function useSkill() {
   if (mode !== 'fight' || paused || G.ending || P.skillCd > 0) return;
-  P.skillCd = SKILLS[run.char].cd * ST.cdMul * (1 - petBonus('cdr'));
+  P.skillCd = SKILLS[run.char].cd * ST.cdMul * (1 - petBonus('cdr')) * (has('quickhands') ? .7 : 1);
   SKILL_FX[run.char](); addShake(.15); sfx('skill'); flashGlow(P.x, P.y, 60, P.color, .25);
 }
 
@@ -1989,7 +2004,7 @@ const PETS = {
 };
 const STAR_AT = [1, 3, 6, 11, 20]; // copies needed for 1..5 stars
 const petStars = id => { const n = (S.pets[id] || 0); let s = 0; for (const k of STAR_AT) if (n >= k) s++; return s; };
-const petPow = id => RAR[PETS[id].r].mul * (1 + .25 * (petStars(id) - 1));
+const petPow = id => RAR[PETS[id].r].mul * (1 + .25 * (petStars(id) - 1)) * (has('treats') ? 1.5 : 1);
 const maxSlots = () => 3 + (S.petSlots || 0);
 function petBonus(kind) { // passive bonuses from the equipped team
   if (!run || !S.team) return 0;
@@ -2013,7 +2028,7 @@ function petUpdate(dt) {
     let tx = P.x + Math.cos(ang) * 62, ty = P.y + Math.sin(ang) * 62;
     if (pt.dive) { pt.dive.t -= dt; tx = pt.dive.x; ty = pt.dive.y; if (pt.dive.t <= 0) pt.dive = null; }
     const k = 1 - Math.exp(-dt * (pt.dive ? 16 : 7)); pt.x += (tx - pt.x) * k; pt.y += (ty - pt.y) * k; pt.hop += dt;
-    pt.cd -= dt;
+    pt.cd -= dt * (has('treats') ? 1.25 : 1);
     __petSrc = pt.id;
     const tgt = r => { let best = null, bd = r * r; for (const e of G.enemies) { if (e.dead || e.hidden) continue; const q = (e.x - P.x) ** 2 + (e.y - P.y) ** 2; if (q < bd) { bd = q; best = e; } } return best; };
     if (role === 'striker' && pt.cd <= 0) {
@@ -2393,7 +2408,8 @@ function update(dt) {
   P.invul -= dt; P.dashCd -= dt; P.aegisT -= dt;
   if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
   if (mode !== 'fight') return;
-  P.ult = Math.min(100, P.ult + 2.4 * dt); rainTick(dt);
+  P.ult = Math.min(100, P.ult + 2.4 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
+  if (has('bloodrage') && (G.nearT = (G.nearT || 0) - dt) <= 0) { G.nearT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 < 150 * 150) n++; G.nearN = n; }
   P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt;
   if (P.healT > 0) { P.healT -= dt; P.hp = Math.min(ST.maxHp, P.hp + ST.maxHp * .1 * dt); if (Math.random() < dt * 10) burst(P.x, P.y, '#5ee08a', 1, .3); }
   if (P.breath > 0) {
