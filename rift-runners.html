@@ -55,6 +55,8 @@ kbd{position:absolute;top:6px;right:8px;font-size:11px;color:var(--dim);border:1
 .panel{background:linear-gradient(180deg,rgba(26,31,48,.92),rgba(18,22,34,.92));border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:min(900px,100%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;width:min(1000px,100%);background:linear-gradient(180deg,rgba(28,33,52,.9),rgba(20,24,38,.9));border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:10px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .bar .it{white-space:nowrap}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(460px,92vw);margin-top:8px}.tgrid .opt.sm{padding:9px 12px;font-size:14px;min-height:0}.tgrid .opt.sm .tag{display:none}
+.card{position:relative}.mast{position:absolute;top:6px;left:8px;font-size:12px;font-weight:700;color:var(--gold)}
 .buildg{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(900px,96vw);max-height:62vh;overflow:auto}.buildg h3{margin:6px 0 4px;color:var(--gold);font-size:15px}.brow{display:flex;gap:8px;align-items:flex-start;margin:5px 0;text-align:left}.brow .bi{font-size:20px;width:26px;flex:none}.brow small{color:var(--dim)}@media(max-width:640px){.buildg{grid-template-columns:1fr}}
 .teamb{flex-wrap:wrap;justify-content:center;gap:6px;margin-top:8px}.teamb .it{opacity:.45;font-size:13px}.teamb .it.on{opacity:1;color:var(--gold)}
 .icons{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -541,15 +543,17 @@ function showTitle() {
     <div class="col">
       ${hasRun ? `<button class="opt big" data-a="0" data-n="1">▶ Continue Run <span class="tag">Act ${S.run.act} · ${CHARS[S.run.char].name}</span><kbd>1</kbd></button>` : ''}
       <button class="opt big" data-a="1" data-n="${hasRun ? 2 : 1}">⚔️ New Run<kbd>${hasRun ? 2 : 1}</kbd></button>
-      <button class="opt big" data-a="9">📚 Codex <span class="tag">${codexCount()} discovered</span><kbd>C</kbd></button>
-      <button class="opt big" data-a="8">🐾 Pets &amp; Rift Capsules <span class="tag">${S.cores} 🔷${S.freePack !== todayStr() ? ' · FREE capsule!' : ''}</span><kbd>P</kbd></button>
       <button class="opt big" data-a="2" data-n="${hasRun ? 3 : 2}">📅 Daily Challenge ${d ? `<span class="tag">best: ${d} pts</span>` : ''}<kbd>${hasRun ? 3 : 2}</kbd></button>
       <button class="opt big" data-a="10" ${S.stats.wins ? '' : 'disabled'}>👹 Boss Rush <span class="tag">${S.stats.wins ? (S.stats.rushBest ? 'best: ' + S.stats.rushBest + '/6 bosses' : 'all 6 bosses, back to back') : '🔒 win a run to unlock'}</span></button>
-      <button class="opt big" data-a="3" data-n="${hasRun ? 4 : 3}">💠 Upgrades <span class="tag">${S.shards} shards</span><kbd>${hasRun ? 4 : 3}</kbd></button>
-      <button class="opt big" data-a="4" data-n="${hasRun ? 5 : 4}">🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span><kbd>${hasRun ? 5 : 4}</kbd></button>
-      <button class="opt big" data-a="5" data-n="${hasRun ? 6 : 5}">📊 Stats &amp; Save Backup<kbd>${hasRun ? 6 : 5}</kbd></button>
-      <button class="opt big" data-a="6" data-n="${hasRun ? 7 : 6}">❓ How to Play<kbd>${hasRun ? 7 : 6}</kbd></button>
-      <button class="opt big" data-a="7" data-n="${hasRun ? 8 : 7}">⚙️ Settings<kbd>${hasRun ? 8 : 7}</kbd></button>
+      <button class="opt big" data-a="8">🐾 Pets &amp; Rift Capsules <span class="tag">${S.cores} 🔷${S.freePack !== todayStr() ? ' · FREE capsule!' : ''}</span><kbd>P</kbd></button>
+    </div>
+    <div class="tgrid">
+      <button class="opt sm" data-a="3" data-n="${hasRun ? 4 : 3}">💠 Upgrades <span class="tag">${S.shards} shards</span><kbd>${hasRun ? 4 : 3}</kbd></button>
+      <button class="opt sm" data-a="9">📚 Codex <span class="tag">${codexCount()} discovered</span><kbd>C</kbd></button>
+      <button class="opt sm" data-a="4" data-n="${hasRun ? 5 : 4}">🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span><kbd>${hasRun ? 5 : 4}</kbd></button>
+      <button class="opt sm" data-a="5" data-n="${hasRun ? 6 : 5}">📊 Stats &amp; Save Backup<kbd>${hasRun ? 6 : 5}</kbd></button>
+      <button class="opt sm" data-a="6" data-n="${hasRun ? 7 : 6}">❓ How to Play<kbd>${hasRun ? 7 : 6}</kbd></button>
+      <button class="opt sm" data-a="7" data-n="${hasRun ? 8 : 7}">⚙️ Settings<kbd>${hasRun ? 8 : 7}</kbd></button>
     </div>
     <div class="foot">Progress saves automatically in this browser. Use "Stats &amp; Save Backup" to copy a backup code.</div>`,
     [resumeRun, () => hasRun ? confirmAbandon(() => showCharSelect(false)) : showCharSelect(false),
@@ -593,7 +597,7 @@ function showCharSelect(daily, rush) {
     const c = CHARS[id], un = !!S.chars[id];
     const w = c.weapon ? WEAPONS[c.weapon] : { icon: '🎲', name: 'Random' };
     return `<button class="card opt ${un ? '' : 'locked'}" data-a="${i}" ${un ? `data-n="${++n <= 9 ? n : ''}"` : 'disabled'}>
-      <div class="ci">${un ? c.icon : '🔒'}</div><div class="ct">${c.name}</div>
+      ${un && S.mastery && S.mastery[id] !== undefined ? `<div class="mast" title="Won with this runner">🏆${S.mastery[id] ? ' H' + S.mastery[id] : ''}</div>` : ''}<div class="ci">${un ? c.icon : '🔒'}</div><div class="ct">${c.name}</div>
       <div class="cs">${w.icon} ${w.name}</div><div class="cd">${un ? c.desc + `<br><b>E</b> ${SKILLS[id].icon} ${SKILLS[id].name}<br><b>Q</b> 💥 ${ULT_NAMES[id]}` : 'Unlock: ' + c.unlock.text}</div>${un && n <= 9 ? `<kbd>${n}</kbd>` : ''}</button>`;
   }).join('');
   const heatRow = S.maxHeat > 0 && !daily ? `<div class="bar"><button data-a="${ids.length}">◀ Q</button><span class="it">🌡️ Heat <b>${csHeat}</b> / ${S.maxHeat} &nbsp;<small style="color:var(--dim)">(+15% enemy HP &amp; +25% shards per level)</small></span><button data-a="${ids.length + 1}">E ▶</button></div>${csHeat ? `<div class="sub heatmods">${HEAT_MODS.slice(1, csHeat + 1).map((m, i) => `<span title="${m.desc}"><b>${i + 1}</b> ${m.name}</span>`).join(' · ')}</div>` : ''}` : '';
@@ -2845,7 +2849,7 @@ function bossReward(g) {
   }
   relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! +${g} gold, healed 40%`, () => {
     if (run.act === 3 && !run.won) {
-      run.won = true; S.stats.wins++; if (CHARS[run.char].twist) S.stats.twistWins++;
+      run.won = true; S.stats.wins++; if (CHARS[run.char].twist) S.stats.twistWins++; S.mastery = S.mastery || {}; S.mastery[run.char] = Math.max(S.mastery[run.char] === undefined ? -1 : S.mastery[run.char], run.heat);
       if (run.heat >= S.maxHeat && S.maxHeat < 10) { S.maxHeat = run.heat + 1; toast(`🌡️ Heat ${S.maxHeat} unlocked!`, '#ff9a4a'); }
       if (run.heat >= 10) S.stats.heat10++;
       checkUnlocks(); checkAch(); save();
