@@ -631,7 +631,7 @@ const ENEMY_INFO = {
   grunt: ['Grunt', 'Walks at you. There are always more.'], runner: ['Runner', 'Fast and fragile.'], brute: ['Brute', 'Tough. In Act 3+ it slams the ground.'],
   shooter: ['Shooter', 'Keeps its distance and fires.'], splitter: ['Splitter', 'Splits into two minis when it dies.'], exploder: ['Exploder', 'Blows up when it reaches you.'],
   warden: ['Warden', 'Shields nearby enemies every few seconds. Kill it first.'], burrower: ['Burrower', 'Digs under you, then pops up. Watch for the red mark.'],
-  dasher: ['Dasher', 'Aims with a red line, then charges.'], sludge: ['Sludge', 'Leaves acid puddles that slow and burn.'],
+  dasher: ['Dasher', 'Aims with a red line, then charges.'], sludge: ['Sludge', 'Leaves acid puddles that slow and burn.'], mender: ['Mender', 'Hangs back and heals nearby enemies. Kill it first.'], mortar: ['Mortar', 'Lobs shells at where you are going. Keep moving.'],
 };
 const codexCount = () => Object.keys(S.codex.evo).length + Object.keys(S.codex.syn).length + Object.keys(S.codex.boss).length + Object.keys(S.codex.relic).length;
 function showCodex(tab = 'weapons') {
@@ -1332,7 +1332,7 @@ function spawnPos() {
 function pickType() {
   const t = G.time, a = run.act;
   return weighted([{ k: 'grunt', w: 10 }, { k: 'runner', w: t > 5 ? 5 : 0 }, { k: 'brute', w: t > 14 ? 1.5 + a : 0 }, { k: 'shooter', w: t > 9 ? 1.5 + a : 0 },
-    { k: 'splitter', w: a >= 2 || t > 24 ? 3 : 0 }, { k: 'exploder', w: a >= 2 || t > 30 ? 2.5 : 0 }, { k: 'warden', w: a >= 3 && t > 8 ? 1.2 : 0 }, { k: 'burrower', w: a >= 3 && t > 6 ? 2 : 0 }, { k: 'dasher', w: a >= 2 && t > 6 ? 1.4 : 0 }, { k: 'sludge', w: a >= 2 && t > 10 ? 1 : 0 }]).k;
+    { k: 'splitter', w: a >= 2 || t > 24 ? 3 : 0 }, { k: 'exploder', w: a >= 2 || t > 30 ? 2.5 : 0 }, { k: 'warden', w: a >= 3 && t > 8 ? 1.2 : 0 }, { k: 'burrower', w: a >= 3 && t > 6 ? 2 : 0 }, { k: 'dasher', w: a >= 2 && t > 6 ? 1.4 : 0 }, { k: 'sludge', w: a >= 2 && t > 10 ? 1 : 0 }, { k: 'mender', w: a >= 2 && t > 12 ? .7 : 0 }, { k: 'mortar', w: a >= 2 && t > 8 ? .9 : 0 }]).k;
 }
 function eliteize(e) { e.elite = true; e.hp = e.maxHp = e.maxHp * 9; e.r *= 1.7; e.dmg *= 1.5; e.spd *= .9; e.xp *= 10; e.affix = []; return e; }
 function makeElite(type) {
@@ -2355,6 +2355,8 @@ Object.assign(ULTS, {
 Object.assign(ENEMIES, {
   dasher: { hp: 26, spd: 70, dmg: 10, r: 11, xp: 2, color: '#ff8a5a' },
   sludge: { hp: 40, spd: 55, dmg: 10, r: 14, xp: 2, color: '#9ad04a' },
+  mender: { hp: 30, spd: 66, dmg: 6, r: 12, xp: 3, color: '#7affc8' },
+  mortar: { hp: 46, spd: 40, dmg: 14, r: 15, xp: 3, color: '#d8a050' },
 });
 
 /* ================= NEW BOSSES (one splits, one teleports, one summons) ================= */
@@ -2580,6 +2582,22 @@ function update(dt) {
     } else if (e.type === 'sludge' && !e.elite) {
       if ((e.slT = (e.slT === undefined ? 1 : e.slT) - dt) <= 0) { e.slT = 1.4; G.areas.push({ kind: 'acid', x: e.x, y: e.y, t: 3, max: 3, r: 24, dmg: e.dmg * .45 }); }
       e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
+    } else if ((e.type === 'mender' || e.type === 'mortar') && !e.elite) {
+      // Both hang back: approach to a comfortable range, back off if you get close.
+      const want = e.type === 'mender' ? 240 : 340, dir = d > want + 40 ? 1 : d < want - 40 ? -1.1 : 0;
+      e.x += dx / d * sp * dir * dt; e.y += dy / d * sp * dir * dt;
+      e.abT = (e.abT === undefined ? 1.5 + Math.random() * 2 : e.abT) - dt;
+      if (e.abT <= 0 && e.type === 'mender') {
+        e.abT = 3.2; let n = 0;
+        for (const o of G.enemies) if (!o.dead && o !== e && !o.boss && o.hp < o.maxHp && Math.hypot(o.x - e.x, o.y - e.y) < 170) { o.hp = Math.min(o.maxHp, o.hp + o.maxHp * .2); n++; if (fxq()) part({ k: 'spark', x: o.x, y: o.y, vx: 0, vy: -60, t: .5, max: .5, c: '#7affc8', r: 2.5, drag: .95 }); }
+        if (n) G.rings.push({ x: e.x, y: e.y, r: 10, max: 170, t: .45, color: '#7affc8', w: 3 });
+      }
+      if (e.abT <= 0 && e.type === 'mortar' && d < 620) {
+        e.abT = 3.4 + Math.random(); e.recoil = .25;
+        const lead = .5, tx = clamp(P.x + (P.dashT > 0 ? 0 : (P.moving ? P.fx * ST.speed * lead : 0)), 30, WORLD - 30), ty = clamp(P.y + (P.dashT > 0 ? 0 : (P.moving ? P.fy * ST.speed * lead : 0)), 30, WORLD - 30);
+        G.areas.push({ kind: 'shell', x: tx, y: ty, sx: e.x, sy: e.y, t: 1.25, max: 1.25, r: 62, dmg: e.dmg });
+      }
+      if (e.recoil > 0) e.recoil -= dt;
     } else { e.x += dx / d * sp * dt; e.y += dy / d * sp * dt; }
     if (e.elite) {
       if (e.sumT !== undefined && (e.sumT -= dt) <= 0) {
@@ -2660,6 +2678,7 @@ function update(dt) {
     else if (a.kind === 'boom' && a.t <= 0) { explodeAt(a.x, a.y, a.r, a.dmg || 0, a.c); addShake(.25); }
     else if (a.kind === 'acid') { if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r - 4 && P.dashT <= 0) { P.slowed = Math.max(P.slowed || 0, .35); if ((G.acidT = (G.acidT || 0) - dt) <= 0) { G.acidT = .5; hurt(a.dmg, 'acid'); } } }
     else if (a.kind === 'glob' && a.t <= 0) { G.areas.push({ kind: 'acid', x: a.x, y: a.y, t: 3, max: 3, r: a.r * .8, dmg: a.dmg * .55 }); burst(a.x, a.y, '#7af0b0', 10); if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r && P.dashT <= 0) hurt(a.dmg * 1.5); }
+    else if (a.kind === 'shell' && a.t <= 0) { explodeAt(a.x, a.y, a.r, 0, '#ffb040', a.dmg); addShake(.15); }
     else if (a.kind === 'echo' && a.t <= 0) { explodeAt(a.x, a.y, a.r, 0, '#c0c8ff', a.dmg); addShake(.2); }
     else if (a.kind === 'quake' && a.t <= 0) { explodeAt(P.x, P.y, a.r, a.dmg, a.c); addShake(.5); for (const e of G.enemies) if (!e.boss && Math.hypot(e.x - P.x, e.y - P.y) < a.r) { e.slowT = 1.5; e.slowAmt = .8; } }
     else if (a.kind === 'grav' || a.kind === 'hole') {
@@ -3297,8 +3316,9 @@ function render(dt) {
     } else if (a.kind === 'acid') {
       const k = Math.min(1, a.t / .6); cx.fillStyle = rgba('#7ac83a', .32 * k); cx.beginPath(); cx.arc(a.x, a.y, a.r, 0, 6.283); cx.fill(); cx.strokeStyle = rgba('#b8f070', .5 * k); cx.lineWidth = 2; cx.stroke();
       cx.fillStyle = rgba('#d8ff9a', .5 * k); for (let i = 0; i < 3; i++) { const b = (t * 1.5 + i * .33 + a.x * .01) % 1; cx.beginPath(); cx.arc(a.x + Math.cos(i * 2.1 + a.y) * a.r * .5, a.y + Math.sin(i * 2.1 + a.x) * a.r * .5, 2 + b * 4, 0, 6.283); cx.fill(); }
-    } else if (a.kind === 'glob' || a.kind === 'echo') {
-      const k = 1 - a.t / a.max, c = a.kind === 'glob' ? '#7af0b0' : '#c0c8ff';
+    } else if (a.kind === 'glob' || a.kind === 'echo' || a.kind === 'shell') {
+      const k = 1 - a.t / a.max, c = a.kind === 'glob' ? '#7af0b0' : a.kind === 'shell' ? '#ffb040' : '#c0c8ff';
+      if (a.kind === 'shell') { const bx = a.sx + (a.x - a.sx) * k, by = a.sy + (a.y - a.sy) * k - Math.sin(k * Math.PI) * 160; cx.fillStyle = '#3a2a1a'; cx.strokeStyle = '#ffb040'; cx.lineWidth = 2; cx.beginPath(); cx.arc(bx, by, 8, 0, 6.283); cx.fill(); cx.stroke(); }
       cx.strokeStyle = rgba(c, .5 + .4 * Math.sin(t * 25)); cx.lineWidth = 2; cx.beginPath(); cx.arc(a.x, a.y, a.r, 0, 6.283); cx.stroke(); cx.fillStyle = rgba(c, .2); cx.beginPath(); cx.arc(a.x, a.y, a.r * k, 0, 6.283); cx.fill();
       if (a.kind === 'glob') { const bx = a.sx + (a.x - a.sx) * k, by = a.sy + (a.y - a.sy) * k - Math.sin(k * Math.PI) * 120; cx.fillStyle = '#5ad0a0'; cx.beginPath(); cx.arc(bx, by, 10, 0, 6.283); cx.fill(); }
       else { cx.globalAlpha = .5; cx.fillStyle = '#c0c8ff'; cx.beginPath(); cx.arc(a.x, a.y - 10, 18, 0, 6.283); cx.fill(); cx.globalAlpha = 1; }
@@ -3669,6 +3689,17 @@ function drawEnemy(e, q) {
   } else if (e.type === 'dasher') {
     cx.rotate(e.dst ? e.da : a); cx.beginPath(); cx.moveTo(r * 1.5, 0); cx.lineTo(-r, -r * .9); cx.lineTo(-r * .4, 0); cx.lineTo(-r, r * .9); cx.closePath(); cx.fill(); cx.stroke();
     cx.fillStyle = shade(e.color, .5); cx.beginPath(); cx.arc(r * .2, 0, r * .25, 0, 6.283); cx.fill(); eyes = false;
+  } else if (e.type === 'mender') {
+    const pu = 1 + .08 * Math.sin(G.now * 4 + e.ph);
+    cx.beginPath(); cx.arc(0, 0, r * pu, 0, 6.283); cx.fill(); cx.stroke();
+    cx.fillStyle = '#eafff6'; cx.fillRect(-r * .18, -r * .6, r * .36, r * 1.2); cx.fillRect(-r * .6, -r * .18, r * 1.2, r * .36);
+    if (e.abT !== undefined && e.abT < .6) { add(); glow(0, 0, r * 2.6, '#7affc8', .6 * (1 - e.abT / .6)); norm(); cx.globalAlpha = 1; }
+    eyes = false;
+  } else if (e.type === 'mortar') {
+    const rc = e.recoil > 0 ? e.recoil * 10 : 0;
+    cx.beginPath(); cx.moveTo(-r, r * .7); cx.lineTo(r, r * .7); cx.lineTo(r * .7, -r * .2); cx.lineTo(-r * .7, -r * .2); cx.closePath(); cx.fill(); cx.stroke();
+    cx.save(); cx.rotate(a - Math.PI / 4); cx.fillStyle = shade(e.color, .55); cx.fillRect(-r * .25 - rc, -r * .3, r * 1.3, r * .6); cx.strokeRect(-r * .25 - rc, -r * .3, r * 1.3, r * .6); cx.restore();
+    eyes = false;
   } else if (e.type === 'sludge') {
     cx.beginPath(); for (let i = 0; i <= 16; i++) { const b = i / 16 * 6.283, w = 1 + .1 * Math.sin(b * 4 + G.now * 5 + e.ph); cx.lineTo(Math.cos(b) * r * w, Math.sin(b) * r * w * .85); } cx.closePath(); cx.fill(); cx.stroke();
     cx.fillStyle = 'rgba(220,255,160,.5)'; cx.beginPath(); cx.arc(-r * .3, r * .2, r * .2, 0, 6.283); cx.arc(r * .35, -r * .1, r * .14, 0, 6.283); cx.fill(); eyes = false;
