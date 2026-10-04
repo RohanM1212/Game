@@ -551,6 +551,7 @@ function showHelp() {
     <li><b>Level up</b> to choose new weapons, upgrades and passives (press 1/2/3, or R to reroll).</li>
     <li><b>Evolve:</b> get a weapon to level 5 AND own its matching passive → an EVOLVE card appears!
       <br><small>${Object.values(WEAPONS).map(w => `${w.icon}+${PASSIVES[w.evo].icon}`).join(' &nbsp; ')}</small></li>
+    <li><b>Controller:</b> 🎮 left stick moves, A dash, X skill, Y ultimate, B rift art, Start pause. Menus: stick or D-pad + A.</li>
     <li><b>Strategy map:</b> between fights, pick your route. ⚔️ fight · 💀 elite (hard, gives a relic) · 🛒 shop · ❓ event · ⛺ rest · 💎 treasure · 👹 boss.</li>
     <li>Your HP carries between fights, so plan when to rest or shop.</li>
     <li><b>Act 3 and beyond get brutal:</b> Rift Surges near the end of fights, elites with modifiers, slamming brutes and bosses with extra phases.</li>
@@ -1077,6 +1078,7 @@ const GLYPH = {
   diamond(g, c) { g.beginPath(); g.moveTo(32, 10); g.lineTo(52, 32); g.lineTo(32, 54); g.lineTo(12, 32); g.closePath(); fs(g, c); },
   dna(g, c) { for (const s of [-1, 1]) { g.beginPath(); for (let y = 6; y <= 58; y += 2) g.lineTo(32 + Math.sin(y / 8) * 14 * s, y); line(g, INK, 7); g.beginPath(); for (let y = 6; y <= 58; y += 2) g.lineTo(32 + Math.sin(y / 8) * 14 * s, y); line(g, s > 0 ? c : shade(c, .4), 4); } },
   ghosts(g, c) { for (const [x, a] of [[22, .6], [40, 1]]) { g.globalAlpha = a; g.beginPath(); g.arc(x, 26, 14, Math.PI, 0); g.lineTo(x + 14, 50); g.lineTo(x + 7, 44); g.lineTo(x, 50); g.lineTo(x - 7, 44); g.lineTo(x - 14, 50); g.closePath(); fs(g, c); } g.globalAlpha = 1; },
+  pad(g, c) { g.beginPath(); g.moveTo(16, 20); g.lineTo(48, 20); g.quadraticCurveTo(60, 20, 60, 38); g.quadraticCurveTo(60, 52, 50, 50); g.lineTo(42, 42); g.lineTo(22, 42); g.lineTo(14, 50); g.quadraticCurveTo(4, 52, 4, 38); g.quadraticCurveTo(4, 20, 16, 20); g.closePath(); fs(g, c); g.fillStyle = '#1a1e2c'; g.fillRect(14, 29, 12, 4); g.fillRect(18, 25, 4, 12); circ(g, 44, 28, 3, '#1a1e2c'); circ(g, 50, 34, 3, '#1a1e2c'); },
   bell(g, c) { g.beginPath(); g.moveTo(14, 46); g.quadraticCurveTo(18, 40, 18, 28); g.quadraticCurveTo(18, 10, 32, 10); g.quadraticCurveTo(46, 10, 46, 28); g.quadraticCurveTo(46, 40, 50, 46); g.closePath(); fs(g, c); circ(g, 32, 52, 6, c); },
   note(g, c) { g.beginPath(); g.ellipse(22, 46, 10, 8, -.4, 0, 6.283); fs(g, c); g.fillStyle = INK; g.fillRect(29, 10, 5, 38); g.beginPath(); g.moveTo(31, 10); g.quadraticCurveTo(48, 14, 50, 28); g.quadraticCurveTo(44, 20, 33, 22); g.closePath(); fs(g, c); },
   bulb(g, c) { circ(g, 32, 26, 18, c); rrg(g, 24, 40, 16, 14, 3); fs(g, '#a8b2c8'); g.beginPath(); g.moveTo(26, 46); g.lineTo(38, 46); line(g, INK, 2); },
@@ -1103,7 +1105,7 @@ const EMO = {
   '■': ['square', '#7c9cff'], '□': ['squareO', '#4a5578'], '⬜': ['squareO', '#8a94b0'], '📋': ['clip', '#7c9cff'], '📥': ['download', '#5ee08a'], '🗑️': ['trash', '#ff6070'], '🔨': ['hammer', '#a8b2c8'],
   '🩸': ['drop', '#ff3050'], '💧': ['drop', '#4fb8ff'], '📦': ['chest', '#a07040'], '📚': ['book', '#7c9cff'], '🧙': ['hat', '#7a5aff'], '🕳️': ['hole', '#b48cff'], '🦇': ['bat', '#5a3a6a'], '🗼': ['tower', '#7a8aa8'],
   '🎭': ['mask', '#ff7ab8'], '👁️': ['eye', '#c040ff'], '♾️': ['infinity', '#b48cff'], '🏠': ['home', '#ffae5c'], '⏸': ['pause', '#e8ecf6'], '📳': ['waves', '#7c9cff'], '🟣': ['dot', '#b45cff'], '🟡': ['dot', '#ffd24a'], '◆': ['diamond', '#ff6070'],
-  '🧬': ['dna', '#5ad0a0'], '📜': ['clip', '#e0c890'], '💡': ['bulb', '#ffe680'], '🔔': ['bell', '#ffd24a'], '🔕': ['bell', '#6a7088'], '🎵': ['note', '#c49cff'], '👥': ['ghosts', '#c0c8ff'], '🤍': ['heart', '#f4f0e6'], '🎁': ['chest', '#ff7ab8'],
+  '🧬': ['dna', '#5ad0a0'], '📜': ['clip', '#e0c890'], '💡': ['bulb', '#ffe680'], '🔔': ['bell', '#ffd24a'], '🔕': ['bell', '#6a7088'], '🎵': ['note', '#c49cff'], '👥': ['ghosts', '#c0c8ff'], '🤍': ['heart', '#f4f0e6'], '🎁': ['chest', '#ff7ab8'], '🎮': ['pad', '#a8b2c8'],
 };
 const EMO_RE = /(?:[←-⇿⌀-⏿■-➿⬀-⯿☀-⛿]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF])[️‍]?/g;
 const glyphCache = new Map(), glyphUrl = new Map();
@@ -2454,6 +2456,7 @@ function update(dt) {
   if (keys.a || keys.arrowleft) mx--; if (keys.d || keys.arrowright) mx++;
   if (keys.w || keys.arrowup) my--; if (keys.s || keys.arrowdown) my++;
   if (TOUCH.jx || TOUCH.jy) { mx = TOUCH.jx; my = TOUCH.jy; }
+  if (PAD.jx || PAD.jy) { mx = PAD.jx; my = PAD.jy; }
   const ml = Math.hypot(mx, my);
   P.moving = ml > 0;
   if (ml) { mx /= ml; my /= ml; P.fx = mx; P.fy = my; P.walk += dt; }
@@ -3960,6 +3963,30 @@ function step(rdt, draw = true) {
   } else if (draw) renderMenuBg(rdt);
 }
 let last = performance.now(), saveTimer = 0, autoSaver = false;
+/* ================= GAMEPAD: left stick moves, A dash, X skill, Y ultimate, B rift art, Start pause ================= */
+const PAD = { jx: 0, jy: 0, prev: {}, nav: 0, on: false };
+function padKey(k, down) { dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { key: k })); }
+function padPoll(dt) {
+  const gp = navigator.getGamepads ? [...navigator.getGamepads()].find(g => g && g.connected) : null;
+  if (!gp) { if (PAD.on) { PAD.on = false; PAD.jx = PAD.jy = 0; } return; }
+  if (!PAD.on) { PAD.on = true; toast('🎮 Controller connected'); }
+  const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0, m = Math.hypot(ax, ay);
+  PAD.jx = m > .22 ? ax : 0; PAD.jy = m > .22 ? ay : 0;
+  const fight = mode === 'fight' && !paused;
+  const map = fight ? { 0: ' ', 2: 'e', 3: 'q', 1: 'r', 5: 'q', 4: ' ', 9: 'escape', 8: 'escape' }
+    : mode === 'pack' ? { 0: ' ', 1: 'escape', 9: 'escape' }
+    : { 0: 'enter', 9: 'escape', 1: 'escape', 12: 'arrowup', 13: 'arrowdown', 14: 'arrowleft', 15: 'arrowright' };
+  for (let i = 0; i < gp.buttons.length; i++) {
+    const b = gp.buttons[i], down = b && (b.pressed || b.value > .5), was = PAD.prev[i];
+    if (down !== !!was) { const k = was || map[i]; if (k) padKey(k, down); PAD.prev[i] = down ? map[i] : null; }
+  }
+  // Stick navigates menus too.
+  if (!fight && mode !== 'pack') {
+    PAD.nav -= dt;
+    if (m > .6 && PAD.nav <= 0) { PAD.nav = .22; padKey(Math.abs(ax) > Math.abs(ay) ? (ax > 0 ? 'arrowright' : 'arrowleft') : (ay > 0 ? 'arrowdown' : 'arrowup'), true); }
+    if (m < .3) PAD.nav = 0;
+  }
+}
 function loop(now) {
   requestAnimationFrame(loop);
   // Battery: menus run at 30 FPS, a paused fight at 8 FPS, fights at 30 FPS in battery saver.
@@ -3967,6 +3994,7 @@ function loop(now) {
   const minDt = mode === 'pack' ? 0 : fighting || mode === 'dead' ? (S.opt.saver || autoSaver ? 1 / 32 : 0) : mode === 'fight' ? 1 / 8 : 1 / 24;
   if (raw < minDt - .002) return;
   const rdt = Math.min(.05, raw); last = now;
+  padPoll(rdt);
   S.stats.playTime += rdt;
   saveTimer += rdt; if (saveTimer > 20) { saveTimer = 0; if (mode !== 'fight') save(); }
   if (mode === 'fight' && !paused && S.opt.fx === 'auto' && autoQ) {
