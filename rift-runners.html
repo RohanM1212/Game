@@ -312,6 +312,8 @@ const ACHIEVEMENTS = [
   { id: 'chal1',  name: 'Up for a Challenge', desc: 'Win a Challenge fight',       reward: 25,  test: s => s.stats.challenges >= 1 },
   { id: 'flaw10', name: 'Spotless',         desc: 'Complete 10 goals flawlessly',  reward: 60,  test: s => s.stats.flawless >= 10 },
   { id: 'heat5',  name: 'Scorched',         desc: 'Win a run on Heat 5+',          reward: 150, test: s => s.maxHeat >= 6 },
+  { id: 'rush3',  name: 'Warming Up',       desc: 'Beat 3 bosses in a Boss Rush', reward: 60, test: s => (s.stats.rushBest || 0) >= 3 },
+  { id: 'rush6',  name: 'Rush Hour',        desc: 'Beat all 6 bosses in a Boss Rush', reward: 200, test: s => (s.stats.rushWins || 0) >= 1 },
   { id: 'twist',  name: 'Twisted',          desc: 'Win a run with Reaper, Sentinel or Juggernaut', reward: 120, test: s => s.stats.twistWins >= 1 },
   { id: 'pets10', name: 'Pet Collector',    desc: 'Own 10 different pets',         reward: 60,  test: s => Object.keys(s.pets || {}).length >= 10 },
   { id: 'legend', name: 'Legendary!',       desc: 'Own a Legendary pet',           reward: 80,  test: s => Object.keys(s.pets || {}).some(k => PETS[k] && PETS[k].r === 4) },
@@ -405,7 +407,7 @@ function addRelic(id) {
 }
 function randomRelics(n) { return shuffle(Object.keys(RELICS).filter(k => !run.relics.includes(k))).slice(0, n); }
 
-function newRun(charId, heat, daily) {
+function newRun(charId, heat, daily, rush) {
   const seed = daily ? hashStr('rift-daily-' + todayStr()) : (Date.now() ^ Math.floor(Math.random() * 1e9)) | 0;
   RNG.s = seed;
   const c = CHARS[charId];
@@ -418,6 +420,7 @@ function newRun(charId, heat, daily) {
   if (daily) { addRelic(pick(Object.keys(RELICS))); run.mut = dailyMuts(run.daily); if (run.mut.includes('glass')) run.bonus.might = (run.bonus.might || 0) + .5; }
   run.hp = calcStats(run).maxHp;
   S.lastChar = charId; S.heat = heat; S.stats.runs++;
+  if (rush) { run.rush = true; run.gold = 0; saveRun(); rushNext(6); return; }
   saveRun(); actIntro(() => showMap());
 }
 function saveRun() {
@@ -430,6 +433,7 @@ function saveRun() {
 function resumeRun() {
   run = JSON.parse(JSON.stringify(S.run)); RNG.s = run.seed || 1;
   // older saves lost their map's room types: rebuild this act's map and start the act's path over
+  if (run.rush) { rushNext(0); return; }
   if (!run.map || run.map.some(row => row.some(n => !NODE[n.t]))) { run.map = genMap(run.act); run.pos = { r: -1, i: -1 }; run.path = []; run.target = null; saveRun(); }
   showMap();
 }
@@ -523,6 +527,7 @@ function showTitle() {
       <button class="opt big" data-a="9">📚 Codex <span class="tag">${codexCount()} discovered</span><kbd>C</kbd></button>
       <button class="opt big" data-a="8">🐾 Pets &amp; Rift Capsules <span class="tag">${S.cores} 🔷${S.freePack !== todayStr() ? ' · FREE capsule!' : ''}</span><kbd>P</kbd></button>
       <button class="opt big" data-a="2" data-n="${hasRun ? 3 : 2}">📅 Daily Challenge ${d ? `<span class="tag">best: ${d} pts</span>` : ''}<kbd>${hasRun ? 3 : 2}</kbd></button>
+      <button class="opt big" data-a="10" ${S.stats.wins ? '' : 'disabled'}>👹 Boss Rush <span class="tag">${S.stats.wins ? (S.stats.rushBest ? 'best: ' + S.stats.rushBest + '/6 bosses' : 'all 6 bosses, back to back') : '🔒 win a run to unlock'}</span></button>
       <button class="opt big" data-a="3" data-n="${hasRun ? 4 : 3}">💠 Upgrades <span class="tag">${S.shards} shards</span><kbd>${hasRun ? 4 : 3}</kbd></button>
       <button class="opt big" data-a="4" data-n="${hasRun ? 5 : 4}">🏆 Achievements <span class="tag">${Object.keys(S.ach).length}/${ACHIEVEMENTS.length}</span><kbd>${hasRun ? 5 : 4}</kbd></button>
       <button class="opt big" data-a="5" data-n="${hasRun ? 6 : 5}">📊 Stats &amp; Save Backup<kbd>${hasRun ? 6 : 5}</kbd></button>
@@ -531,7 +536,7 @@ function showTitle() {
     </div>
     <div class="foot">Progress saves automatically in this browser. Use "Stats &amp; Save Backup" to copy a backup code.</div>`,
     [resumeRun, () => hasRun ? confirmAbandon(() => showCharSelect(false)) : showCharSelect(false),
-     () => hasRun ? confirmAbandon(() => showCharSelect(true)) : showCharSelect(true), showUpgrades, showAchievements, showStats, showHelp, () => showSettings(), () => showPets(), () => showCodex()], 'menu', k => { if (k === 'p') { showPets(); return true; } if (k === 'c') { showCodex(); return true; } });
+     () => hasRun ? confirmAbandon(() => showCharSelect(true)) : showCharSelect(true), showUpgrades, showAchievements, showStats, showHelp, () => showSettings(), () => showPets(), () => showCodex(), () => hasRun ? confirmAbandon(() => showCharSelect(false, true)) : showCharSelect(false, true)], 'menu', k => { if (k === 'p') { showPets(); return true; } if (k === 'c') { showCodex(); return true; } });
   if (!S.seenHelp) { S.seenHelp = true; save(); showHelp(); }
 }
 function confirmAbandon(then) {
@@ -562,7 +567,7 @@ function showHelp() {
   <div class="col" style="margin-top:12px"><button class="opt" data-a="0" data-n="1">Got it!<kbd>1</kbd></button></div>`, [showTitle]);
 }
 let csHeat = null;
-function showCharSelect(daily) {
+function showCharSelect(daily, rush) {
   checkUnlocks();
   if (csHeat === null) csHeat = Math.min(S.heat || 0, S.maxHeat);
   const ids = Object.keys(CHARS);
@@ -575,12 +580,12 @@ function showCharSelect(daily) {
       <div class="cs">${w.icon} ${w.name}</div><div class="cd">${un ? c.desc + `<br><b>E</b> ${SKILLS[id].icon} ${SKILLS[id].name}<br><b>Q</b> 💥 ${ULT_NAMES[id]}` : 'Unlock: ' + c.unlock.text}</div>${un && n <= 9 ? `<kbd>${n}</kbd>` : ''}</button>`;
   }).join('');
   const heatRow = S.maxHeat > 0 && !daily ? `<div class="bar"><button data-a="${ids.length}">◀ Q</button><span class="it">🌡️ Heat <b>${csHeat}</b> / ${S.maxHeat} &nbsp;<small style="color:var(--dim)">(+15% enemy HP &amp; +25% shards per level)</small></span><button data-a="${ids.length + 1}">E ▶</button></div>${csHeat ? `<div class="sub heatmods">${HEAT_MODS.slice(1, csHeat + 1).map((m, i) => `<span title="${m.desc}"><b>${i + 1}</b> ${m.name}</span>`).join(' · ')}</div>` : ''}` : '';
-  const acts = ids.map(id => () => newRun(id, daily ? 0 : csHeat, daily));
-  acts.push(() => { csHeat = Math.max(0, csHeat - 1); showCharSelect(daily); });
-  acts.push(() => { csHeat = Math.min(S.maxHeat, csHeat + 1); showCharSelect(daily); });
+  const acts = ids.map(id => () => newRun(id, daily ? 0 : csHeat, daily, rush));
+  acts.push(() => { csHeat = Math.max(0, csHeat - 1); showCharSelect(daily, rush); });
+  acts.push(() => { csHeat = Math.min(S.maxHeat, csHeat + 1); showCharSelect(daily, rush); });
   acts.push(showTitle);
-  screen(`<h2>${daily ? '📅 Daily Challenge — ' + todayStr() : 'Choose your Runner'}</h2>
-    <div class="sub">${daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.<br>Today\'s rules: ' + dailyMuts(todayStr()).map(k => `<b>${MUTS[k].name}</b> (${MUTS[k].desc})`).join(' · ') : 'Each character starts with a different weapon.'}</div>
+  screen(`<h2>${daily ? '📅 Daily Challenge — ' + todayStr() : rush ? '👹 Boss Rush' : 'Choose your Runner'}</h2>
+    <div class="sub">${rush ? 'Face all 6 bosses in a row. You start with 6 level-ups, and get a relic and 4 more level-ups after every boss. No map, no shops, no mercy.' : daily ? 'Same map and luck for everyone today. You start with a bonus relic. +20% shards.<br>Today\'s rules: ' + dailyMuts(todayStr()).map(k => `<b>${MUTS[k].name}</b> (${MUTS[k].desc})`).join(' · ') : 'Each character starts with a different weapon.'}</div>
     ${heatRow}<div class="row">${cards}</div>
     <div class="col" style="margin-top:14px"><button data-a="${ids.length + 2}">← Back (Esc)</button></div>`, acts, 'menu', k => {
     if (k === 'escape') { showTitle(); return true; }
@@ -634,7 +639,7 @@ function showStats(msg) {
     <div>Gold collected: <b>${s.gold.toLocaleString()}</b></div><div>Evolutions: <b>${s.evolutions}</b></div><div>Highest level: <b>${s.bestLevel}</b></div>
     <div>Shards earned: <b>${s.shardsEarned}</b></div><div>Max Heat unlocked: <b>${S.maxHeat}</b></div><div>Play time: <b>${h}h ${m}m</b></div>
   </div></div>
-  ${(S.history || []).length ? `<h2 style="margin-top:16px">📜 Recent Runs</h2><div class="panel"><div class="hist">${S.history.map(h => `<div>${h.w ? '🏆' : h.how === 'dead' ? '💀' : '🏳️'} <b>${CHARS[h.c] ? CHARS[h.c].icon + ' ' + CHARS[h.c].name : h.c}</b> · Act ${h.a} · ${h.f} floors · ${h.k} kills · Lv ${h.l}${h.h ? ' · Heat ' + h.h : ''}${h.daily ? ' · Daily' : ''} <small style="color:var(--dim)">${h.d}</small></div>`).join('')}</div></div>` : ''}
+  ${(S.history || []).length ? `<h2 style="margin-top:16px">📜 Recent Runs</h2><div class="panel"><div class="hist">${S.history.map(h => `<div>${h.w ? '🏆' : h.how === 'dead' ? '💀' : '🏳️'} <b>${CHARS[h.c] ? CHARS[h.c].icon + ' ' + CHARS[h.c].name : h.c}</b> · Act ${h.a} · ${h.f} floors · ${h.k} kills · Lv ${h.l}${h.h ? ' · Heat ' + h.h : ''}${h.daily ? ' · Daily' : ''}${h.rush ? ' · Boss Rush' : ''} <small style="color:var(--dim)">${h.d}</small></div>`).join('')}</div></div>` : ''}
   <h2 style="margin-top:16px">💾 Save Backup</h2>
   <div class="panel"><p style="margin-top:0">School Chromebooks sometimes wipe browser data. <b>Copy this code</b> and email it to yourself or paste it in a Google Doc. Paste it back here to restore everything, or to move your save to a new version of the game.</p>
     <textarea id="code" readonly></textarea>
@@ -1240,9 +1245,9 @@ const AFFIX = {
 function startFight(type) {
   const rk0 = RNG.s; // fights never change the run's random sequence, so daily runs stay identical
   ST = calcStats(run);
-  const act = run.act, row = run.target ? run.target.r : 0;
+  const act = run.rush ? Math.min(3, run.act) + Math.max(0, run.act - 3) * .5 : run.act, row = run.target ? run.target.r : 0;
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
-  const actHp = act === 1 ? 1 : act === 2 ? 1.65 : 2.65 * Math.pow(1.6, act - 3);
+  const actHp = act === 1 ? 1 : act === 2 ? 1.65 : 2.8 * Math.pow(1.6, act - 3);
   const actDmg = act === 1 ? 1 : act === 2 ? 1.3 : 1.75 * Math.pow(1.28, act - 3);
   const rowHp = act === 1 ? .05 : act === 2 ? .08 : .1;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
@@ -1261,7 +1266,7 @@ function startFight(type) {
     cam: { x: P.x, y: P.y }, zoom: 1.15, trauma: 0, stop: 0, slow: 0, flash: null, intro: .8, hpLag: P.hp, bossLag: 1,
     combo: 0, comboT: 0, surge: false, lvPending: 0, lvDelay: 0, bossIntro: 0, dying: 0, stormT: 4 + Math.random() * 6,
     banner: null };
-  setBanner(type === 'boss' ? '👹 BOSS FIGHT' : type === 'elite' ? '💀 ELITE FIGHT' : `Act ${act} · Floor ${row + 1}`, 2.2, type === 'fight' ? '#ffffff' : '#ff8090', actInfo(act).name);
+  setBanner(type === 'boss' ? '👹 BOSS FIGHT' : type === 'elite' ? '💀 ELITE FIGHT' : `Act ${run.act} · Floor ${row + 1}`, 2.2, type === 'fight' ? '#ffffff' : '#ff8090', actInfo(run.act).name);
   for (const w of run.weapons) { w.t = .4 + Math.random() * .3; w.ang = 0; w.cd = 0; }
   Object.assign(P, { skillCd: 1, artCd: 1, mirror: 0, breath: 0, field: 0, fieldT: 0, healT: 0, slowed: 0, bubble: false });
   Object.assign(G, { props: [], beams: [], turrets: [], pets: [], slashes: [], sweeps: [], waves: [], timeStop: 0, decoy: null, buff: null, golden: 0, meteorsT: 0, cloud: null, gaze: null, rain: null });
@@ -2351,7 +2356,7 @@ function newBossAI(e, dt, sp, dx, dy, d, ph, enr, hard) {
     }
     e.t1 += dt;
     if (e.t1 > (2.8 - .4 * e.gen) * enr) { // lob acid globs that leave puddles
-      e.t1 = 0; for (let i = 0; i < 3 - e.gen; i++) { const a = Math.random() * 6.283, o = 30 + Math.random() * 130; G.areas.push({ kind: 'glob', x: clamp(P.x + Math.cos(a) * o, 30, WORLD - 30), y: clamp(P.y + Math.sin(a) * o, 30, WORLD - 30), sx: e.x, sy: e.y, t: 1, max: 1, r: 55, dmg: e.dmg * .4 }); }
+      e.t1 = 0; for (let i = 0; i < 3 - e.gen; i++) { const a = Math.random() * 6.283, o = 30 + Math.random() * 130; G.areas.push({ kind: 'glob', x: clamp(P.x + Math.cos(a) * o, 30, WORLD - 30), y: clamp(P.y + Math.sin(a) * o, 30, WORLD - 30), sx: e.x, sy: e.y, t: 1.1, max: 1.1, r: 55, dmg: e.dmg * .35 }); }
     }
     e.t2 += dt; if (e.t2 > 3.5) { e.t2 = 0; const n = 10; for (let i = 0; i < n; i++) ebullet(e.x, e.y, i / n * 6.283 + e.gen, 150, e.dmg * .45, 6, '#7af0b0'); }
   } else if (e.kind === 'phantom') {
@@ -2630,7 +2635,7 @@ function update(dt) {
     }
     else if (a.kind === 'boom' && a.t <= 0) { explodeAt(a.x, a.y, a.r, a.dmg || 0, a.c); addShake(.25); }
     else if (a.kind === 'acid') { if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r - 4 && P.dashT <= 0) { P.slowed = Math.max(P.slowed || 0, .35); if ((G.acidT = (G.acidT || 0) - dt) <= 0) { G.acidT = .5; hurt(a.dmg); } } }
-    else if (a.kind === 'glob' && a.t <= 0) { G.areas.push({ kind: 'acid', x: a.x, y: a.y, t: 4, max: 4, r: a.r * .85, dmg: a.dmg }); burst(a.x, a.y, '#7af0b0', 10); if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r && P.dashT <= 0) hurt(a.dmg * 1.5); }
+    else if (a.kind === 'glob' && a.t <= 0) { G.areas.push({ kind: 'acid', x: a.x, y: a.y, t: 3, max: 3, r: a.r * .8, dmg: a.dmg * .55 }); burst(a.x, a.y, '#7af0b0', 10); if (Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r && P.dashT <= 0) hurt(a.dmg * 1.5); }
     else if (a.kind === 'echo' && a.t <= 0) { explodeAt(a.x, a.y, a.r, 0, '#c0c8ff', a.dmg); addShake(.2); }
     else if (a.kind === 'quake' && a.t <= 0) { explodeAt(P.x, P.y, a.r, a.dmg, a.c); addShake(.5); for (const e of G.enemies) if (!e.boss && Math.hypot(e.x - P.x, e.y - P.y) < a.r) { e.slowT = 1.5; e.slowAmt = .8; } }
     else if (a.kind === 'grav' || a.kind === 'hole') {
@@ -2815,6 +2820,12 @@ function finishFight() {
 function bossReward(g) {
   run.bosses++; S.stats.bosses++; S.codex.boss[bossKindFor(run.act)] = 1;
   healPct(.4);
+  if (run.rush) {
+    S.stats.rushBest = Math.max(S.stats.rushBest || 0, run.act); save();
+    if (run.act >= 6) { run.won = true; S.stats.rushWins = (S.stats.rushWins || 0) + 1; checkAch(); sfx('win'); setTimeout(() => endRun('win'), 50); return; }
+    relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! (${run.act}/6) · healed 40%`, () => { run.act++; saveRun(); rushNext(4); });
+    return;
+  }
   relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! +${g} gold, healed 40%`, () => {
     if (run.act === 3 && !run.won) {
       run.won = true; S.stats.wins++; if (CHARS[run.char].twist) S.stats.twistWins++;
@@ -2848,9 +2859,16 @@ function actIntro(then) {
     <div class="col" style="margin-top:22px;width:220px"><button class="opt" data-a="0" data-n="1">Enter<kbd>1</kbd></button></div>`, [then], 'overlay', k => { if (k === ' ' || k === 'escape') { then(); return true; } });
   inputLock = performance.now() + 600;
 }
+function rushNext(lv) {
+  const d = BOSSES[bossKindFor(run.act)];
+  screen(`<div class="actcard" style="--ac:#ff5a6a"><div class="an">BOSS RUSH · ${run.act} / 6</div><div class="at">${d.name}</div><div class="al">${lv ? `Choose ${lv} upgrades, then fight.` : 'The fight resumes.'}</div><div class="ah">Level ${run.level} · ${run.relics.length} relics</div></div>
+    <div class="col" style="margin-top:22px;width:220px"><button class="opt" data-a="0" data-n="1">Fight<kbd>1</kbd></button></div>`,
+    [() => { const go = () => { run.target = { r: 6, i: 0 }; startFight('boss'); }; if (lv) { run.level += lv; queueLevelUps(lv, go); } else go(); }], 'overlay');
+  inputLock = performance.now() + 600;
+}
 function calcShards(r) {
   let s = r.floors * 3 + r.kills / 20 + r.bosses * 20 + r.elites * 5 + (r.won ? 50 : 0) + Math.max(0, r.act - 3) * 30;
-  s *= (1 + .25 * r.heat) * (r.relics.includes('idol') ? 1.3 : 1) * (r.daily ? 1.2 : 1);
+  s *= (1 + .25 * r.heat) * (r.relics.includes('idol') ? 1.3 : 1) * (r.daily ? 1.2 : 1) * (r.rush ? .7 : 1);
   return Math.round(s);
 }
 function endRun(how, then) {
@@ -2862,7 +2880,7 @@ function endRun(how, then) {
   const cores = Math.round((r.mut && r.mut.includes('elites') ? 1.5 : 1) * (r.floors * 4 + r.elites * 8 + r.bosses * 35 + Math.max(0, r.act - 1) * 20 + (r.won ? 60 : 0)) + (r.bonusCores || 0)); r.cores = cores; S.cores += cores;
   if (r.daily) { S.stats.dailies++; r.score = dailyScore(r); S.daily[r.daily] = Math.max(S.daily[r.daily] || 0, r.score); }
   checkAch(r);
-  S.history = [{ d: todayStr(), c: r.char, a: r.act, f: r.floors, k: r.kills, l: r.level, w: !!r.won, how, h: r.heat, daily: !!r.daily }].concat(S.history || []).slice(0, 15);
+  S.history = [{ d: todayStr(), c: r.char, a: r.act, f: r.floors, k: r.kills, l: r.level, w: !!r.won, how, h: r.heat, daily: !!r.daily, rush: !!r.rush }].concat(S.history || []).slice(0, 15);
   S.run = null; run = null;
   const newChars = checkUnlocks();
   save();
