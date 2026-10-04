@@ -2901,7 +2901,7 @@ function endRun(how, then) {
   const newChars = checkUnlocks();
   save();
   if (then) { then(); return; }
-  const title = how === 'win' ? '🏆 Run Complete!' : how === 'dead' ? '💀 You Fell' : '🏳️ Run Ended';
+  const title = how === 'win' ? (r.rush ? '👑 Boss Rush Complete!' : '🏆 Run Complete!') : how === 'dead' ? '💀 You Fell' : '🏳️ Run Ended';
   screen(`<h1 style="font-size:48px">${title}</h1>${how === 'dead' && r.killedBy ? `<div class="sub" style="color:#ff8a9a">Taken down by <b>${r.killedBy}</b>${r.rush ? ` · Boss ${r.act}/6` : ''}</div>` : ''}
     <div class="panel" style="max-width:520px"><div class="grid" style="width:100%;grid-template-columns:1fr 1fr">
       <div>Character: <b>${CHARS[r.char].icon} ${CHARS[r.char].name}</b></div><div>Reached: <b>Act ${r.act}</b></div>
