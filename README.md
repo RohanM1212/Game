@@ -22,7 +22,7 @@ so the AI can't be talked into "I win".
 Action roguelite with a strategy map. Synthesized sound + music (**M** mutes). **WASD/arrows** move · **Space** dash · **E** class skill · **Q** ultimate · **R** Rift Art (found during a run) · **Esc** pause.
 Works on phones/tablets too: a touch joystick and ability buttons appear automatically. Save backup code: **Stats & Save Backup**. Progress (including pets) is saved in the browser.
 
-- **Pets & Rift Capsules:** 20 original pets in 5 rarities (Common → Legendary), each with its own job (tank, healer, striker, bomber, collector…).
+- **Pets & Rift Capsules:** 30 original pets in 5 rarities (Common → Legendary), each with its own job (tank, healer, striker, bomber, collector…).
   Bring 3 into every run (buy up to 5 slots). Open capsules with 🔷 cores from runs, plus a free daily capsule. Duplicates add ★ stars;
   guaranteed Epic+ every 25 pulls and Legendary every 80.
 - **Fight goals:** 15 goal types shown on the map (Survive, Hunt, Defend, Capture, Collect, Defuse, Escort, King of the Hill, Rift Anchors,

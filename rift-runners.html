@@ -2030,6 +2030,16 @@ const PETS = {
   phoenix:  { name: 'Rift Phoenix', r: 4, role: 'healer',   color: '#ffb84a', sp: 'Revives you once per run.' },
   kraken:   { name: 'Void Kraken',  r: 4, role: 'striker',  color: '#7a4aff', sp: 'Tentacles grab and crush 3 enemies at once.' },
   chronocat:{ name: 'Chrono Cat',   r: 4, role: 'charger',  color: '#5ff0e0', sp: 'Slows time for enemies every 10s.' },
+  puffling: { name: 'Puffling',     r: 0, role: 'healer',   color: '#ffc8e0', sp: 'A cloud of fluff that hums healing songs.' },
+  gritbug:  { name: 'Gritbug',      r: 0, role: 'striker',  color: '#a8885a', sp: 'Small, angry, surprisingly bitey.' },
+  bombeetle:{ name: 'Bombeetle',    r: 1, role: 'bomber',   color: '#5a6a8a', sp: 'Throws two bombs at once.' },
+  glowworm: { name: 'Glowworm',     r: 1, role: 'shooter',  color: '#c8ff7a', sp: 'Its shots pierce through 3 enemies.' },
+  shellby:  { name: 'Shellby',      r: 1, role: 'guardian', color: '#e0a070', sp: 'Shields you a bit more often.' },
+  vacuole:  { name: 'Vacuole',      r: 2, role: 'magnet',   color: '#9ae8ff', sp: 'Vacuums every gem on screen every few seconds.' },
+  mirrorling:{ name: 'Mirrorling',  r: 2, role: 'tank',     color: '#d8e0f0', sp: 'Bullets it blocks fly back at enemies.' },
+  frostwyrm:{ name: 'Frost Wyrm',   r: 3, role: 'frost',    color: '#8ad8ff', sp: 'Its pulse freezes enemies solid in a huge radius.' },
+  gildbeast:{ name: 'Gildbeast',    r: 3, role: 'lucky',    color: '#ffd24a', sp: 'Coughs up piles of gold.' },
+  starseer: { name: 'Starseer',     r: 4, role: 'charger',  color: '#fff2a0', sp: 'Every 25s: instantly fills your ultimate and resets your skill.' },
 };
 const STAR_AT = [1, 3, 6, 11, 20]; // copies needed for 1..5 stars
 const petStars = id => { const n = (S.pets[id] || 0); let s = 0; for (const k of STAR_AT) if (n >= k) s++; return s; };
@@ -2078,11 +2088,11 @@ function petUpdate(dt) {
         const a = Math.atan2(e.y - pt.y, e.x - pt.x);
         if (pt.id === 'prismowl') { petAct(pt, .95, '🎯'); beam(pt.x, pt.y, a, 560, 14, wDmg(34) * pw, '#e0f0ff'); }
         else if (pt.id === 'voltmoth') { petAct(pt, .7, '⚡'); let cur = e, px = pt.x, py = pt.y; const hs = new Set(); for (let c = 0; c < 3 && cur; c++) { zap(px, py, cur.x, cur.y, 2); damageEnemy(cur, wDmg(18) * pw); hs.add(cur); px = cur.x; py = cur.y; cur = G.enemies.find(f => !f.dead && !hs.has(f) && Math.hypot(f.x - px, f.y - py) < 160); } }
-        else { petAct(pt, .55 / (1 + .08 * pw), '🎯'); for (const da of [-.12, .12]) shoot(pt.x, pt.y, a + da, 520, 6, wDmg(15) * pw, 1, 1.2, d.color, { pet: pt.id }); }
+        else { petAct(pt, .55 / (1 + .08 * pw), '🎯'); for (const da of [-.12, .12]) shoot(pt.x, pt.y, a + da, 520, 6, wDmg(15) * pw, pt.id === 'glowworm' ? 3 : 1, 1.2, d.color, { pet: pt.id }); }
         flashGlow(pt.x + Math.cos(a) * 14, pt.y + Math.sin(a) * 14, 22, d.color, .15);
       }
     } else if (role === 'tank') {
-      for (const b of G.eb) if ((b.x - pt.x) ** 2 + (b.y - pt.y) ** 2 < 36 * 36) { b.life = 0; burst(b.x, b.y, d.color, 4, .6); pt.punch = .15; }
+      for (const b of G.eb) if (b.life > 0 && (b.x - pt.x) ** 2 + (b.y - pt.y) ** 2 < 36 * 36) { b.life = 0; burst(b.x, b.y, d.color, 4, .6); pt.punch = .15; if (pt.id === 'mirrorling') { const e = nearest(pt.x, pt.y, 500); if (e) shoot(pt.x, pt.y, Math.atan2(e.y - pt.y, e.x - pt.x), 520, 6, wDmg(20) * pw, 2, 1.2, '#d8e0f0', { pet: pt.id }); } }
       if (pt.cd <= 0) { // taunt slam: knocks back and slows everything around it
         petAct(pt, pt.id === 'ironhorn' ? 2.6 : 3.2, '🛡️');
         const R = pt.id === 'ironhorn' ? 150 : 120; G.rings.push({ x: pt.x, y: pt.y, r: 10, max: R, t: .35, color: d.color, w: 6 }); addShake(.06);
@@ -2097,19 +2107,20 @@ function petUpdate(dt) {
       if (pt.id === 'phoenix') for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - pt.x, e.y - pt.y) < 120) damageEnemy(e, wDmg(20) * pw);
     } else if (role === 'bomber' && pt.cd <= 0) {
       const c = G.enemies.filter(e => !e.dead && Math.hypot(e.x - P.x, e.y - P.y) < 440);
-      if (c.length) { petAct(pt, 1.6 / (1 + .08 * pw), '💣'); for (let k2 = 0; k2 < (pt.id === 'soldrake' ? 3 : 1); k2++) { const e = pick(c); G.areas.push({ kind: 'bomb', x: e.x, y: e.y, sx: pt.x, sy: pt.y, t: .6, max: .6, r: 78, dmg: wDmg(38) * pw, pet: pt.id, evo: pt.id === 'soldrake' }); } }
+      if (c.length) { petAct(pt, 1.6 / (1 + .08 * pw), '💣'); for (let k2 = 0; k2 < (pt.id === 'soldrake' ? 3 : pt.id === 'bombeetle' ? 2 : 1); k2++) { const e = pick(c); G.areas.push({ kind: 'bomb', x: e.x, y: e.y, sx: pt.x, sy: pt.y, t: .6, max: .6, r: 78, dmg: wDmg(38) * pw, pet: pt.id, evo: pt.id === 'soldrake' }); } }
     } else if (role === 'frost' && pt.cd <= 0) {
-      petAct(pt, 2.2, '❄️'); G.rings.push({ x: pt.x, y: pt.y, r: 8, max: 165, t: .45, color: '#bfefff', fill: true, w: 5 });
-      for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - pt.x, e.y - pt.y) < 165) { e.slowT = 2; e.slowAmt = e.boss ? .25 : .6; damageEnemy(e, wDmg(11) * pw); }
+      const FR = pt.id === 'frostwyrm' ? 220 : 165; petAct(pt, 2.2, '❄️'); G.rings.push({ x: pt.x, y: pt.y, r: 8, max: FR, t: .45, color: '#bfefff', fill: true, w: 5 });
+      for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - pt.x, e.y - pt.y) < FR) { e.slowT = 2; e.slowAmt = e.boss ? .3 : pt.id === 'frostwyrm' ? 1 : .6; damageEnemy(e, wDmg(11) * pw); }
     } else if (role === 'charger') {
       P.ult = Math.min(100, P.ult + .8 * pw * dt);
-      if (pt.cd <= 0) { petAct(pt, pt.id === 'chronocat' ? 9 : 3, '🔋'); zapLine(pt.x, pt.y, P.x, P.y, '#ffd24a'); P.ult = Math.min(100, P.ult + 2 * pw); if (pt.id === 'chronocat') { G.timeStop = Math.max(G.timeStop, 1.3); G.rings.push({ x: P.x, y: P.y, r: 10, max: 500, t: .6, color: '#5ff0e0', w: 5 }); } }
+      if (pt.id === 'starseer' && pt.cd <= 0) { petAct(pt, 25, '🌟'); P.ult = 100; P.skillCd = 0; G.rings.push({ x: P.x, y: P.y, r: 10, max: 160, t: .5, color: '#fff2a0', w: 6 }); burst(P.x, P.y, '#fff2a0', 30, 1.3); }
+      else if (pt.cd <= 0) { petAct(pt, pt.id === 'chronocat' ? 9 : 3, '🔋'); zapLine(pt.x, pt.y, P.x, P.y, '#ffd24a'); P.ult = Math.min(100, P.ult + 2 * pw); if (pt.id === 'chronocat') { G.timeStop = Math.max(G.timeStop, 1.3); G.rings.push({ x: P.x, y: P.y, r: 10, max: 500, t: .6, color: '#5ff0e0', w: 5 }); } }
     } else if (role === 'guardian' && pt.cd <= 0 && !P.bubble) {
-      petAct(pt, 9 / (1 + .15 * pw), '🫧'); P.bubble = true; G.rings.push({ x: P.x, y: P.y, r: 6, max: 40, t: .35, color: '#6ab8ff', w: 4 });
+      petAct(pt, 9 / (1 + .15 * pw) * (pt.id === 'shellby' ? .75 : 1), '🫧'); P.bubble = true; G.rings.push({ x: P.x, y: P.y, r: 6, max: 40, t: .35, color: '#6ab8ff', w: 4 });
     } else if (role === 'lucky' && pt.cd <= 0) {
-      petAct(pt, 5, '🍀'); for (let k2 = 0; k2 < 3; k2++) G.pick.push({ x: pt.x + (Math.random() - .5) * 30, y: pt.y + (Math.random() - .5) * 30, v: Math.round(2 * pw * G.goldScale), gold: true, mag: false }); burst(pt.x, pt.y, '#ffd24a', 10);
+      petAct(pt, 5, '🍀'); for (let k2 = 0; k2 < (pt.id === 'gildbeast' ? 8 : 3); k2++) G.pick.push({ x: pt.x + (Math.random() - .5) * 30, y: pt.y + (Math.random() - .5) * 30, v: Math.round(2 * pw * G.goldScale), gold: true, mag: false }); burst(pt.x, pt.y, '#ffd24a', 10);
     } else if (role === 'magnet' && pt.cd <= 0) {
-      petAct(pt, 4, '🧲'); for (const g of G.pick) if (Math.hypot(g.x - P.x, g.y - P.y) < 500) g.mag = true; G.rings.push({ x: pt.x, y: pt.y, r: 500, max: 10, t: .4, color: '#ff8090', w: 3 });
+      petAct(pt, pt.id === 'vacuole' ? 2.5 : 4, '🧲'); for (const g of G.pick) if (pt.id === 'vacuole' || Math.hypot(g.x - P.x, g.y - P.y) < 500) g.mag = true; G.rings.push({ x: pt.x, y: pt.y, r: 500, max: 10, t: .4, color: '#ff8090', w: 3 });
     }
     __petSrc = null;
   });
