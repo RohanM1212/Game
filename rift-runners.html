@@ -55,6 +55,7 @@ kbd{position:absolute;top:6px;right:8px;font-size:11px;color:var(--dim);border:1
 .panel{background:linear-gradient(180deg,rgba(26,31,48,.92),rgba(18,22,34,.92));border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:min(900px,100%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;width:min(1000px,100%);background:linear-gradient(180deg,rgba(28,33,52,.9),rgba(20,24,38,.9));border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:10px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .bar .it{white-space:nowrap}
+.buildg{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(900px,96vw);max-height:62vh;overflow:auto}.buildg h3{margin:6px 0 4px;color:var(--gold);font-size:15px}.brow{display:flex;gap:8px;align-items:flex-start;margin:5px 0;text-align:left}.brow .bi{font-size:20px;width:26px;flex:none}.brow small{color:var(--dim)}@media(max-width:640px){.buildg{grid-template-columns:1fr}}
 .teamb{flex-wrap:wrap;justify-content:center;gap:6px;margin-top:8px}.teamb .it{opacity:.45;font-size:13px}.teamb .it.on{opacity:1;color:var(--gold)}
 .icons{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .ico{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 6px;font-size:14px;white-space:nowrap}
@@ -2942,9 +2943,25 @@ function drawPause() {
     <div class="col"><button class="opt big" data-a="0" data-n="1">▶ Resume (Esc)<kbd>1</kbd></button>
     <button class="opt" data-a="1" data-n="2">⚙️ Settings<kbd>2</kbd></button>
     <button class="opt" data-a="2" data-n="3">💾 Save &amp; Quit <small style="color:var(--dim)">(restart this fight later)</small><kbd>3</kbd></button>
-    <button class="opt" data-a="3" data-n="4">🏳️ Give up this run<kbd>4</kbd></button></div>`,
-    [resume, () => showSettings(drawPause, 'overlay'), () => { mode = 'menu'; paused = false; G = null; showTitle(); }, () => { run.hp = P.hp; endRun('abandon'); }],
+    <button class="opt" data-a="3" data-n="4">🏳️ Give up this run<kbd>4</kbd></button>
+    <button class="opt" data-a="4" data-n="5">📋 Your build<kbd>5</kbd></button></div>`,
+    [resume, () => showSettings(drawPause, 'overlay'), () => { mode = 'menu'; paused = false; G = null; showTitle(); }, () => { run.hp = P.hp; endRun('abandon'); }, () => showBuild(drawPause)],
     'overlay', k => { if (k === 'escape' || k === 'p') { resume(); return true; } });
+}
+// Full build sheet with every description, so touch and controller players don't need hover tooltips.
+function showBuild(back) {
+  const st = ST || calcStats(run), pct = v => Math.round(v * 100) + '%';
+  const row = (ic, name, desc, tag) => `<div class="brow"><span class="bi">${ic}</span><span><b>${name}</b>${tag ? ` <span class="tag">${tag}</span>` : ''}<br><small>${desc}</small></span></div>`;
+  const ws = run.weapons.map(w => { const d = WEAPONS[w.id]; return row(d.icon, w.evo ? d.evoName : d.name, d.desc + (w.evo ? '' : ` Evolves at level 5 with <b>${PASSIVES[d.evo].name}</b>${run.passives[d.evo] ? ' ✓' : ''}.`), w.evo ? 'EVOLVED' : 'Lv ' + w.lvl); }).join('');
+  const ps = Object.entries(run.passives).map(([k, l]) => row(PASSIVES[k].icon, PASSIVES[k].name, PASSIVES[k].desc + ' per level', 'Lv ' + l + '/' + PASSIVES[k].max)).join('');
+  const rs = run.relics.map(k => row(RELICS[k].icon, RELICS[k].name, RELICS[k].desc)).join('');
+  const sy = Object.keys(run.syn || {}).filter(k => SYN[k]).map(k => row('⚡', SYN[k].name, SYN[k].desc)).join('');
+  const ar = run.art && ARTS[run.art] ? row(ARTS[run.art].icon, ARTS[run.art].name, ARTS[run.art].desc, 'R') : '';
+  screen(`<h2>📋 Your Build</h2>
+    <div class="bar"><span class="it">💪 Damage ${pct(st.might)}</span><span class="it">⏱️ Cooldown ${pct(st.cdMul)}</span><span class="it">🌀 Area ${pct(st.area)}</span><span class="it">🎯 Crit ${pct(st.crit)}</span><span class="it">🛡️ Armor ${st.armor}</span><span class="it">👟 Speed ${Math.round(st.speed)}</span><span class="it">🧲 Pickup ${Math.round(st.magnet)}</span></div>
+    <div class="buildg"><div class="panel"><h3>Weapons</h3>${ws}${ar ? '<h3>Rift Art</h3>' + ar : ''}${sy ? '<h3>Synergies</h3>' + sy : ''}</div>
+    <div class="panel"><h3>Passives</h3>${ps || '<small>None yet</small>'}<h3>Relics</h3>${rs || '<small>None yet</small>'}</div></div>
+    <div class="col" style="margin-top:12px"><button class="opt" data-a="0" data-n="1">← Back (Esc)<kbd>1</kbd></button></div>`, [back], 'overlay', k => { if (k === 'escape') { back(); return true; } });
 }
 function showSettings(back = showTitle, cls = 'menu') {
   const o = S.opt, fxName = { auto: 'Auto', high: 'High', low: 'Low (faster)' }[o.fx];
