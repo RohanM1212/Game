@@ -55,6 +55,7 @@ kbd{position:absolute;top:6px;right:8px;font-size:11px;color:var(--dim);border:1
 .panel{background:linear-gradient(180deg,rgba(26,31,48,.92),rgba(18,22,34,.92));border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:min(900px,100%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;width:min(1000px,100%);background:linear-gradient(180deg,rgba(28,33,52,.9),rgba(20,24,38,.9));border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:10px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .bar .it{white-space:nowrap}
+.teamb{flex-wrap:wrap;justify-content:center;gap:6px;margin-top:8px}.teamb .it{opacity:.45;font-size:13px}.teamb .it.on{opacity:1;color:var(--gold)}
 .icons{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .ico{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 6px;font-size:14px;white-space:nowrap}
 .ico b{font-size:11px;color:var(--gold)}
@@ -387,9 +388,24 @@ function calcStats(r) {
   s.crit += s.luck * .3;
   s.maxHp = Math.max(10, Math.round(s.maxHp));
   s.cdMul = Math.max(.3, s.cdMul);
+  const tb = teamBonus(); s.might += tb.might; s.maxHp += tb.hp;
   return s;
 }
 const xpNeed = l => Math.floor(5 + (l - 1) * 6 + Math.pow(l - 1, 1.6));
+// Pet team bonuses: two pets sharing a role bond (+25% power each), and four different roles give a small boost to you.
+function teamBonus() {
+  const team = (S.team || []).filter(id => PETS[id] && S.pets[id]), roles = {};
+  for (const id of team) roles[PETS[id].role] = (roles[PETS[id].role] || 0) + 1;
+  const n = Object.keys(roles).length, legend = team.filter(id => PETS[id].r >= 4).length;
+  return { roles, bond: r => roles[r] >= 2 ? 1.25 : 1, variety: n >= 4, might: (n >= 4 ? .06 : 0) + (legend >= 2 ? .05 : 0), hp: n >= 4 ? 15 : 0, legend };
+}
+function teamBonusHtml() {
+  const tb = teamBonus(), out = [];
+  for (const r in tb.roles) if (tb.roles[r] >= 2) out.push(`<span class="it on">${ROLES[r].icon} ${ROLES[r].name} Bond: +25% power</span>`);
+  out.push(`<span class="it ${tb.variety ? 'on' : ''}">✨ Variety (4 roles): +6% damage, +15 HP</span>`);
+  out.push(`<span class="it ${tb.legend >= 2 ? 'on' : ''}">👑 Two Legendaries: +5% damage</span>`);
+  return `<div class="bar teamb">${out.join('')}</div>`;
+}
 function getHp() { return mode === 'fight' ? P.hp : run.hp; }
 function setHp(v) { v = clamp(v, 0, calcStats(run).maxHp); if (mode === 'fight') P.hp = v; else run.hp = v; }
 function healPct(p) { setHp(getHp() + calcStats(run).maxHp * p * (heat(4) ? .7 : 1)); }
@@ -2064,7 +2080,7 @@ function petBonus(kind) { // passive bonuses from the equipped team
   return kind === 'cdr' ? Math.min(.35, v) : v;
 }
 function spawnPets() {
-  G.pets = (S.team || []).filter(id => PETS[id] && S.pets[id]).map((id, i) => ({ id, d: PETS[id], pw: petPow(id), x: P.x, y: P.y, i, cd: 1 + i * .3, cd2: 2, vx: 0, vy: 0, hop: 0, rev: id === 'phoenix' }));
+  const TB = teamBonus(); G.pets = (S.team || []).filter(id => PETS[id] && S.pets[id]).map((id, i) => ({ id, d: PETS[id], pw: petPow(id) * TB.bond(PETS[id].role), x: P.x, y: P.y, i, cd: 1 + i * .3, cd2: 2, vx: 0, vy: 0, hop: 0, rev: id === 'phoenix' }));
 }
 let __petSrc = null; // which pet is dealing damage right now (for the end-of-run pet stats)
 const petAct = (pt, cd, ic) => { pt.cd = cd; pt.cdMax = cd; pt.emo = { t: .8, ic }; pt.punch = .25; };
@@ -3001,7 +3017,7 @@ function showPets(msg) {
     <div class="bar"><span class="it">🔷 <b>${S.cores}</b> cores</span><span class="it">💠 ${S.shards} shards</span><span class="it" title="Guaranteed pulls">🟣 Epic+ in <b>${PITY_E - S.pity.e}</b> · 🟡 Legendary in <b>${PITY_L - S.pity.l}</b></span></div>
     ${msg ? `<div class="sub" style="color:var(--gold)">${msg}</div>` : ''}
     <div class="sub" style="margin-bottom:6px">Your team fights beside you in every run. Earn 🔷 cores from runs (more for bosses, elites and deeper acts).</div>
-    <div class="row team">${slots}</div>
+    <div class="row team">${slots}</div>${teamBonusHtml()}
     <div class="row" style="margin-top:12px">${caps}</div>
     <h2 style="margin-top:18px">Collection <span class="tag">${Object.keys(S.pets).length}/${ids.length}</span></h2>
     <div class="pgrid">${coll}</div>
