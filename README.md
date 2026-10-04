@@ -38,5 +38,6 @@ Works on phones/tablets too: a touch joystick and ability buttons appear automat
 - **Twist characters:** Reaper (levels from kills, no XP), Sentinel (only fires while standing still), Juggernaut (no dash, crushes on contact).
 - **Heat 1–10:** each level adds a modifier (faster foes, pricier shops, extra elite modifiers, weaker healing, and more).
 - **Daily run:** same map and same level-up offers for everyone that day; your score is shown with a copyable line to share.
+- **Codex (C):** tracks discovered evolutions, synergies, bosses, relics and enemies; 11 new achievements.
 - **Art:** all icons are drawn in code in one flat style (no emoji).
 - **⚙️ Settings:** screen shake, effects quality, and 🔋 Battery saver (30 FPS). Menus are throttled to save battery on Chromebooks.

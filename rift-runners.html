@@ -162,7 +162,7 @@ const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + St
 
 /* ================= DATA ================= */
 const WEAPONS = {
-  wand:      { name: 'Magic Bolt',      icon: '✨', desc: 'Fires bolts at the nearest enemy.',            evo: 'multi', evoName: 'Arcane Barrage' },
+  wand:      { name: 'Magic Bolt',      icon: '✨', desc: 'Fires bolts at the nearest enemy.',            evo: 'multi', evoName: 'Arcane Lance' },
   daggers:   { name: 'Throwing Knives', icon: '🔪', desc: 'Throws knives the way you are moving.',        evo: 'haste', evoName: 'Blade Storm' },
   orbit:     { name: 'Orbit Blades',    icon: '🌙', desc: 'Blades circle around you.',                    evo: 'area',  evoName: 'Blade Halo' },
   aura:      { name: 'Holy Aura',       icon: '☀️', desc: 'Burns every enemy close to you.',              evo: 'vital', evoName: 'Sanctuary' },
@@ -290,6 +290,17 @@ const ACHIEVEMENTS = [
   { id: 'heat3',  name: 'Feel the Heat',   desc: 'Win a run on Heat 3+',          reward: 100, test: s => s.maxHeat >= 4 },
   { id: 'heat10', name: 'Inferno Master',  desc: 'Win a run on Heat 10',          reward: 500, test: s => s.stats.heat10 >= 1 },
   { id: 'daily',  name: 'Daily Habit',     desc: 'Finish a Daily Challenge run',  reward: 15,  test: s => s.stats.dailies >= 1 },
+  { id: 'syn1',   name: 'Better Together',  desc: 'Unlock a weapon synergy',       reward: 30,  test: s => Object.keys(s.codex.syn).length >= 1 },
+  { id: 'syn6',   name: 'Perfect Harmony',  desc: 'Discover all 6 synergies',      reward: 200, test: s => Object.keys(s.codex.syn).length >= 6 },
+  { id: 'evo9',   name: 'Master Smith',     desc: 'Discover all 9 evolutions',     reward: 200, test: s => Object.keys(s.codex.evo).length >= 9 },
+  { id: 'boss6',  name: 'Rift Breaker',     desc: 'Defeat all 6 bosses',           reward: 250, test: s => Object.keys(s.codex.boss).length >= 6 },
+  { id: 'chal1',  name: 'Up for a Challenge', desc: 'Win a Challenge fight',       reward: 25,  test: s => s.stats.challenges >= 1 },
+  { id: 'flaw10', name: 'Spotless',         desc: 'Complete 10 goals flawlessly',  reward: 60,  test: s => s.stats.flawless >= 10 },
+  { id: 'heat5',  name: 'Scorched',         desc: 'Win a run on Heat 5+',          reward: 150, test: s => s.maxHeat >= 6 },
+  { id: 'twist',  name: 'Twisted',          desc: 'Win a run with Reaper, Sentinel or Juggernaut', reward: 120, test: s => s.stats.twistWins >= 1 },
+  { id: 'pets10', name: 'Pet Collector',    desc: 'Own 10 different pets',         reward: 60,  test: s => Object.keys(s.pets || {}).length >= 10 },
+  { id: 'legend', name: 'Legendary!',       desc: 'Own a Legendary pet',           reward: 80,  test: s => Object.keys(s.pets || {}).some(k => PETS[k] && PETS[k].r === 4) },
+  { id: 'relic25',name: 'Curator',          desc: 'Find 25 different relics',      reward: 100, test: s => Object.keys(s.codex.relic).length >= 25 },
   { id: 'chars',  name: 'Full Roster',     desc: 'Unlock every character',        reward: 100, test: s => Object.keys(CHARS).every(k => s.chars[k]) },
 ];
 
@@ -297,7 +308,7 @@ const ACHIEVEMENTS = [
 const SAVE_KEY = 'riftRunnersSave_v1';
 function defaultSave() {
   return { v: 1, shards: 0, meta: {}, chars: { knight: true }, maxHeat: 0, heat: 0, ach: {}, daily: {}, run: null, lastChar: 'knight', seenHelp: false, opt: { shake: true, fx: 'auto', saver: false, sound: true, music: true }, pets: { sparkit: 1 }, team: ['sparkit'], cores: 300, pity: { e: 0, l: 0 }, freePack: '', petSlots: 0,
-    stats: { runs: 0, kills: 0, bosses: 0, wins: 0, bestAct: 1, elites: 0, gold: 0, playTime: 0, shardsEarned: 0, deaths: 0, evolutions: 0, noHit: 0, dailies: 0, heat10: 0, bestLevel: 0 } };
+    stats: { runs: 0, kills: 0, bosses: 0, wins: 0, bestAct: 1, elites: 0, gold: 0, playTime: 0, shardsEarned: 0, deaths: 0, evolutions: 0, noHit: 0, dailies: 0, heat10: 0, bestLevel: 0, challenges: 0, flawless: 0, twistWins: 0, synergies: 0 }, codex: { evo: {}, syn: {}, boss: {}, relic: {} } };
 }
 function merge(d, o) { for (const k in o) { if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k]) && d[k] && typeof d[k] === 'object') merge(d[k], o[k]); else d[k] = o[k]; } return d; }
 function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); if (raw) return merge(defaultSave(), JSON.parse(raw)); } catch (e) {} return defaultSave(); }
@@ -363,6 +374,7 @@ function setHp(v) { v = clamp(v, 0, calcStats(run).maxHp); if (mode === 'fight')
 function healPct(p) { setHp(getHp() + calcStats(run).maxHp * p * (heat(4) ? .7 : 1)); }
 
 function addRelic(id) {
+  S.codex.relic[id] = 1;
   if (run.relics.includes(id)) return;
   const before = calcStats(run).maxHp;
   run.relics.push(id);
@@ -489,6 +501,7 @@ function showTitle() {
     <div class="col">
       ${hasRun ? `<button class="opt big" data-a="0" data-n="1">▶ Continue Run <span class="tag">Act ${S.run.act} · ${CHARS[S.run.char].name}</span><kbd>1</kbd></button>` : ''}
       <button class="opt big" data-a="1" data-n="${hasRun ? 2 : 1}">⚔️ New Run<kbd>${hasRun ? 2 : 1}</kbd></button>
+      <button class="opt big" data-a="9">📚 Codex <span class="tag">${codexCount()} discovered</span><kbd>C</kbd></button>
       <button class="opt big" data-a="8">🐾 Pets &amp; Rift Capsules <span class="tag">${S.cores} 🔷${S.freePack !== todayStr() ? ' · FREE capsule!' : ''}</span><kbd>P</kbd></button>
       <button class="opt big" data-a="2" data-n="${hasRun ? 3 : 2}">📅 Daily Challenge ${d ? `<span class="tag">best: ${d} pts</span>` : ''}<kbd>${hasRun ? 3 : 2}</kbd></button>
       <button class="opt big" data-a="3" data-n="${hasRun ? 4 : 3}">💠 Upgrades <span class="tag">${S.shards} shards</span><kbd>${hasRun ? 4 : 3}</kbd></button>
@@ -499,7 +512,7 @@ function showTitle() {
     </div>
     <div class="foot">Progress saves automatically in this browser. Use "Stats &amp; Save Backup" to copy a backup code.</div>`,
     [resumeRun, () => hasRun ? confirmAbandon(() => showCharSelect(false)) : showCharSelect(false),
-     () => hasRun ? confirmAbandon(() => showCharSelect(true)) : showCharSelect(true), showUpgrades, showAchievements, showStats, showHelp, () => showSettings(), () => showPets()], 'menu', k => { if (k === 'p') { showPets(); return true; } });
+     () => hasRun ? confirmAbandon(() => showCharSelect(true)) : showCharSelect(true), showUpgrades, showAchievements, showStats, showHelp, () => showSettings(), () => showPets(), () => showCodex()], 'menu', k => { if (k === 'p') { showPets(); return true; } if (k === 'c') { showCodex(); return true; } });
   if (!S.seenHelp) { S.seenHelp = true; save(); showHelp(); }
 }
 function confirmAbandon(then) {
@@ -566,6 +579,26 @@ function showUpgrades() {
     <div class="grid">${rows}</div><div class="col" style="margin-top:14px"><button data-a="${META.length}">← Back (Esc)</button></div>`,
     [...META.map(m => () => { const l = S.meta[m.id] || 0, c = metaCost(m, l); if (l < m.max && S.shards >= c) { S.shards -= c; S.meta[m.id] = l + 1; save(); toast(`${m.icon} ${m.name} upgraded!`); } showUpgrades(); }), showTitle],
     'menu', k => { if (k === 'escape') { showTitle(); return true; } });
+}
+const ENEMY_INFO = {
+  grunt: ['Grunt', 'Walks at you. There are always more.'], runner: ['Runner', 'Fast and fragile.'], brute: ['Brute', 'Tough. In Act 3+ it slams the ground.'],
+  shooter: ['Shooter', 'Keeps its distance and fires.'], splitter: ['Splitter', 'Splits into two minis when it dies.'], exploder: ['Exploder', 'Blows up when it reaches you.'],
+  warden: ['Warden', 'Shields nearby enemies every few seconds. Kill it first.'], burrower: ['Burrower', 'Digs under you, then pops up. Watch for the red mark.'],
+  dasher: ['Dasher', 'Aims with a red line, then charges.'], sludge: ['Sludge', 'Leaves acid puddles that slow and burn.'],
+};
+const codexCount = () => Object.keys(S.codex.evo).length + Object.keys(S.codex.syn).length + Object.keys(S.codex.boss).length + Object.keys(S.codex.relic).length;
+function showCodex(tab = 'weapons') {
+  const C = S.codex, tabs = { weapons: 'Weapons', syn: 'Synergies', bosses: 'Bosses', relics: 'Relics', enemies: 'Enemies' };
+  let body = '';
+  if (tab === 'weapons') body = Object.entries(WEAPONS).map(([k, w]) => { const got = C.evo[k]; return `<div class="ach ${got ? 'done' : ''}"><b>${w.icon} ${w.name}</b><br><small>${w.desc}</small><br><span class="tag">evolves with ${PASSIVES[w.evo].icon} ${PASSIVES[w.evo].name}</span> → <b style="color:${got ? '#ffb84a' : 'var(--dim)'}">${got ? '★ ' + w.evoName : '???'}</b></div>`; }).join('');
+  if (tab === 'syn') body = Object.entries(SYN).map(([k, d]) => { const got = C.syn[k]; return `<div class="ach ${got ? 'done' : ''}"><b>${WEAPONS[d.a].icon} + ${WEAPONS[d.b].icon} ${got ? d.name : '???'}</b><br><small>${got ? d.desc : `Get ${WEAPONS[d.a].name} and ${WEAPONS[d.b].name} to level 4+ in one run.`}</small></div>`; }).join('');
+  if (tab === 'bosses') body = BOSS_ORDER.map((k, i) => { const got = C.boss[k], b = BOSSES[k]; return `<div class="ach ${got ? 'done' : ''}"><b>${got ? '👑 ' + b.name : '🔒 ???'}</b><br><small>${i < 3 ? 'Act ' + (i + 1) : 'Endless · Act ' + (i + 1)}${got ? ' · defeated' : ''}</small></div>`; }).join('');
+  if (tab === 'relics') body = Object.entries(RELICS).map(([k, r]) => C.relic[k] ? `<div class="ach done"><b>${r.icon} ${r.name}</b><br><small>${r.desc}</small></div>` : `<div class="ach"><b>❓ ???</b><br><small>Not found yet.</small></div>`).join('');
+  if (tab === 'enemies') body = Object.entries(ENEMY_INFO).map(([k, [n, d]]) => `<div class="ach"><b><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${ENEMIES[k].color};margin-right:6px"></span>${n}</b><br><small>${d}</small></div>`).join('');
+  const keys = Object.keys(tabs);
+  screen(`<h2>📚 Codex</h2><div class="row" style="margin-bottom:12px">${keys.map((k, i) => `<button data-a="${i}" ${k === tab ? 'style="border-color:var(--acc)"' : ''}>${tabs[k]}</button>`).join('')}</div>
+    <div class="grid">${body}</div><div class="col" style="margin-top:14px"><button data-a="${keys.length}">← Back (Esc)</button></div>`,
+    [...keys.map(k => () => showCodex(k)), showTitle], 'menu', k => { if (k === 'escape') { showTitle(); return true; } });
 }
 function showAchievements() {
   const list = ACHIEVEMENTS.map(a => `<div class="ach ${S.ach[a.id] ? 'done' : ''}">${S.ach[a.id] ? '✅' : '⬜'} <b>${a.name}</b> <span class="tag">+${a.reward} 💠</span><br><small style="color:var(--dim)">${a.desc}</small></div>`).join('');
@@ -813,8 +846,8 @@ function choiceDesc(o) {
 }
 function applyChoice(o) {
   const before = calcStats(run).maxHp;
-  if (o.k === 'evo') { const w = run.weapons.find(x => x.id === o.id); w.evo = true; w.lvl = 6; S.stats.evolutions++; toast(`★ ${WEAPONS[o.id].evoName}! ★`, '#ffb84a'); }
-  else if (o.k === 'syn') { run.syn = run.syn || {}; run.syn[o.id] = true; toast(`⚡ ${SYN[o.id].name}! ⚡`, '#c49cff'); }
+  if (o.k === 'evo') { const w = run.weapons.find(x => x.id === o.id); w.evo = true; w.lvl = 6; S.stats.evolutions++; S.codex.evo[o.id] = 1; toast(`★ ${WEAPONS[o.id].evoName}! ★`, '#ffb84a'); }
+  else if (o.k === 'syn') { run.syn = run.syn || {}; run.syn[o.id] = true; S.codex.syn[o.id] = 1; S.stats.synergies++; toast(`⚡ ${SYN[o.id].name}! ⚡`, '#c49cff'); }
   else if (o.k === 'wup') run.weapons.find(x => x.id === o.id).lvl++;
   else if (o.k === 'wnew') run.weapons.push({ id: o.id, lvl: 1, evo: false });
   else if (o.k === 'pup' || o.k === 'pnew') run.passives[o.id] = (run.passives[o.id] || 0) + 1;
@@ -976,7 +1009,7 @@ const GLYPH = {
   arm(g, c) { rrg(g, 14, 28, 36, 8, 3); fs(g, '#a8b2c8'); for (const x of [8, 46]) { rrg(g, x, 16, 10, 32, 4); fs(g, c); } },
   clock(g, c) { circ(g, 32, 34, 23, c); circ(g, 32, 34, 17, '#f4f0e6', true); g.beginPath(); g.moveTo(32, 34); g.lineTo(32, 22); g.moveTo(32, 34); g.lineTo(41, 38); line(g, INK, 3.5); g.fillStyle = c; g.fillRect(27, 4, 10, 6); },
   hourglass(g, c) { g.beginPath(); g.moveTo(16, 8); g.lineTo(48, 8); g.lineTo(34, 32); g.lineTo(48, 56); g.lineTo(16, 56); g.lineTo(30, 32); g.closePath(); fs(g, '#e8ecf6'); g.beginPath(); g.moveTo(22, 52); g.lineTo(42, 52); g.lineTo(32, 40); g.closePath(); g.fillStyle = c; g.fill(); g.fillStyle = INK; g.fillRect(12, 4, 40, 6); g.fillRect(12, 54, 40, 6); },
-  boot(g, c) { g.beginPath(); g.moveTo(20, 6); g.lineTo(36, 6); g.lineTo(36, 36); g.lineTo(54, 42); g.lineTo(54, 54); g.lineTo(16, 54); g.closePath(); fs(g, c); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(16, 48, 38, 6); },
+  boot(g, c) { g.beginPath(); g.moveTo(10, 44); g.lineTo(12, 26); g.quadraticCurveTo(22, 22, 28, 30); g.quadraticCurveTo(40, 34, 52, 38); g.quadraticCurveTo(58, 42, 56, 48); g.lineTo(10, 48); g.closePath(); fs(g, c); rrg(g, 8, 46, 50, 8, 4); fs(g, '#f4f0e6'); g.beginPath(); g.moveTo(26, 32); g.lineTo(30, 28); g.moveTo(32, 34); g.lineTo(36, 30); g.moveTo(38, 36); g.lineTo(42, 32); line(g, '#f4f0e6', 3); },
   thermo(g, c) { rrg(g, 26, 6, 12, 38, 6); fs(g, '#e8ecf6'); circ(g, 32, 48, 11, c); g.fillStyle = c; g.fillRect(29, 20, 6, 26); },
   calendar(g, c) { rrg(g, 8, 12, 48, 44, 6); fs(g, '#f4f0e6'); g.fillStyle = c; g.fillRect(9, 13, 46, 12); g.fillStyle = INK; for (let i = 0; i < 3; i++) for (let j = 0; j < 4; j++) g.fillRect(14 + j * 10, 30 + i * 8, 6, 5); },
   paw(g, c) { g.beginPath(); g.ellipse(32, 42, 13, 11, 0, 0, 6.283); fs(g, c); for (const [x, y] of [[16, 26], [26, 16], [38, 16], [48, 26]]) circ(g, x, y, 6.5, c); },
@@ -1793,6 +1826,7 @@ function goalEnd(win) {
   g.result = win ? 'win' : 'fail';
   if (win) {
     const mult = (g.key === 'chaos' ? 2 : 1) * (g.flawless ? 1.5 : 1), gold = Math.round((20 + 12 * run.act) * mult), cores = Math.round((6 + 4 * run.act) * mult);
+    if (g.flawless) S.stats.flawless++;
     run.gold += gold; S.stats.gold += gold; run.bonusCores = (run.bonusCores || 0) + cores; g.reward = `+${gold} 🪙 +${cores} 🔷${g.flawless ? ' · FLAWLESS!' : ''}`;
     startEnding(g.flawless ? '🌟 FLAWLESS!' : '✅ GOAL COMPLETE!'); sfx('win'); setBanner(g.flawless ? '🌟 FLAWLESS!' : '✅ GOAL COMPLETE!', 2.2, g.flawless ? '#ffd24a' : '#5ee08a', g.reward);
   } else { g.reward = 'Goal failed: no bonus'; startEnding('❌ GOAL FAILED'); sfx('fail'); setBanner('❌ GOAL FAILED', 2, '#ff6070', 'NO BONUS THIS TIME'); }
@@ -2690,17 +2724,17 @@ function finishFight() {
   run.petDmg = run.petDmg || {}; for (const k in G.petDmg) run.petDmg[k] = (run.petDmg[k] || 0) + Math.round(G.petDmg[k]);
   for (const w of run.weapons) { delete w.lx; delete w.ly; delete w.blades; delete w.cd; delete w.pulse; delete w.rad; }
   G = null;
-  if (wasChallenge) { run.bonusCores = (run.bonusCores || 0) + 30; relicChoice(`🔥 Challenge conquered! +${g} gold · +30 🔷${goalMsg}`, () => completeNode()); }
+  if (wasChallenge) { S.stats.challenges++; run.bonusCores = (run.bonusCores || 0) + 30; relicChoice(`🔥 Challenge conquered! +${g} gold · +30 🔷${goalMsg}`, () => completeNode()); }
   else if (type === 'elite') { run.elites++; S.stats.elites++; relicChoice(`💀 Elite defeated! +${g} gold`, () => completeNode()); }
   else if (type === 'boss') bossReward(g);
   else completeNode(`✅ Fight cleared! +${g} gold${goalMsg}`);
 }
 function bossReward(g) {
-  run.bosses++; S.stats.bosses++;
+  run.bosses++; S.stats.bosses++; S.codex.boss[bossKindFor(run.act)] = 1;
   healPct(.4);
   relicChoice(`👑 ${BOSSES[bossKindFor(run.act)].name} defeated! +${g} gold, healed 40%`, () => {
     if (run.act === 3 && !run.won) {
-      run.won = true; S.stats.wins++;
+      run.won = true; S.stats.wins++; if (CHARS[run.char].twist) S.stats.twistWins++;
       if (run.heat >= S.maxHeat && S.maxHeat < 10) { S.maxHeat = run.heat + 1; toast(`🌡️ Heat ${S.maxHeat} unlocked!`, '#ff9a4a'); }
       if (run.heat >= 10) S.stats.heat10++;
       checkUnlocks(); checkAch(); save();
