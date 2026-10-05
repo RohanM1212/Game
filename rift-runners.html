@@ -1418,7 +1418,7 @@ function killEnemy(e, silent) {
   e.dead = true;
   if (silent) { burst(e.x, e.y, e.color, 4); flashGlow(e.x, e.y, e.r * 2.6, e.color, .3); return; }
   G.kills++; run.kills++; S.stats.kills++;
-  G.combo++; G.comboT = 2.5; sfx('kill'); if (!(G.ultLock > G.now)) P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.4 : 1));
+  G.combo++; G.comboT = 2.5; sfx('kill'); if (!(G.ultLock > G.now)) P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.1 : .8));
   if (!e.boss) deathFx(e);
   if (twist('reaper') && !e.boss) addXp(xpNeed(run.level) / (6 + run.level * 1.2));
   else if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
@@ -2739,7 +2739,7 @@ function update(dt) {
   P.invul -= dt; P.dashCd -= dt; P.aegisT -= dt;
   if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
   if (mode !== 'fight') return;
-  P.ult = Math.min(100, P.ult + 2.4 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
+  P.ult = Math.min(100, P.ult + 1.9 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
   if (P.ult >= 100 && !G.ultReady) { G.ultReady = true; sfx('ready'); popText(P.x, P.y - 34, 'ULTIMATE READY', ULT_COLOR[run.char] || '#ffd24a', true); G.rings.push({ x: P.x, y: P.y, r: 60, max: 14, t: .4, color: ULT_COLOR[run.char] || '#ffd24a', w: 4 }); } else if (P.ult < 100) G.ultReady = false;
   if (has('bloodrage') && (G.nearT = (G.nearT || 0) - dt) <= 0) { G.nearT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 < 150 * 150) n++; G.nearN = n; }
   P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt; if (P.hasteT > 0) P.hasteT -= dt; if (P.invis > 0) P.invis -= dt;
