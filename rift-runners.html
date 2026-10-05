@@ -1313,7 +1313,7 @@ function spawnBoss() {
   const hp = 3000 * G.bossHpMul * (G.hard ? 1.15 : 1) * (heat(8) ? 1.25 : 1);
   const a = Math.random() * Math.PI * 2;
   const e = makeEnemy('grunt', P.x + Math.cos(a) * 300, P.y + Math.sin(a) * 300);
-  Object.assign(e, { boss: true, kind, name: d.name, r: d.r, hp, maxHp: hp, spd: kind === 'colossus' ? 58 : 45, dmg: 22 * G.dmgMul, color: d.color, xp: 0, state: 'walk', at: 0, t1: 0, t2: 0, t3: 0, t4: 0, sa: 0,
+  Object.assign(e, { boss: true, kind, name: d.name, r: d.r, hp, maxHp: hp, spd: kind === 'colossus' ? 58 : 45, dmg: 22 * G.dmgMul * (run.act === 3 && !run.rush ? .88 : 1), color: d.color, xp: 0, state: 'walk', at: 0, t1: 0, t2: 0, t3: 0, t4: 0, sa: 0,
     phase: 1, chain: 0, spawnT: 0, shape: Array.from({ length: 11 }, () => .84 + Math.random() * .22) });
   G.boss = e; G.bossIntro = 2.2; sfx('boss'); G.bossParts = null;
   if (kind === 'mitosis') { e.gen = 0; G.bossParts = [e]; G.bossTotal = hp; }
