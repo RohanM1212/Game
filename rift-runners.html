@@ -1277,8 +1277,8 @@ function startFight(type) {
   ST = calcStats(run);
   const act = run.rush ? 1 + (run.act - 1) * .6 : run.act, row = run.target ? run.target.r : 0;
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
-  const actHp = act === 1 ? 1 : act === 2 ? 1.9 : 3.4 * Math.pow(1.6, act - 3);
-  const actDmg = act === 1 ? 1 : act === 2 ? 1.4 : 2 * Math.pow(1.28, act - 3);
+  const actHp = act === 1 ? 1 : act === 2 ? 1.9 : 3.9 * Math.pow(1.6, act - 3);
+  const actDmg = act === 1 ? 1 : act === 2 ? 1.4 : 2.2 * Math.pow(1.28, act - 3);
   const rowHp = act === 1 ? .05 : act === 2 ? .08 : .1;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
   P = { x: WORLD / 2, y: WORLD / 2, r: 13, hp: run.hp, fx: 1, fy: 0, invul: 1.2, dashT: 0, dashCd: 0, dvx: 0, dvy: 0, aegisT: 0, moving: false, color: CHARS[run.char].color, trail: [], dustT: 0, walk: 0, ult: 0 };
