@@ -1212,7 +1212,13 @@ const SND = {
   hurt: () => { tone(220, .18, 'sawtooth', .18, 90); noise(.12, .15, 900); },
   gem: () => tone(1100 + Math.random() * 300, .06, 'sine', .08, 1700),
   coin: () => { tone(1320, .05, 'square', .06); tone(1760, .08, 'square', .06, 0, .05); },
-  dash: () => noise(.18, .14, 1800, 0, .6),
+  dash: () => { // airy whoosh: a filtered noise sweep up then down, plus a soft low thump
+    const t = AC.currentTime, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = NOISE; f.type = 'bandpass'; f.Q.value = 1.4; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2600, t + .07); f.frequency.exponentialRampToValueAtTime(700, t + .2);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.16, t + .04); g.gain.exponentialRampToValueAtTime(.001, t + .22);
+    s.connect(f); f.connect(g); g.connect(SFXG); s.start(t); s.stop(t + .25);
+    tone(150, .09, 'sine', .07, 70);
+  },
   level: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .18, 'triangle', .14, 0, i * .07)),
   skill: () => { tone(300, .2, 'sawtooth', .12, 900); noise(.15, .1, 2500); },
   ult: () => { tone(110, .6, 'sawtooth', .16, 440); noise(.5, .18, 1500, 0, .5); [0, 4, 7, 12].forEach((n, i) => tone(392 * Math.pow(2, n / 12), .25, 'square', .06, 0, .1 + i * .06)); },
@@ -1382,6 +1388,7 @@ function damageEnemy(e, amt, kx = 0, ky = 0) {
   if (e.dead) return;
   const crit = Math.random() < ST.crit;
   if (crit) amt *= 2;
+  if (e.markT > G.now) amt *= 1.3;
   if (e.hidden) return;
   if (has('scope') && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 > 250 * 250) amt *= 1.3;
   if (__wsrc === 'lightning' && syn('superconductor') && e.slowT > 0) { amt *= 3; burst(e.x, e.y, '#cff4ff', 5); }
@@ -1410,7 +1417,7 @@ function killEnemy(e, silent) {
   e.dead = true;
   if (silent) { burst(e.x, e.y, e.color, 4); flashGlow(e.x, e.y, e.r * 2.6, e.color, .3); return; }
   G.kills++; run.kills++; S.stats.kills++;
-  G.combo++; G.comboT = 2.5; sfx('kill'); P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.4 : 1));
+  G.combo++; G.comboT = 2.5; sfx('kill'); if (!(G.ultLock > G.now)) P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.4 : 1));
   if (!e.boss) deathFx(e);
   if (twist('reaper') && !e.boss) addXp(xpNeed(run.level) / (6 + run.level * 1.2));
   else if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
@@ -2352,6 +2359,227 @@ Object.assign(ULTS, {
   juggernaut() { for (let i = 0; i < 3; i++) G.areas.push({ kind: 'quake', x: P.x, y: P.y, t: .1 + i * .35, r: 180 + i * 90, dmg: uDmg(70), c: '#d08a5a' }); },
 });
 
+/* ================= ABILITY OVERHAUL: cinematic ultimates, two-sided class skills ================= */
+// Small timer helpers so abilities can unfold over a few seconds (pauses with the game).
+function later(d, fn) { (G.timers = G.timers || []).push({ t: d, fn }); }
+function every(dur, gap, fn) { (G.timers = G.timers || []).push({ t: 0, gap, left: dur, fn, rep: true }); }
+function timerTick(dt) {
+  if (!G.timers || !G.timers.length) return;
+  const list = G.timers; G.timers = [];
+  for (const T of list) {
+    if (!G || mode !== 'fight') return;
+    if (T.rep) { T.t -= dt; T.left -= dt; while (T.t <= 0 && T.left > -T.gap) { T.t += T.gap; T.fn(); if (!G) return; } if (T.left > 0) G.timers.push(T); }
+    else if ((T.t -= dt) <= 0) { T.fn(); if (!G) return; }
+    else G.timers.push(T);
+  }
+}
+const liveOn = () => G.enemies.filter(e => !e.dead && !e.hidden && onScr(e));
+const U = b => uDmg(b) * 1.6;
+// Every ultimate opens with the same beat: a slow-motion moment, a white flash and shockwave rings.
+function ultCine(c) {
+  G.slow = Math.max(G.slow || 0, .4); hitstop(.07); screenFlash('#ffffff', .5, .35); addShake(.65);
+  for (let i = 0; i < 3; i++) G.rings.push({ x: P.x, y: P.y, r: 10, max: 240 + i * 170, t: .55, color: i ? c : '#ffffff', w: 9 - i * 2, d: i * .08 });
+  flashGlow(P.x, P.y, 300, c, .45); burst(P.x, P.y, c, 46, 2); burst(P.x, P.y, '#ffffff', 16, 1.4);
+  G.tint = { c, t: 1.1, max: 1.1, a: .2 }; P.invul = Math.max(P.invul, 1);
+}
+const bigRing = (x, y, R, c, w = 7) => G.rings.push({ x, y, r: 12, max: R, t: .45, color: c, fill: true, w });
+const ULT_DESC = {
+  knight: 'Three shockwaves blast enemies far away and stagger them. You reflect bullets for 4s.',
+  ranger: 'Arrows rain on every enemy on screen for 4.5s.',
+  mage: 'A giant meteor hits the biggest crowd, then a meteor shower follows.',
+  bomber: 'Three rings of bombs explode outward, then one huge blast at your feet.',
+  pyro: 'Waves of flame roll across the screen and leave the ground burning.',
+  vampire: 'A blood moon rises: everything on screen bleeds for 4.5s and you heal from it.',
+  cryo: 'Freezes the whole screen, then shatters frozen enemies for huge damage.',
+  storm: 'Lightning strikes enemies all over the screen for 4s and chains between them.',
+  ranger2: 'Twelve giant boomerangs and a vortex drag everything into a blender.',
+  gambler: 'Rolls another class\'s ultimate, with a 50% chance of a second one and some gold.',
+  reaper: 'Three death tolls execute weak enemies on screen and heal you per kill.',
+  sentinel: 'Five seconds untouchable, four turrets around you, and reflected bullets.',
+  juggernaut: 'Four earthquakes rip outward across the screen and stun enemies.',
+};
+Object.assign(ULT_NAMES, { knight: 'Aegis Cataclysm', ranger: 'Arrow Storm', mage: 'Meteor Shower', bomber: 'Carpet Bomb', pyro: 'Firestorm', vampire: 'Blood Moon', cryo: 'Absolute Zero', storm: 'Thunderstorm', ranger2: 'Cyclone', gambler: 'Jackpot', reaper: 'Death Toll', sentinel: 'Fortress', juggernaut: 'Earthquake' });
+const ULT_COLOR = { knight: '#9fb4ff', ranger: '#c8ffb0', mage: '#ff9a4a', bomber: '#ffb040', pyro: '#ff6a20', vampire: '#ff3a6a', cryo: '#9fe8ff', storm: '#fff47a', ranger2: '#e0b070', gambler: '#ffd24a', reaper: '#d0d8e8', sentinel: '#7fd0ff', juggernaut: '#d08a5a' };
+Object.assign(ULTS, {
+  knight() {
+    P.mirror = Math.max(P.mirror, 4); P.invul = Math.max(P.invul, 1.6);
+    G.eb = G.eb.filter(b => Math.hypot(b.x - P.x, b.y - P.y) > 560);
+    for (let i = 0; i < 3; i++) later(.12 + i * .28, () => {
+      const R = 260 + i * 150; bigRing(P.x, P.y, R, i === 2 ? '#ffffff' : '#bfd0ff', 9); addShake(.45); sfx('boom'); decal(P.x, P.y, 60, '#000000', 'scorch');
+      for (const e of G.enemies) { if (e.dead) continue; const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; if (d < R + e.r) { damageEnemy(e, U(60), (e.x - P.x) / d * 1100, (e.y - P.y) / d * 1100); e.slowT = Math.max(e.slowT, 1.4); e.slowAmt = Math.max(e.slowAmt || 0, e.boss ? .3 : .75); } }
+    });
+  },
+  ranger() {
+    every(4.5, .045, () => {
+      const L = liveOn(), t = L.length ? pick(L) : null;
+      const x = t ? t.x + (Math.random() - .5) * 30 : P.x + (Math.random() - .5) * 700, y = t ? t.y + (Math.random() - .5) * 30 : P.y + (Math.random() - .5) * 500;
+      G.projs.push({ x, y: y - 340, vx: 0, vy: 1050, r: 6, dmg: U(15), pierce: 3, life: .33, color: '#c8ffb0', hits: new Set(), kind: 'knife', mark: 4 });
+    });
+  },
+  mage() {
+    let best = null, bn = -1;
+    for (const e of liveOn()) { let n = e.boss ? 25 : 0; for (const f of G.enemies) if ((f.x - e.x) ** 2 + (f.y - e.y) ** 2 < 50000) n++; if (n > bn) { bn = n; best = e; } }
+    const bx = best ? best.x : P.x + P.fx * 220, by = best ? best.y : P.y + P.fy * 220;
+    G.areas.push({ kind: 'meteor', x: bx, y: by, t: .85, max: .85, r: 250, dmg: U(200), c: '#ff9a4a' });
+    later(.9, () => { bigRing(bx, by, 330, '#ffd060', 10); addShake(.7); screenFlash('#ff9a4a', .3, .3); });
+    every(2.6, .18, () => { const L = liveOn(), t = L.length ? pick(L) : null; const x = t ? t.x : P.x + (Math.random() - .5) * 700, y = t ? t.y : P.y + (Math.random() - .5) * 500; G.areas.push({ kind: 'meteor', x, y, t: .7, max: .7, r: 105, dmg: U(65) }); });
+  },
+  bomber() {
+    G.eb = G.eb.filter(b => Math.hypot(b.x - P.x, b.y - P.y) > 300);
+    [[170, 9], [330, 15], [490, 21]].forEach(([d, n], ring) => { for (let k = 0; k < n; k++) { const a = k / n * 6.283 + ring * .4; G.areas.push({ kind: 'meteor', x: clamp(P.x + Math.cos(a) * d, 20, WORLD - 20), y: clamp(P.y + Math.sin(a) * d, 20, WORLD - 20), t: .45 + ring * .3 + k * .01, max: .45 + ring * .3 + k * .01, r: 100, dmg: U(45), c: '#ffb040' }); } });
+    later(1.5, () => { explodeAt(P.x, P.y, 340, U(90), '#fff2a0'); bigRing(P.x, P.y, 420, '#ffb040', 12); addShake(.8); screenFlash('#ffd080', .4, .35); });
+  },
+  pyro() {
+    for (let i = 0; i < 3; i++) later(i * .3, () => { const R = 330 + i * 130; G.rings.push({ x: P.x, y: P.y, r: 20, max: R, t: .6, color: i ? '#ff6a20' : '#ffd060', fill: true, w: 10 }); addShake(.35); for (const e of G.enemies) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < R + e.r) damageEnemy(e, U(38)); });
+    for (let i = 0; i < 16; i++) { const a = i / 16 * 6.283, d = 110 + (i % 3) * 120; G.areas.push({ kind: 'fire', x: clamp(P.x + Math.cos(a) * d, 20, WORLD - 20), y: clamp(P.y + Math.sin(a) * d, 20, WORLD - 20), t: 4.5, r: 60, dmg: uDmg(9), evo: true }); }
+  },
+  vampire() {
+    G.tint = { c: '#a0001a', t: 4.6, max: 4.6, a: .22 };
+    let healed = 0;
+    every(4.5, .5, () => {
+      const L = liveOn(); G.rings.push({ x: P.x, y: P.y, r: 20, max: 560, t: .45, color: '#ff3a6a', w: 4 });
+      for (const e of L) { damageEnemy(e, U(13)); if (fxq() && Math.random() < .4) part({ k: 'spark', x: e.x, y: e.y, vx: (P.x - e.x) * 1.5, vy: (P.y - e.y) * 1.5, t: .5, max: .5, c: '#ff3a6a', r: 2.5, drag: .99 }); }
+      const h = Math.min(8, L.length * .6); if (healed < 45) { P.hp = Math.min(ST.maxHp, P.hp + h); healed += h; }
+      for (let i = 0; i < 2; i++) shoot(P.x, P.y, Math.random() * 6.283, 320, 7, U(10), 3, 2.5, '#ff5c8a', { kind: 'bat', heal: .5 });
+    });
+  },
+  cryo() {
+    G.eb = []; G.tint = { c: '#bff4ff', t: 3.4, max: 3.4, a: .16 };
+    const frozen = liveOn();
+    for (const e of frozen) { e.slowT = e.boss ? 3 : 3.4; e.slowAmt = e.boss ? .6 : 1; damageEnemy(e, U(18)); }
+    later(3.2, () => { sfx('crit'); addShake(.6); screenFlash('#ffffff', .35, .3); for (const e of frozen) if (!e.dead) { damageEnemy(e, U(85)); burst(e.x, e.y, '#dff8ff', 10, 1.2); chunks(e.x, e.y, '#bfefff', 4); } });
+  },
+  storm() {
+    G.tint = { c: '#20244a', t: 4.2, max: 4.2, a: .3 };
+    every(4, .07, () => {
+      const L = liveOn(); if (!L.length) return; const t = pick(L);
+      zap(t.x, t.y - 460, t.x, t.y, 3.5); explodeAt(t.x, t.y, 65, U(26), '#fff47a');
+      const n = G.enemies.find(f => f !== t && !f.dead && !f.hidden && Math.hypot(f.x - t.x, f.y - t.y) < 200); if (n) { zap(t.x, t.y, n.x, n.y, 2); damageEnemy(n, U(14)); }
+    });
+  },
+  ranger2() {
+    for (let k = 0; k < 12; k++) { const a = k / 12 * 6.283; shoot(P.x, P.y, a, 520, 26, U(30), 1e9, 3, '#e0b070', { kind: 'boom', bt: 0, ba: a, spd: 520, pull: true, slow: 1.5 }); }
+    G.areas.push({ kind: 'hole', x: P.x, y: P.y, t: 2.6, max: 2.6, r: 330, dmg: sDmg(14) });
+  },
+  reaper() {
+    let heal = 0;
+    for (let i = 0; i < 3; i++) later(i * .5, () => {
+      screenFlash('#10141c', .45, .35); sfx('boss'); G.rings.push({ x: P.x, y: P.y, r: 20, max: 620, t: .5, color: '#d0d8e8', w: 5 });
+      for (const e of liveOn()) {
+        if (!e.boss && e.hp / e.maxHp < .45) { G.slashes.push({ x: e.x, y: e.y, a: Math.random() * 6, t: .3, c: '#ffffff', r: e.r + 14 }); killEnemy(e); if (heal < 25) { P.hp = Math.min(ST.maxHp, P.hp + 1); heal++; } }
+        else { damageEnemy(e, (e.maxHp - e.hp) * (e.boss ? .05 : .3) + U(e.boss ? 45 : 25)); G.slashes.push({ x: e.x, y: e.y, a: Math.random() * 6, t: .25, c: '#d0d8e8', r: e.r + 8 }); }
+      }
+    });
+  },
+  sentinel() {
+    P.fortress = 5; P.invul = Math.max(P.invul, 5); P.mirror = Math.max(P.mirror, 5);
+    for (let i = 0; i < 4; i++) { const a = i / 4 * 6.283 + .785; G.turrets.push({ x: clamp(P.x + Math.cos(a) * 70, 20, WORLD - 20), y: clamp(P.y + Math.sin(a) * 70, 20, WORLD - 20), t: 6, cd: i * .07 }); }
+  },
+  juggernaut() {
+    for (let i = 0; i < 4; i++) G.areas.push({ kind: 'quake', x: P.x, y: P.y, t: .05 + i * .3, r: 200 + i * 130, dmg: U(45), c: '#d08a5a' });
+  },
+});
+ULTS.gambler = () => {
+  const ks = Object.keys(ULTS).filter(k => k !== 'gambler' && !CHARS[k].twist);
+  const a = pick(ks); ULTS[a](); popText(P.x, P.y - 40, ULT_NAMES[a], '#ffd24a', true);
+  if (Math.random() < .5) later(1, () => { const b = pick(ks); ULTS[b](); popText(P.x, P.y - 40, ULT_NAMES[b] + '!', '#ffd24a', true); });
+  run.gold += 15; for (let i = 0; i < 8; i++) G.pick.push({ x: P.x + (Math.random() - .5) * 60, y: P.y + (Math.random() - .5) * 60, v: 2, gold: true, mag: true });
+};
+useUlt = function () {
+  if (mode !== 'fight' || paused || G.ending || P.ult < 100) return;
+  const c = ULT_COLOR[run.char] || P.color;
+  P.ult = 0; G.ultLock = G.now + 5; ultCine(c); ULTS[run.char]();
+  setBanner(ULT_NAMES[run.char].toUpperCase(), 1.4, c, 'ULTIMATE');
+};
+
+/* ----- class skills: smaller than ultimates, but each does two things ----- */
+Object.assign(SKILLS.knight,   { desc: 'Shove nearby enemies back, then reflect bullets for 2s. Ends with a shield bash.' });
+Object.assign(SKILLS.ranger,   { desc: 'Hop backwards and fire a fan of arrows. Hit enemies are marked and take 30% more damage for 4s.' });
+Object.assign(SKILLS.mage,     { desc: 'Teleport forward with a blast at both ends. The spot you left becomes a small rift that pulls enemies in.' });
+Object.assign(SKILLS.bomber,   { desc: 'Sucks enemies in, explodes, then scatters 5 bomblets.' });
+Object.assign(SKILLS.pyro,     { desc: 'Breathe fire for 1.5s. Leaves burning ground where it lands.' });
+Object.assign(SKILLS.vampire,  { desc: '8 bats hunt enemies and heal you. You turn to mist: brief invulnerability and +30% speed for 2s.' });
+Object.assign(SKILLS.cryo,     { desc: 'Freeze every enemy near you and fire 8 ice shards that slow what they hit.' });
+Object.assign(SKILLS.storm,    { desc: '3s field that zaps enemies, erases bullets and speeds you up. Ends with a discharge.' });
+Object.assign(SKILLS.ranger2,  { desc: 'A giant boomerang that drags enemies along and slows them.' });
+Object.assign(SKILLS.gambler,  { desc: 'A random class skill. 30% chance to refund half the cooldown.' });
+Object.assign(SKILLS.reaper,   { desc: 'Execute weakened enemies near you and heal from them. Harvest 3+ for a soul shield that blocks one hit.' });
+Object.assign(SKILLS.sentinel, { desc: 'Deploy two turrets and raise a reflective barrier for 2s.' });
+Object.assign(SKILLS.juggernaut,{ desc: 'Charge forward, flattening everything in your way, then stomp.' });
+const KN = SKILL_FX.knight, RA = SKILL_FX.ranger, MA = SKILL_FX.mage, BO = SKILL_FX.bomber, VA = SKILL_FX.vampire, CR = SKILL_FX.cryo, ST0 = SKILL_FX.storm, RE = SKILL_FX.reaper, SE = SKILL_FX.sentinel, JU = SKILL_FX.juggernaut;
+Object.assign(SKILL_FX, {
+  knight() {
+    KN(); P.mirror = 2.2;
+    for (const e of G.enemies) { if (e.dead) continue; const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; if (d < 140 + e.r) { damageEnemy(e, sDmg(18), (e.x - P.x) / d * 700, (e.y - P.y) / d * 700); e.slowT = Math.max(e.slowT, 1); e.slowAmt = Math.max(e.slowAmt || 0, .5); } }
+    later(2.2, () => { explodeAt(P.x, P.y, 150, sDmg(45), '#bfd0ff'); });
+  },
+  ranger() {
+    const a = Math.atan2(P.fy, P.fx);
+    P.dashT = .12; P.dvx = -P.fx * 700; P.dvy = -P.fy * 700; P.invul = Math.max(P.invul, .2);
+    for (let i = 0; i < 11; i++) shoot(P.x, P.y, a + (i - 5) * .11, 640, 5, sDmg(28), 4, 1, '#c8ffb0', { kind: 'knife', mark: 4 });
+  },
+  mage() { const ox = P.x, oy = P.y; MA(); G.areas.push({ kind: 'hole', x: ox, y: oy, t: 1.6, max: 1.6, r: 170, dmg: sDmg(6) }); },
+  bomber() {
+    BO(); const tx = G.areas[G.areas.length - 1];
+    later(1.35, () => { for (let i = 0; i < 5; i++) { const a = i / 5 * 6.283 + Math.random() * .5, d = 90 + Math.random() * 60; G.areas.push({ kind: 'boom', x: clamp(tx.x + Math.cos(a) * d, 20, WORLD - 20), y: clamp(tx.y + Math.sin(a) * d, 20, WORLD - 20), t: .25 + i * .08, r: 70, dmg: sDmg(32), c: '#ffb040' }); } });
+  },
+  pyro() { P.breath = 1.5; every(1.5, .25, () => { G.areas.push({ kind: 'fire', x: clamp(P.x + P.fx * 170, 20, WORLD - 20), y: clamp(P.y + P.fy * 170, 20, WORLD - 20), t: 2.5, r: 45, dmg: sDmg(5), evo: true }); }); },
+  vampire() { VA(); P.invul = Math.max(P.invul, .6); P.hasteT = 2; burst(P.x, P.y, '#ff5c8a', 18, 1.2); },
+  cryo() { CR(); for (let i = 0; i < 8; i++) shoot(P.x, P.y, i / 8 * 6.283 + .2, 520, 7, sDmg(20), 4, .9, '#cff4ff', { kind: 'knife', slow: 1.8 }); },
+  storm() { ST0(); P.hasteT = 3; later(3, () => { explodeAt(P.x, P.y, 190, sDmg(55), '#fff47a'); for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283; zap(P.x, P.y, P.x + Math.cos(a) * 190, P.y + Math.sin(a) * 190, 2); } }); },
+  ranger2() { shoot(P.x, P.y, Math.atan2(P.fy, P.fx), 520, 30, sDmg(45), 1e9, 3, '#e0b070', { kind: 'boom', bt: 0, ba: Math.atan2(P.fy, P.fx), spd: 520, pull: true, slow: 1.5 }); },
+  reaper() { const n0 = run.kills; RE(); if (run.kills - n0 >= 3 && !P.bubble) { P.bubble = true; popText(P.x, P.y - 34, 'SOUL SHIELD', '#d0d8e8', true); } },
+  sentinel() { SE(); P.mirror = Math.max(P.mirror, 2); },
+  juggernaut() { JU(); later(.42, () => { explodeAt(P.x, P.y, 135, sDmg(50), '#d08a5a'); addShake(.3); for (const e of G.enemies) if (!e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 150) { e.slowT = Math.max(e.slowT, 1.2); e.slowAmt = Math.max(e.slowAmt || 0, .7); } }); },
+});
+SKILL_FX.gambler = () => {
+  const k = pick(Object.keys(SKILL_FX).filter(k => k !== 'gambler' && !CHARS[k].twist)); SKILL_FX[k](); popText(P.x, P.y - 30, SKILLS[k].name, '#ffd24a', true);
+  if (Math.random() < .3) { P.skillCd *= .5; later(.3, () => popText(P.x, P.y - 44, 'LUCKY! Cooldown halved', '#ffd24a', true)); }
+};
+
+/* ----- Rift Arts: the weaker ones got a second job ----- */
+Object.assign(ARTS.decoy, { cd: 16, desc: 'You turn invisible while a running decoy pulls enemies toward it for 5s, then explodes. Bosses aren\'t fooled.' });
+Object.assign(ARTS.turret, { desc: 'Drop a turret that fires for 8s and slows enemies near it.' });
+Object.assign(ARTS.heal, { desc: 'Heal 30% HP over 3s, knock enemies back, and run 30% faster while it lasts.' });
+Object.assign(ARTS.nova, { desc: 'A huge blast that also clears bullets and makes you untouchable for 1s.' });
+Object.assign(ART_FX, {
+  decoy() {
+    const a = Math.atan2(-P.fy, -P.fx) + (Math.random() - .5) * 1.2;
+    G.decoy = { x: P.x, y: P.y, t: 5, max: 5, a, zT: 0 }; P.invis = 5;
+    burst(P.x, P.y, '#ff7ab8', 24, 1.2); G.rings.push({ x: P.x, y: P.y, r: 10, max: 90, t: .35, color: '#ff7ab8', w: 4 });
+  },
+  turret() { G.turrets.push({ x: P.x, y: P.y, t: 8, cd: 0, slowF: true }); },
+  heal() { P.healT = 3; P.hasteT = 3; for (const e of G.enemies) { if (e.dead || e.boss) continue; const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; if (d < 170) { e.kx += (e.x - P.x) / d * 600; e.ky += (e.y - P.y) / d * 600; } } G.rings.push({ x: P.x, y: P.y, r: 10, max: 170, t: .4, color: '#5ee08a', w: 5 }); },
+  nova() { explodeAt(P.x, P.y, 270, sDmg(110), '#fff2a0'); G.eb = G.eb.filter(b => Math.hypot(b.x - P.x, b.y - P.y) > 300); screenFlash('#fff2a0', .35, .4); P.invul = Math.max(P.invul, 1); },
+});
+function decoyTick(dt) {
+  const D = G.decoy; if (!D) return;
+  D.t -= dt; D.a += Math.sin(G.now * 1.9) * dt * 1.8;
+  const nx = D.x + Math.cos(D.a) * 155 * dt, ny = D.y + Math.sin(D.a) * 155 * dt;
+  if (nx < 50 || nx > WORLD - 50) D.a = Math.PI - D.a; if (ny < 50 || ny > WORLD - 50) D.a = -D.a;
+  D.x = clamp(nx, 50, WORLD - 50); D.y = clamp(ny, 50, WORLD - 50);
+  for (const e of G.enemies) if (!e.dead && !e.boss) { const dx = D.x - e.x, dy = D.y - e.y, d = Math.hypot(dx, dy) || 1; if (d < 320 && d > 26) { e.x += dx / d * 75 * dt; e.y += dy / d * 75 * dt; } }
+  if ((D.zT -= dt) <= 0) { D.zT = .9; G.rings.push({ x: D.x, y: D.y, r: 320, max: 20, t: .5, color: '#ff7ab8', w: 3 }); }
+  if (D.t <= 0) { explodeAt(D.x, D.y, 200, sDmg(120), '#ff7ab8'); addShake(.35); G.decoy = null; P.invis = 0; burst(P.x, P.y, '#ff7ab8', 14); }
+}
+function drawDecoy(q) {
+  const D = G.decoy; if (!D) return;
+  const ox = P.x, oy = P.y, og = G.ghosts, ot = P.trail, ofx = P.fx, ofy = P.fy, om = P.moving;
+  P.x = D.x; P.y = D.y; G.ghosts = []; P.trail = []; P.fx = Math.cos(D.a); P.fy = Math.sin(D.a); P.moving = true;
+  drawPlayer(q); // drawn as the decoy
+  P.x = ox; P.y = oy; G.ghosts = og; P.trail = ot; P.fx = ofx; P.fy = ofy; P.moving = om;
+  cx.strokeStyle = rgba('#ff7ab8', .7); cx.lineWidth = 2; cx.setLineDash([5, 5]); cx.beginPath(); cx.arc(D.x, D.y, P.r + 9, G.now * 3, G.now * 3 + 6.283); cx.stroke(); cx.setLineDash([]);
+}
+// One short line the first time you meet each boss.
+const BOSS_TIPS = {
+  colossus: 'The Colossus winds up before it charges. Step aside, and dodge the falling boulders.',
+  queen: 'The Hive Queen lays eggs that hatch into elites. Break the eggs fast.',
+  eye: 'The Void Eye\'s Gaze hits everywhere except the safe circles. Stand in one when the screen turns purple.',
+  mitosis: 'The Mitosis splits in two at half health, twice. Keep moving out of its acid puddles.',
+  phantom: 'The Phantom blinks beside you and leaves echoes that explode a moment later. Its fading clones shoot too, so focus the solid one.',
+  herald: 'The Rift Herald is shielded while 2+ portals stand. Break the portals, then hit it.',
+};
+
 /* ================= NEW ENEMIES ================= */
 Object.assign(ENEMIES, {
   dasher: { hp: 26, spd: 70, dmg: 10, r: 11, xp: 2, color: '#ff8a5a' },
@@ -2501,7 +2729,7 @@ function update(dt) {
   P.moving = ml > 0;
   if (ml) { mx /= ml; my /= ml; P.fx = mx; P.fy = my; P.walk += dt; }
   if (P.dashT > 0) { P.dashT -= dt; P.x += P.dvx * dt; P.y += P.dvy * dt; G.ghosts.push({ x: P.x, y: P.y, t: .28 }); }
-  else { const sp = ST.speed * (1 - (P.slowed || 0)); P.x += mx * sp * dt; P.y += my * sp * dt; }
+  else { const sp = ST.speed * (1 - (P.slowed || 0)) * (P.hasteT > 0 ? 1.3 : 1); P.x += mx * sp * dt; P.y += my * sp * dt; }
   P.x = clamp(P.x, P.r, WORLD - P.r); P.y = clamp(P.y, P.r, WORLD - P.r);
   if (P.charge > 0) { P.charge -= dt; P.x = clamp(P.x + P.fx * 760 * dt, P.r, WORLD - P.r); P.y = clamp(P.y + P.fy * 760 * dt, P.r, WORLD - P.r); G.ghosts.push({ x: P.x, y: P.y, t: .25 }); for (const e of G.enemies) if (!e.dead && e.orbitT <= G.now && Math.hypot(e.x - P.x, e.y - P.y) < e.r + 34) { e.orbitT = G.now + .3; damageEnemy(e, sDmg(55), P.fx * 500, P.fy * 500); burst(e.x, e.y, '#d08a5a', 6); } }
   if (G.props) pushOut(P, P.r);
@@ -2512,7 +2740,7 @@ function update(dt) {
   if (mode !== 'fight') return;
   P.ult = Math.min(100, P.ult + 2.4 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
   if (has('bloodrage') && (G.nearT = (G.nearT || 0) - dt) <= 0) { G.nearT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 < 150 * 150) n++; G.nearN = n; }
-  P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt;
+  P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt; if (P.hasteT > 0) P.hasteT -= dt; if (P.invis > 0) P.invis -= dt;
   if (P.healT > 0) { P.healT -= dt; P.hp = Math.min(ST.maxHp, P.hp + ST.maxHp * .1 * dt); if (Math.random() < dt * 10) burst(P.x, P.y, '#5ee08a', 1, .3); }
   if (P.breath > 0) {
     P.breath -= dt; const fa = Math.atan2(P.fy, P.fx);
@@ -2521,9 +2749,10 @@ function update(dt) {
   }
   if (P.field > 0) { P.field -= dt; if ((P.fieldT -= dt) <= 0) { P.fieldT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && n < 6 && Math.hypot(e.x - P.x, e.y - P.y) < 170) { n++; zap(P.x, P.y, e.x, e.y, 1.5); damageEnemy(e, sDmg(16)); } } }
   P.slowed = 0; mapUpdate(dt); petUpdate(dt); goalUpdate(dt); hintTick(dt);
-  for (const T of G.turrets) { T.t -= dt; if ((T.cd -= dt) <= 0) { const e = nearest(T.x, T.y, 450); if (e) { T.cd = .3; shoot(T.x, T.y - 18, Math.atan2(e.y - T.y + 18, e.x - T.x), 520, 5, sDmg(16), 1, 1, '#7fe3ff'); } } }
+  for (const T of G.turrets) { if (T.slowF) for (const e of G.enemies) if (!e.dead && (e.x - T.x) ** 2 + (e.y - T.y) ** 2 < 150 * 150) { e.slowT = Math.max(e.slowT, .3); e.slowAmt = Math.max(e.slowAmt || 0, e.boss ? .2 : .45); }
+    T.t -= dt; if ((T.cd -= dt) <= 0) { const e = nearest(T.x, T.y, 450); if (e) { T.cd = .3; shoot(T.x, T.y - 18, Math.atan2(e.y - T.y + 18, e.x - T.x), 520, 5, sDmg(16), 1, 1, '#7fe3ff'); } } }
   G.turrets = G.turrets.filter(T => T.t > 0);
-  if (G.decoy && (G.decoy.t -= dt) <= 0) { explodeAt(G.decoy.x, G.decoy.y, 170, sDmg(100), '#ff7ab8'); G.decoy = null; }
+  decoyTick(dt); timerTick(dt); if (!G) return;
   if (G.timeStop > 0) G.timeStop -= dt;
   if (G.gaze) { const z = G.gaze; z.t -= dt; if (z.t <= 0) { G.gaze = null; screenFlash('#c040ff', .7, .6); addShake(.7); if (!z.safe.some(c => Math.hypot(P.x - c.x, P.y - c.y) < c.r) && P.dashT <= 0) hurt(z.dmg); } }
   for (const w of G.waves) { w.r += w.spd * dt; if (!w.hit && Math.abs(Math.hypot(P.x - w.x, P.y - w.y) - w.r) < w.w / 2 + P.r && P.dashT <= 0) { w.hit = true; hurt(w.dmg); } }
@@ -2643,6 +2872,7 @@ function update(dt) {
       if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < (e.r + p.r) ** 2) {
         p.hits.add(e); const v = Math.hypot(p.vx, p.vy) || 1;
         __petSrc = p.pet || null; __wsrc = p.src || null; damageEnemy(e, p.dmg, p.vx / v * 120, p.vy / v * 120); __petSrc = null; __wsrc = null; if (p.heal) P.hp = Math.min(ST.maxHp, P.hp + p.heal);
+        if (p.mark) e.markT = G.now + p.mark; if (p.slow) { e.slowT = Math.max(e.slowT, p.slow); e.slowAmt = Math.max(e.slowAmt || 0, e.boss ? .25 : .5); }
         if (p.kind === 'rico' && !p.ret) { ricoBounce(p, e); break; }
         if (p.color === '#c9a8ff' && !p.child && syn('spellblades')) for (let k = 0; k < 3; k++) shoot(e.x, e.y, Math.random() * 6.283, 420, 4, p.dmg * .45, 2, .7, '#e8f0ff', { kind: 'bat', child: true });
         if (p.kind !== 'boom') burst(p.x, p.y, p.color, 2, .5);
@@ -2737,6 +2967,7 @@ function fxTick(dt) {
   for (const d of G.decals) d.t -= dt; if (G.decals.length && G.decals[0].t <= 0) G.decals = G.decals.filter(d => d.t > 0);
   for (const g of G.ghosts) g.t -= dt; G.ghosts = G.ghosts.filter(g => g.t > 0);
   if (G.flash) { G.flash.t -= dt; if (G.flash.t <= 0) G.flash = null; }
+  if (G.tint) { G.tint.t -= dt; if (G.tint.t <= 0) G.tint = null; }
   G.trauma = Math.max(0, G.trauma - dt * 1.6);
   if (G.hpLag > P.hp) G.hpLag = Math.max(P.hp, G.hpLag - ST.maxHp * .5 * dt); else G.hpLag = P.hp;
   const bf = G.boss ? bossFrac() : 0;
@@ -2994,7 +3225,7 @@ function showBuild(back) {
   const ar = run.art && ARTS[run.art] ? row(ARTS[run.art].icon, ARTS[run.art].name, ARTS[run.art].desc, 'R') : '';
   screen(`<h2>📋 Your Build</h2>
     <div class="bar"><span class="it">💪 Damage ${pct(st.might)}</span><span class="it">⏱️ Cooldown ${pct(st.cdMul)}</span><span class="it">🌀 Area ${pct(st.area)}</span><span class="it">🎯 Crit ${pct(st.crit)}</span><span class="it">🛡️ Armor ${st.armor}</span><span class="it">👟 Speed ${Math.round(st.speed)}</span><span class="it">🧲 Pickup ${Math.round(st.magnet)}</span></div>
-    <div class="buildg"><div class="panel"><h3>Weapons</h3>${ws}${ar ? '<h3>Rift Art</h3>' + ar : ''}${sy ? '<h3>Synergies</h3>' + sy : ''}</div>
+    <div class="buildg"><div class="panel"><h3>Abilities</h3>${row(SKILLS[run.char].icon, SKILLS[run.char].name, SKILLS[run.char].desc, 'E')}${row('💥', ULT_NAMES[run.char], ULT_DESC[run.char] || '', 'Q')}<h3>Weapons</h3>${ws}${ar ? '<h3>Rift Art</h3>' + ar : ''}${sy ? '<h3>Synergies</h3>' + sy : ''}</div>
     <div class="panel"><h3>Passives</h3>${ps || '<small>None yet</small>'}<h3>Relics</h3>${rs || '<small>None yet</small>'}</div></div>
     <div class="col" style="margin-top:12px"><button class="opt" data-a="0" data-n="1">← Back (Esc)<kbd>1</kbd></button></div>`, [back], 'overlay', k => { if (k === 'escape') { back(); return true; } });
 }
@@ -3409,9 +3640,10 @@ function render(dt) {
   }
   norm();
   for (const e of G.enemies) if (vis(e.x, e.y, e.r + 30)) drawEnemy(e, q);
-  drawPlayer(q);
+  if (P.invis > 0 && mode === 'fight') { cx.globalAlpha = .5 + .15 * Math.sin(G.now * 10); cx.strokeStyle = P.color; cx.lineWidth = 2.5; cx.setLineDash([4, 6]); cx.beginPath(); cx.arc(P.x, P.y, P.r + 2, -G.now * 2, -G.now * 2 + 6.283); cx.stroke(); cx.setLineDash([]); cx.fillStyle = rgba(P.color, .28); cx.beginPath(); cx.arc(P.x, P.y, P.r, 0, 6.283); cx.fill(); norm(); }
+  else drawPlayer(q);
   for (const T of G.turrets) { cx.fillStyle = '#2a3450'; cx.strokeStyle = '#7fe3ff'; cx.lineWidth = 2; rr(T.x - 9, T.y - 24, 18, 26, 4); cx.fill(); cx.stroke(); add(); glow(T.x, T.y - 22, 14, '#7fe3ff', .7 + .3 * Math.sin(t * 10)); norm(); }
-  if (G.decoy) { const D = G.decoy; cx.globalAlpha = .55 + .25 * Math.sin(t * 12); cx.fillStyle = P.color; cx.beginPath(); cx.arc(D.x, D.y, P.r, 0, 6.283); cx.fill(); cx.globalAlpha = 1; cx.strokeStyle = '#ff7ab8'; cx.lineWidth = 2; cx.beginPath(); cx.arc(D.x, D.y, P.r + 6 + Math.sin(t * 8) * 3, 0, 6.283); cx.stroke(); }
+  drawDecoy(q);
   drawPetsWorld(t, q);
   for (const w of run.weapons) if (w.drones) for (const [x, y] of w.drones) { cx.fillStyle = '#2a3450'; cx.strokeStyle = w.evo ? '#bff8ff' : '#7fe3ff'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(x, y - 8); cx.lineTo(x + 8, y); cx.lineTo(x, y + 8); cx.lineTo(x - 8, y); cx.closePath(); cx.fill(); cx.stroke(); cx.fillStyle = cx.strokeStyle; cx.fillRect(x - 2, y - 2, 4, 4); }
   if (P.bubble) { cx.strokeStyle = 'rgba(150,210,255,.7)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(P.x, P.y, P.r + 9, 0, 6.283); cx.stroke(); }
@@ -3556,6 +3788,7 @@ function render(dt) {
   // ---- screen space ----
   cx.setTransform(1, 0, 0, 1, 0, 0); cx.textBaseline = 'alphabetic';
   setVig(G.surge ? .4 + .2 * Math.sin(t * 4) : 0, mode === 'fight' && P.hp / ST.maxHp < .3 ? .5 + .5 * Math.pow(Math.max(0, Math.sin(t * 7)), 6) : 0);
+  if (G.tint) { const T = G.tint; cx.globalAlpha = T.a * Math.min(1, T.t / .4, (T.max - T.t) / .15 + .2); cx.fillStyle = T.c; cx.fillRect(0, 0, VW, VH); norm(); }
   if (G.flash) { cx.globalAlpha = G.flash.a * G.flash.t / G.flash.max; cx.fillStyle = G.flash.c; cx.fillRect(0, 0, VW, VH); norm(); }
   if (mode === 'dead') { cx.globalAlpha = Math.min(.8, G.dying * .55); cx.fillStyle = '#0a0006'; cx.fillRect(0, 0, VW, VH); norm(); }
   if (G.bossIntro > 0) { const k = Math.min(1, (2.2 - G.bossIntro) * 4, G.bossIntro * 3), h = VH * .1 * k; cx.fillStyle = '#000'; cx.fillRect(0, 0, VW, h); cx.fillRect(0, VH - h, VW, h); }
@@ -3961,7 +4194,8 @@ function hintTick(dt) {
   if (G.time < 2 || G.ending) return;
   const key = k => TOUCH.on ? 'Tap ' + k : 'Press ' + k;
   if (P.skillCd <= 0 && G.time > 4) hint('skill', `${key('E')} for your class skill: ${SKILLS[run.char].name}. ${SKILLS[run.char].desc}`);
-  if (P.ult >= 100) hint('ult', `Your ultimate is charged! ${key('Q')} for ${ULT_NAMES[run.char]}.`);
+  if (P.ult >= 100) hint('ult', `Your ultimate is charged! ${key('Q')} for ${ULT_NAMES[run.char]}: ${ULT_DESC[run.char] || ''}`);
+  if (G.boss && G.bossIntro <= 0 && BOSS_TIPS[G.boss.kind]) hint('boss_' + G.boss.kind, BOSS_TIPS[G.boss.kind]);
   if (run.art) hint('art', `${key('R')} to use your Rift Art: ${ARTS[run.art].name}.`);
   if (G.goal && G.goal.key !== 'survive') hint('goal', 'This fight has a goal (top of the screen). Arrows at the edge point to objectives.');
   if (G.enemies.some(e => e.elite && !e.dead)) hint('elite', 'Elites are tough but drop lots of XP. The colored dots under them are extra powers.');
