@@ -1277,7 +1277,7 @@ function startFight(type) {
   ST = calcStats(run);
   const act = run.rush ? 1 + (run.act - 1) * .6 : run.act, row = run.target ? run.target.r : 0;
   // Act 3 and Endless ramp up hard: tougher, hit harder, and every floor of the act gets worse.
-  const actHp = act === 1 ? 1 : act === 2 ? 1.65 : 2.8 * Math.pow(1.6, act - 3);
+  const actHp = act === 1 ? 1 : act === 2 ? 1.75 : 2.95 * Math.pow(1.6, act - 3);
   const actDmg = act === 1 ? 1 : act === 2 ? 1.3 : 1.75 * Math.pow(1.28, act - 3);
   const rowHp = act === 1 ? .05 : act === 2 ? .08 : .1;
   const heatHp = 1 + .15 * run.heat, heatDmg = 1 + .1 * run.heat;
@@ -1292,7 +1292,7 @@ function startFight(type) {
     enemies: [], projs: [], eb: [], pick: [], areas: [], parts: [], texts: [], bolts: [], rings: [], decals: [], ghosts: [], lasers: [], amb: [],
     spawnAcc: 0, swarmT: 13, eliteT, ending: 0, tookDmg: false, boss: null, kills: 0,
     hpMul: (actHp + rowHp * row) * heatHp * (1 + .15 * run.curse) * (has('crown') ? 1.15 : 1), dmgMul: actDmg * heatDmg * (heat(6) ? 1.15 : 1) * (1 + .1 * (run.dmgCurse || 0)),
-    bossHpMul: actHp * heatHp * (1 + .15 * run.curse), xpScale: 1 + .35 * (act - 1), goldScale: 1 + .3 * (act - 1),
+    bossHpMul: actHp * heatHp * (1 + .15 * run.curse) * (run.rush ? 1 : 1.25), xpScale: 1 + .35 * (act - 1), goldScale: 1 + .3 * (act - 1),
     cam: { x: P.x, y: P.y }, zoom: 1.15, trauma: 0, stop: 0, slow: 0, flash: null, intro: .8, hpLag: P.hp, bossLag: 1,
     combo: 0, comboT: 0, surge: false, lvPending: 0, lvDelay: 0, bossIntro: 0, dying: 0, stormT: 4 + Math.random() * 6,
     banner: null };
@@ -1363,7 +1363,7 @@ function spawnTick(dt) {
   if (G.hard && G.type !== 'boss' && !G.surge && prog > .72) {
     G.surge = true; setBanner('⚠️ RIFT SURGE', 2.2, '#ff5060', 'THE RIFT IS COLLAPSING. HOLD ON!'); screenFlash('#ff2040', .3, .5); addShake(.4);
   }
-  const rate = (run.act === 1 ? .8 + 2.4 * prog : 1.2 + 2.8 * prog) * (1 + (G.hard ? .3 : .22) * (run.act - 1)) * (1 + .08 * run.heat) * (G.type === 'boss' ? .45 : 1) * (G.surge ? 1.6 : 1) * (heat(5) ? 1.3 : 1) * (G.goal && gs('gauntlet') ? 1.7 : 1) * (mut('swarm') ? 1.4 : 1) * (G.goal && (gs('defend') || gs('escort')) ? 1.15 : 1);
+  const rate = (run.act === 1 ? .8 + 2.4 * prog : 1.35 + 3.1 * prog) * (1 + (G.hard ? .3 : .22) * (run.act - 1)) * (1 + .08 * run.heat) * (G.type === 'boss' ? .45 : 1) * (G.surge ? 1.6 : 1) * (heat(5) ? 1.3 : 1) * (G.goal && gs('gauntlet') ? 1.7 : 1) * (mut('swarm') ? 1.4 : 1) * (G.goal && (gs('defend') || gs('escort')) ? 1.15 : 1);
   G.spawnAcc += rate * dt;
   const cap = G.hard ? 260 : 230;
   while (G.spawnAcc >= 1) { G.spawnAcc--; if (G.enemies.length < cap) { const [x, y] = spawnPos(); makeEnemy(pickType(), x, y); } }
@@ -1418,7 +1418,7 @@ function killEnemy(e, silent) {
   e.dead = true;
   if (silent) { burst(e.x, e.y, e.color, 4); flashGlow(e.x, e.y, e.r * 2.6, e.color, .3); return; }
   G.kills++; run.kills++; S.stats.kills++;
-  G.combo++; G.comboT = 2.5; sfx('kill'); if (!(G.ultLock > G.now)) P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.1 : .8));
+  G.combo++; G.comboT = 2.5; sfx('kill'); if (!(G.ultLock > G.now)) P.ult = Math.min(100, P.ult + (has('timeshard') ? 1.4 : 1));
   if (!e.boss) deathFx(e);
   if (twist('reaper') && !e.boss) addXp(xpNeed(run.level) / (6 + run.level * 1.2));
   else if (e.xp > 0) G.pick.push({ x: e.x, y: e.y, v: e.xp * G.xpScale, gold: false, mag: false });
@@ -2739,7 +2739,7 @@ function update(dt) {
   P.invul -= dt; P.dashCd -= dt; P.aegisT -= dt;
   if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
   if (mode !== 'fight') return;
-  P.ult = Math.min(100, P.ult + 1.9 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
+  P.ult = Math.min(100, P.ult + 2.4 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
   if (P.ult >= 100 && !G.ultReady) { G.ultReady = true; sfx('ready'); popText(P.x, P.y - 34, 'ULTIMATE READY', ULT_COLOR[run.char] || '#ffd24a', true); G.rings.push({ x: P.x, y: P.y, r: 60, max: 14, t: .4, color: ULT_COLOR[run.char] || '#ffd24a', w: 4 }); } else if (P.ult < 100) G.ultReady = false;
   if (has('bloodrage') && (G.nearT = (G.nearT || 0) - dt) <= 0) { G.nearT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 < 150 * 150) n++; G.nearN = n; }
   P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt; if (P.hasteT > 0) P.hasteT -= dt; if (P.invis > 0) P.invis -= dt;
