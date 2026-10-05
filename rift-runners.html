@@ -1233,6 +1233,7 @@ const SND = {
   laser: () => tone(140, .7, 'sawtooth', .1, 80),
   zap: () => noise(.08, .1, 5000, 0, 4),
   shoot: () => tone(880, .04, 'square', .025, 500),
+  ready: () => [784, 988, 1319].forEach((f, i) => tone(f, .22, 'sine', .1, 0, i * .06)),
 };
 const SND_GAP = { hit: .045, kill: .035, gem: .05, coin: .06, boom: .07, shoot: .07, zap: .06, crit: .08 };
 function sfx(name, arg) {
@@ -2739,6 +2740,7 @@ function update(dt) {
   if (ST.regen) P.hp = Math.min(ST.maxHp, P.hp + ST.regen * dt);
   if (mode !== 'fight') return;
   P.ult = Math.min(100, P.ult + 2.4 * dt * (has('timeshard') ? 1.4 : 1)); rainTick(dt);
+  if (P.ult >= 100 && !G.ultReady) { G.ultReady = true; sfx('ready'); popText(P.x, P.y - 34, 'ULTIMATE READY', ULT_COLOR[run.char] || '#ffd24a', true); G.rings.push({ x: P.x, y: P.y, r: 60, max: 14, t: .4, color: ULT_COLOR[run.char] || '#ffd24a', w: 4 }); } else if (P.ult < 100) G.ultReady = false;
   if (has('bloodrage') && (G.nearT = (G.nearT || 0) - dt) <= 0) { G.nearT = .25; let n = 0; for (const e of G.enemies) if (!e.dead && (e.x - P.x) ** 2 + (e.y - P.y) ** 2 < 150 * 150) n++; G.nearN = n; }
   P.skillCd -= dt; P.artCd -= dt; P.mirror -= dt; if (P.hasteT > 0) P.hasteT -= dt; if (P.invis > 0) P.invis -= dt;
   if (P.healT > 0) { P.healT -= dt; P.hp = Math.min(ST.maxHp, P.hp + ST.maxHp * .1 * dt); if (Math.random() < dt * 10) burst(P.x, P.y, '#5ee08a', 1, .3); }
